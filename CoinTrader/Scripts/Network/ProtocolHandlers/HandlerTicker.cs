@@ -18,19 +18,19 @@ namespace Network
         /// <summary>
         /// 최근 거래 일자(UTC)
         /// </summary>
-        public DateTime trade_date;
+        public string trade_date;
         /// <summary>
         /// 최근 거래 시각(UTC)
         /// </summary>
-        public DateTime trade_time;
+        public string trade_time;
         /// <summary>
         ///  최근 거래 일자(KST)
         /// </summary>
-        public DateTime trade_date_kst;
+        public string trade_date_kst;
         /// <summary>
         /// 최근 거래 시각(KST)
         /// </summary>
-        public DateTime trade_time_kst;
+        public string trade_time_kst;
         /// <summary>
         /// 시가
         /// </summary>
@@ -113,33 +113,81 @@ namespace Network
         /// 타임스탬프
         /// </summary>
         public long timestamp;
+
+        /// <summary>
+        /// 표준 시간 구분
+        /// </summary>
+        public enum eTimeType
+        {
+            /// <summary>
+            /// 세계협정시
+            /// </summary>
+            UTC,
+            /// <summary>
+            /// 한국 표준 시간
+            /// </summary>
+            KST,
+        }
+
+        /// <summary>
+        /// 거래 DateTime 가져오기
+        /// </summary>
+        /// <param name="timeType">표준 시간 기준</param>
+        /// <returns>거래 시간</returns>
+        public DateTime GetTradeDateTime(eTimeType timeType)
+        {
+            string strDate = string.Empty;
+            string strTime = string.Empty;
+
+            switch (timeType)
+            {
+                case eTimeType.UTC:
+                    strDate = trade_date.ToString();
+                    strTime = trade_time.ToString();
+                    break;
+                case eTimeType.KST:
+                    strDate = trade_date_kst.ToString();
+                    strTime = trade_time_kst.ToString();
+                    break;
+                default:
+                    break;
+            }
+
+            int year = int.Parse(strDate.Substring(0, 4));
+            int month = int.Parse(strDate.Substring(4, 2));
+            int day = int.Parse(strDate.Substring(6, 2));
+            int hour = int.Parse(strTime.Substring(0, 2));
+            int minute = int.Parse(strTime.Substring(2, 2));
+            int second = int.Parse(strTime.Substring(4, 2));
+            return new DateTime(year, month, day, hour, minute, second);
+        }
     }
 
     public class HandlerTicker : ProtocolHandler
     {
         public HandlerTicker()
         {
-            this.URI = new Uri(ProtocolManager.BASE_URL + "ticker?markets=BTC-ETH"); // <- 코드 수정해야함 POST와 GET 방식으로 설계되도록
+            this.URI = new Uri(ProtocolManager.BASE_URL + "ticker?");
             this.Method = Method.Get;
         }
 
-        public void Request(Action<bool> onFinished = null)
+        public void Request(string market, Action<bool> onFinished = null)
         {
-            RestRequest request = new RestRequest(URI, Method);
+            RestRequest request = new RestRequest(URI + $"market={market}", Method);
             request.AddHeader("Accept", "application/json");
             base.RequestProcess(request, onFinished);
         }
 
-        protected override void Response(RestRequest req, RestResponse res)
+        protected override void Response(RestRequest request, RestResponse response)
         {
-            if (res.IsSuccessful)
+            if (response.IsSuccessful)
             {
-                List<TickerRes> tickerRes = JsonParser<TickerRes>(res.Content);
+                List<TickerRes> res = JsonParser<TickerRes>(response.Content);
             }
             else
             {
-                if (res.ErrorMessage != null)
-                    Logger.Error(res.ErrorMessage);
+                if (response.ErrorMessage != null)
+                    Logger.Error(response.ErrorMessage);
             }
         }
     }

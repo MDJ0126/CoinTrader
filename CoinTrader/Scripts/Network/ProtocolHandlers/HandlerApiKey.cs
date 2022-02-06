@@ -37,16 +37,16 @@ namespace Network
             base.RequestProcess(request, onFinished);
         }
 
-        protected override void Response(RestRequest req, RestResponse res)
+        protected override void Response(RestRequest request, RestResponse response)
         {
-            if (res.IsSuccessful)
+            if (response.IsSuccessful)
             {
-                List<ApiKeyRes> apiKeyRea = JsonParser<ApiKeyRes>(res.Content);
+                List<ApiKeyRes> res = JsonParser<ApiKeyRes>(response.Content);
             }
             else
             {
-                if (res.ErrorMessage != null)
-                    Logger.Error(res.ErrorMessage);
+                if (response.ErrorMessage != null)
+                    Logger.Error(response.ErrorMessage);
             }
         }
     }

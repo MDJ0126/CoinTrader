@@ -9,47 +9,40 @@ namespace Network
     /// <summary>
     /// 전체 계좌 조회
     /// </summary>
-    public class AccountRes : iResponse
+    public class MarketRes : iResponse
     {
         /// <summary>
-        /// 화폐를 의미하는 영문 대문자 코드
+        /// 업비트에서 제공중인 시장 정보
         /// </summary>
-        public string currency;
+        public string market;
         /// <summary>
-        /// 주문가능 금액/수량
+        /// 거래 대상 암호화폐 한글명
         /// </summary>
-        public float balance;
+        public string korean_name;
         /// <summary>
-        /// 주문 중 묶여있는 금액/수량
+        /// 거래 대상 암호화폐 영문명
         /// </summary>
-        public float locked;
+        public string english_name;
         /// <summary>
-        /// 매수평균가
+        /// 유의 종목 여부
+        /// NONE(해당 사항 없음), CAUTION(투자유의)
         /// </summary>
-        public float avg_buy_price;
-        /// <summary>
-        /// 매수평균가 수정 여부
-        /// </summary>
-        public bool avg_buy_price_modified;
-        /// <summary>
-        /// 평단가 기준 화폐
-        /// </summary>
-        public string unit_currency;
+        public string market_warning;
     }
 
-    public class HandlerAccount : ProtocolHandler
+    public class HandlerMarket : ProtocolHandler
     {
-        public HandlerAccount()
+        public HandlerMarket()
         {
-            this.URI = new Uri(ProtocolManager.BASE_URL + "accounts");
+            this.URI = new Uri(ProtocolManager.BASE_URL + "market/all");
             this.Method = Method.Get;
         }
 
         public void Request(Action<bool> onFinished = null)
         {
             RestRequest request = new RestRequest(URI, Method);
-            request.AddHeader("Authorization", ProtocolManager.GetAuthToken());
             request.AddHeader("Accept", "application/json");
+            request.AddHeader("isDetails", "true");
             base.RequestProcess(request, onFinished);
         }
 
@@ -57,7 +50,8 @@ namespace Network
         {
             if (response.IsSuccessful)
             {
-                List<AccountRes> res = JsonParser<AccountRes>(response.Content);
+                List<MarketRes> res = JsonParser<MarketRes>(response.Content);
+                ModelCenter.MarketModel.MarketRes = res;
             }
             else
             {

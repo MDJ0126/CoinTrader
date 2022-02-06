@@ -111,7 +111,9 @@ namespace Network
                                     fieldInfo.SetValue(convertRes, jToken.ToObject<Boolean>());
                                     break;
                                 case "DateTime":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<DateTime>());
+                                    {
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<DateTime>());
+                                    }
                                     break;
                                 case "String":
                                     fieldInfo.SetValue(convertRes, jToken.ToString());
