@@ -173,7 +173,7 @@ namespace Network
 
         public void Request(string market, Action<bool> onFinished = null)
         {
-            RestRequest request = new RestRequest(URI + $"market={market}", Method);
+            RestRequest request = new RestRequest(URI + $"markets={market}", Method);
             request.AddHeader("Accept", "application/json");
             base.RequestProcess(request, onFinished);
         }
