@@ -18,7 +18,7 @@ namespace CoinTrader
             InitializeComponent();
             ProtocolManager.GetHandler<HandlerAccount>().Request();
             ProtocolManager.GetHandler<HandlerApiKey>().Request();
-            ProtocolManager.GetHandler<HandlerTicker>().Request("KRW-BTC");
+            ProtocolManager.GetHandler<HandlerTicker>().Request("KRW-BTC, BTC-ETH");
             ProtocolManager.GetHandler<HandlerMarket>().Request();
         }
     }

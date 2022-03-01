@@ -8,9 +8,9 @@ namespace Network
 {
     public abstract class ProtocolHandler
     {
-        protected static Dictionary<string, RemainingReq> RemainingReqs { get; } = new Dictionary<string,RemainingReq>();
+        protected static Dictionary<string, RemainingReq> RemainingReqs { get; } = new Dictionary<string, RemainingReq>();
 
-        public delegate void RestRequestDelegate(RestRequest request, Action<RestResponse> onResponse);
+        public delegate void RestRequestDelegate(ProtocolHandler protocolHandler, RestRequest request, Action<RestResponse> onResponse);
         public RestRequestDelegate restRequest = null;
 
         protected Uri URI { get; set; }
@@ -21,6 +21,10 @@ namespace Network
         /// </summary>
         private Action<bool> onFinished = null;
 
+        /// <summary>
+        /// Request 요청 그룹
+        /// </summary>
+        private string group = string.Empty;    // => Unknown
 
         /// <summary>
         /// Rest 요청 프로세스
@@ -29,7 +33,7 @@ namespace Network
         protected void RequestProcess(RestRequest req, Action<bool> onFinished)
         {
             this.onFinished = onFinished;
-            restRequest?.Invoke(req, (res) =>
+            restRequest?.Invoke(this, req, (res) =>
             {
                 if (res.IsSuccessful)
                 {
@@ -52,6 +56,41 @@ namespace Network
         }
 
         /// <summary>
+        /// 요청 가능 횟수 차감
+        /// </summary>
+        public void UseReuqestCount()
+        {
+            if (RemainingReqs.TryGetValue(group, out var remainingReq))
+                remainingReq.UseRequestCount();
+        }
+
+        /// <summary>
+        /// 요청 가능한지 체크
+        /// </summary>
+        /// <returns></returns>
+        public bool IsCanRequest()
+        {
+            if (!string.IsNullOrEmpty(group))
+            {
+                if (RemainingReqs.TryGetValue(group, out var remainingReq))
+                {
+                    // 그룹에 대한 정보가 있는 경우 체크
+                    return remainingReq.IsCanRequest();
+                }
+                else
+                {
+                    // 그룹에 대한 정보가 없다는 것은 최초 통신 시도한다는 것으로 간주
+                    return true;
+                }
+            }
+            else
+            {
+                // 그룹을 모르기에 일단 통신 시도할 수 있다고 간주
+                return true;
+            }
+        }
+
+        /// <summary>
         /// 남은 요청 수 갱신
         /// 참고: https://docs.upbit.com/docs/user-request-guide
         /// </summary>
@@ -66,6 +105,7 @@ namespace Network
                     string group = Utils.GetHeaderValue((string)header.Value, "group");
                     if (!RemainingReqs.TryGetValue(group, out var value))
                     {
+                        this.group = group;
                         value = new RemainingReq();
                         RemainingReqs.Add(group, value);
                     }

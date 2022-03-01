@@ -17,16 +17,18 @@ namespace Network
 
         private class RequestInfo
         {
+            public ProtocolHandler protocolHandler;
             public RestRequest request;
             public Action<RestResponse> onResponse;
-            public RequestInfo(RestRequest request, Action<RestResponse> onResponse)
+            public RequestInfo(ProtocolHandler protocolHandler, RestRequest request, Action<RestResponse> onResponse)
             {
+                this.protocolHandler = protocolHandler;
                 this.request = request;
                 this.onResponse = onResponse;
             }
         }
 
-        private Queue<RequestInfo> restRequestDelegates = new Queue<RequestInfo>();
+        private Queue<RequestInfo> requestMessageQueue = new Queue<RequestInfo>();
 
         protected override void Install()
         {
@@ -49,9 +51,9 @@ namespace Network
         /// </summary>
         /// <param name="request"></param>
         /// <param name="onResponse"></param>
-        private void Request(RestRequest request, Action<RestResponse> onResponse)
+        private void Request(ProtocolHandler protocolHandler, RestRequest request, Action<RestResponse> onResponse)
         {
-            restRequestDelegates.Enqueue(new RequestInfo(request, onResponse));
+            requestMessageQueue.Enqueue(new RequestInfo(protocolHandler, request, onResponse));
         }
 
         /// <summary>
@@ -63,17 +65,23 @@ namespace Network
         {
             while (true)
             {
-                if (restRequestDelegates.Count > 0)
+                if (requestMessageQueue.Count > 0)
                 {
                     // 리스트 꺼내기
-                    var dequeue = restRequestDelegates.Dequeue();
+                    var dequeue = requestMessageQueue.Dequeue();
                     if (dequeue != null)
                     {
-                        // Request
-                        RestResponse response = await restClient.ExecuteAsync(dequeue.request);
+                        if (dequeue.protocolHandler.IsCanRequest())
+                        {
+                            // Request
+                            RestResponse response = await restClient.ExecuteAsync(dequeue.request);
+                            
+                            // 요청 횟수 차감
+                            dequeue.protocolHandler.UseReuqestCount();
 
-                        // Response
-                        dequeue.onResponse.Invoke(response);
+                            // Response
+                            dequeue.onResponse.Invoke(response);
+                        }
                     }
                 }
                 else
