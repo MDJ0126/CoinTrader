@@ -8,6 +8,8 @@ namespace Network
 {
     public abstract class ProtocolHandler
     {
+        protected static Dictionary<string, RemainingReq> RemainingReqs { get; } = new Dictionary<string,RemainingReq>();
+
         public delegate void RestRequestDelegate(RestRequest request, Action<RestResponse> onResponse);
         public RestRequestDelegate restRequest = null;
 
@@ -19,7 +21,6 @@ namespace Network
         /// </summary>
         private Action<bool> onFinished = null;
 
-        protected abstract void Response(RestRequest req, RestResponse res);
 
         /// <summary>
         /// Rest 요청 프로세스
@@ -32,6 +33,9 @@ namespace Network
             {
                 if (res.IsSuccessful)
                 {
+                    // 남은 요청 수 갱신
+                    UpdateRemainingReq(res);
+
                     // 표준 수신 처리
                     Response(req, res);
 
@@ -46,6 +50,31 @@ namespace Network
                 }
             });
         }
+
+        /// <summary>
+        /// 남은 요청 수 갱신
+        /// 참고: https://docs.upbit.com/docs/user-request-guide
+        /// </summary>
+        private void UpdateRemainingReq(RestResponse res)
+        {
+            var enumerator = res.Headers.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                var header = enumerator.Current;
+                if (header.Name.Equals(RemainingReq.HEADER_NAME))
+                {
+                    string group = Utils.GetHeaderValue((string)header.Value, "group");
+                    if (!RemainingReqs.TryGetValue(group, out var value))
+                    {
+                        value = new RemainingReq();
+                        RemainingReqs.Add(group, value);
+                    }
+                    value.Update((string)header.Value);
+                }
+            }
+        }
+
+        protected abstract void Response(RestRequest req, RestResponse res);
 
         /// <summary>
         /// Json 포맷을 Response 클래스로 변환

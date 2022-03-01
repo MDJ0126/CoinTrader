@@ -16,10 +16,10 @@ namespace CoinTrader
         public Form1()
         {
             InitializeComponent();
-            //ProtocolManager.GetHandler<HandlerAccount>().Request();
-            //ProtocolManager.GetHandler<HandlerApiKey>().Request();
+            ProtocolManager.GetHandler<HandlerAccount>().Request();
+            ProtocolManager.GetHandler<HandlerApiKey>().Request();
             ProtocolManager.GetHandler<HandlerTicker>().Request("KRW-BTC");
-            //ProtocolManager.GetHandler<HandlerMarket>().Request();
+            ProtocolManager.GetHandler<HandlerMarket>().Request();
         }
     }
 }

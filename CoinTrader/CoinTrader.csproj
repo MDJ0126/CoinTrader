@@ -105,7 +105,7 @@
     <Compile Include="Scripts\Model\ModelCenter.cs" />
     <Compile Include="Scripts\Network\ProtocolHandlers\HandlerMarket.cs" />
     <Compile Include="Scripts\Network\ProtocolHandlers\HandlerTicker.cs" />
-    <Compile Include="Scripts\Network\ResponseData.cs" />
+    <Compile Include="Scripts\Network\RemainingReq.cs" />
     <Compile Include="Scripts\Network\ProtocolHandlers\HandlerApiKey.cs" />
     <Compile Include="Scripts\Network\ProtocolHandlers\HandlerAccount.cs" />
     <Compile Include="Scripts\Network\ProtocolHandler.cs" />
