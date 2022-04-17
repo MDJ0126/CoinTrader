@@ -27,19 +27,29 @@ public static class Time
         }
     }
 
+    private static Thread thread = null;
+
     public static void Start()
     {
-        startedTime = DateTime.Now;
-        realtimeSinceStartup = 0f;
-        Thread thread = new Thread(() =>
+        if (thread == null)
         {
-            int UpdateInterval = (int)(realtimeSinceStartup_UpdateInterval * 1000);
-            while (true)
+            startedTime = DateTime.Now;
+            realtimeSinceStartup = 0f;
+            thread = new Thread(() =>
             {
-                Thread.Sleep(UpdateInterval);
-                realtimeSinceStartup += UpdateInterval / 1000f;
-            }
-        });
-        thread.Start();
+                int UpdateInterval = (int)(realtimeSinceStartup_UpdateInterval * 1000);
+                while (true)
+                {
+                    Thread.Sleep(UpdateInterval);
+                    realtimeSinceStartup += UpdateInterval / 1000f;
+                }
+            });
+            thread.Start();
+        }
+    }
+
+    public static void Stop()
+    {
+        thread?.Abort();
     }
 }

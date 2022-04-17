@@ -6,7 +6,7 @@ public static class Logger
 {
     public delegate void OnAddLog(string text);
     private static event OnAddLog onLog;
-    public static event OnAddLog OnLog
+    public static event OnAddLog OnLogger
     {
         add
         {
