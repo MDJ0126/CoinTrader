@@ -26,21 +26,20 @@ namespace CoinTrader
         {
             Initialize();
             Logger.OnLogger += OnLogger;
-            Logger.Log(1);
-            Logger.Log(2);
-            Logger.Log(3);
-            Logger.Log(4);
-            Logger.Log(5);
         }
 
         private void Initialize()
         {
-            textBox1.Text = string.Empty;
+            listView1.Items.Clear();
+            listView1.DoubleBuffered(true);
         }
 
         private void OnLogger(string text)
         {
-            textBox1.Text += $"{text}\r\n";
+            listView1.BeginUpdate();
+            listView1.Items.Add(text);
+            listView1.EndUpdate();
+            listView1.Items[listView1.Items.Count - 1].EnsureVisible();
         }
     }
 }

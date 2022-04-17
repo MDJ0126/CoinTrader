@@ -18,11 +18,13 @@ namespace CoinTrader
             Mutex mutex = new Mutex(true, "F2D98EF4-4736-4DE4-BD7B-F8267D914387", out bool createNew);
             if (createNew)
             {
-                Time.Start();
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+
+                Logger.Start();
+                Time.Start();
                 Application.Run(new Form1());
-                Time.Stop();
+                MultiThread.Release();
                 mutex.ReleaseMutex();
             }
             else

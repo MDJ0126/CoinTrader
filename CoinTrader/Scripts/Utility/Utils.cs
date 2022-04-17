@@ -42,4 +42,15 @@ public static class Utils
 		}
 		return value;
 	}
+
+	/// <summary>
+	/// 더블 버퍼링 옵션
+	/// </summary>
+	/// <param name="control"></param>
+	/// <param name="enabled"></param>
+	public static void DoubleBuffered(this System.Windows.Forms.Control control, bool enabled)
+	{
+		var prop = control.GetType().GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
+		prop.SetValue(control, enabled, null);
+	}
 }

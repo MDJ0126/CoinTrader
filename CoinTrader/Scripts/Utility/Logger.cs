@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 
 public static class Logger
 {
@@ -19,28 +20,31 @@ public static class Logger
         }
     }
 
-    private const int LOG_COUNT_MAX = 20;
-
-    public static Queue<object> Logs { get; private set; } = new Queue<object>();
+    public static Queue<string> Logs { get; private set; } = new Queue<string>();
 
     private static StringBuilder sb = new StringBuilder();
+
+    private static string CurrentTime()
+    {
+        return Time.NowTime.ToString("[HH:mm:ss]");
+    }
 
     public static void Log(object obj)
     {
         sb.Length = 0;
-        Add(sb.Append("[Log] ").Append(obj).ToString());
+        Add(sb.Append(CurrentTime()).Append("[Log] ").Append(obj).ToString());
     }
 
     public static void Warning(object obj)
     {
         sb.Length = 0;
-        Add(sb.Append("[LogWarning] ").Append(obj).ToString());
+        Add(sb.Append(CurrentTime()).Append("[LogWarning] ").Append(obj).ToString());
     }
 
     public static void Error(object obj)
     {
         sb.Length = 0;
-        Add(sb.Append("[LogError] ").Append(obj).ToString());
+        Add(sb.Append(CurrentTime()).Append("[LogError] ").Append(obj).ToString());
     }
 
     public static string GetLogs()
@@ -54,19 +58,33 @@ public static class Logger
         return sb.ToString();
     }
 
+    public static void Start()
+    {
+        Timer timer = new Timer();
+        timer.Interval = 100;
+        timer.Tick += (sender, eventArgs) => Update();
+        timer.Start();
+    }
+
+    public static void Update()
+    {
+        if (Logs.Count > 0)
+        {
+            string text = Logs.Dequeue();
+            if (!string.IsNullOrEmpty(text))
+            {
+                // Console 출력
+                Console.WriteLine(text);
+
+                // 로그 추가 이벤트 발생
+                onLog?.Invoke(text);
+            }
+        }
+    }
+
     private static void Add(string text)
     {
         // 추가
         Logs.Enqueue(text);
-
-        // 정리
-        if (Logs.Count > LOG_COUNT_MAX)
-            Logs.Dequeue();
-
-        // Console 출력
-        Console.WriteLine(text);
-
-        // 로그 추가 이벤트 발생
-        onLog?.Invoke(text);
     }
 }
