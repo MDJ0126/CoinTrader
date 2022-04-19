@@ -68,7 +68,7 @@ public static class Logger
 
     public static void Update()
     {
-        if (Logs.Count > 0)
+        while (Logs.Count > 0)
         {
             string text = Logs.Dequeue();
             if (!string.IsNullOrEmpty(text))
