@@ -1,6 +1,6 @@
-﻿using MetroFramework.Forms;
-using Network;
+﻿using Network;
 using System;
+using MetroFramework.Forms;
 using System.Windows.Forms;
 
 namespace CoinTrader
@@ -36,10 +36,13 @@ namespace CoinTrader
 
         private void OnLogger(string text)
         {
-            listView1.BeginUpdate();
             listView1.Items.Add(text);
-            listView1.EndUpdate();
-            listView1.Items[listView1.Items.Count - 1].EnsureVisible();
+            listView1.EnsureVisible(listView1.Items.Count - 1);
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
