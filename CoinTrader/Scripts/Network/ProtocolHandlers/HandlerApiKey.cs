@@ -23,25 +23,27 @@ namespace Network
 
     public class HandlerApiKey : ProtocolHandler
     {
+        private List<ApiKeyRes> res = null;
+
         public HandlerApiKey()
         {
             this.URI = new Uri(ProtocolManager.BASE_URL + "api_keys");
             this.Method = Method.Get;
         }
 
-        public void Request(Action<bool> onFinished = null)
+        public void Request(Action<bool, List<ApiKeyRes>> onFinished = null)
         {
             RestRequest request = new RestRequest(URI, Method);
             request.AddHeader("Authorization", ProtocolManager.GetAuthToken());
             request.AddHeader("Accept", "application/json");
-            base.RequestProcess(request, onFinished);
+            base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
         }
 
         protected override void Response(RestRequest request, RestResponse response)
         {
             if (response.IsSuccessful)
             {
-                List<ApiKeyRes> res = JsonParser<ApiKeyRes>(response.Content);
+                res = JsonParser<ApiKeyRes>(response.Content);
             }
             else
             {

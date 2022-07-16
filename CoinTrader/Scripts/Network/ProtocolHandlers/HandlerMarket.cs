@@ -32,25 +32,27 @@ namespace Network
 
     public class HandlerMarket : ProtocolHandler
     {
+        private List<MarketRes> res = null;
+
         public HandlerMarket()
         {
             this.URI = new Uri(ProtocolManager.BASE_URL + "market/all");
             this.Method = Method.Get;
         }
 
-        public void Request(Action<bool> onFinished = null)
+        public void Request(Action<bool, List<MarketRes>> onFinished = null)
         {
             RestRequest request = new RestRequest(URI, Method);
             request.AddHeader("Accept", "application/json");
             request.AddHeader("isDetails", "true");
-            base.RequestProcess(request, onFinished);
+            base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
         }
 
         protected override void Response(RestRequest request, RestResponse response)
         {
             if (response.IsSuccessful)
             {
-                List<MarketRes> res = JsonParser<MarketRes>(response.Content);
+                res = JsonParser<MarketRes>(response.Content);
                 ModelCenter.MarketModel.MarketRes = res;
             }
             else

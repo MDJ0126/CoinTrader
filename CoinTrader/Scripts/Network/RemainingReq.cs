@@ -53,14 +53,8 @@ namespace Network
             return false;
         }
 
-        public void UseRequestCount()
-        {
-            --seconds;
-        }
+        public void UseRequestCount() => --seconds;
 
-        public override string ToString()
-        {
-            return $"group: {group}, min: {minutes}, sec: {seconds}";
-        }
+        public override string ToString() => $"group: {group}, min: {minutes}, sec: {seconds}";
     }
 }

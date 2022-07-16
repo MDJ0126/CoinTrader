@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using System.Threading;
 
 namespace Network
 {
@@ -15,29 +14,9 @@ namespace Network
 
         private RestClient restClient = new RestClient(BASE_URL);
 
-        private class RequestInfo
-        {
-            public ProtocolHandler protocolHandler;
-            public RestRequest request;
-            public Action<RestResponse> onResponse;
-            public RequestInfo(ProtocolHandler protocolHandler, RestRequest request, Action<RestResponse> onResponse)
-            {
-                this.protocolHandler = protocolHandler;
-                this.request = request;
-                this.onResponse = onResponse;
-            }
-        }
-
-        private Queue<RequestInfo> requestMessageQueue = new Queue<RequestInfo>();
-
         protected override void Install()
         {
-            MultiThread.Start(RequestProcess);
-            // 여러개를 사용하면 속도가 빨라지는데, 필요할 때 다르게 사용하자
-            //MultiThread.Start(RequestProcess);
-            //MultiThread.Start(RequestProcess);
-            //MultiThread.Start(RequestProcess);
-            //MultiThread.Start(RequestProcess);
+
         }
 
         protected override void Release()
@@ -51,44 +30,18 @@ namespace Network
         /// </summary>
         /// <param name="request"></param>
         /// <param name="onResponse"></param>
-        private void Request(ProtocolHandler protocolHandler, RestRequest request, Action<RestResponse> onResponse)
+        private async void Request(ProtocolHandler protocolHandler, RestRequest request, Action<RestResponse> onResponse)
         {
-            requestMessageQueue.Enqueue(new RequestInfo(protocolHandler, request, onResponse));
-        }
-
-        /// <summary>
-        /// 요청 프로세스 (쓰레드)
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="onResponse"></param>
-        private async void RequestProcess()
-        {
-            while (true)
+            if (protocolHandler.CanRequest())
             {
-                if (requestMessageQueue.Count > 0)
-                {
-                    // 리스트 꺼내기
-                    var dequeue = requestMessageQueue.Dequeue();
-                    if (dequeue != null)
-                    {
-                        if (dequeue.protocolHandler.IsCanRequest())
-                        {
-                            // Request
-                            RestResponse response = await restClient.ExecuteAsync(dequeue.request);
-                            
-                            // 요청 횟수 차감
-                            dequeue.protocolHandler.UseReuqestCount();
+                // 요청 횟수 차감
+                protocolHandler.UseReuqestCount();
 
-                            // Response
-                            dequeue.onResponse.Invoke(response);
-                        }
-                    }
-                }
-                else
-                {
-                    // 반복 대기 (0.1초마다 Queue 확인)
-                    Thread.Sleep(100);
-                }
+                // Request
+                RestResponse response = await restClient.ExecuteAsync(request);
+
+                // Reponse
+                onResponse?.Invoke(response);
             }
         }
 

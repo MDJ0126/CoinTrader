@@ -1,12 +1,5 @@
 ﻿using Network;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CoinTrader
@@ -19,7 +12,11 @@ namespace CoinTrader
             ProtocolManager.GetHandler<HandlerAccount>().Request();
             ProtocolManager.GetHandler<HandlerApiKey>().Request();
             ProtocolManager.GetHandler<HandlerTicker>().Request("KRW-BTC, BTC-ETH");
-            ProtocolManager.GetHandler<HandlerMarket>().Request();
+            ProtocolManager.GetHandler<HandlerMarket>().Request((result, res) => 
+            {
+                Logger.Error(MultiThread.IsCurrentMainThread());
+                listView1.Items.Clear();    // UI 쓰레드 접근 가능
+            });
         }
 
         private void Form1_Load(object sender, EventArgs e)

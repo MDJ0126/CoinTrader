@@ -39,25 +39,27 @@ namespace Network
 
     public class HandlerAccount : ProtocolHandler
     {
+        private List<AccountRes> res = null;
+
         public HandlerAccount()
         {
             this.URI = new Uri(ProtocolManager.BASE_URL + "accounts");
             this.Method = Method.Get;
         }
 
-        public void Request(Action<bool> onFinished = null)
+        public void Request(Action<bool, List<AccountRes>> onFinished = null)
         {
             RestRequest request = new RestRequest(URI, Method);
             request.AddHeader("Authorization", ProtocolManager.GetAuthToken());
             request.AddHeader("Accept", "application/json");
-            base.RequestProcess(request, onFinished);
+            base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
         }
 
         protected override void Response(RestRequest request, RestResponse response)
         {
             if (response.IsSuccessful)
             {
-                List<AccountRes> res = JsonParser<AccountRes>(response.Content);
+                res = JsonParser<AccountRes>(response.Content);
             }
             else
             {

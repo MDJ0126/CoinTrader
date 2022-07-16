@@ -45,13 +45,9 @@ namespace Network
 
                     // 수신 처리 완료 콜백
                     onFinished?.Invoke(true);
-                    onFinished = null;
                 }
                 else
-                {
                     onFinished?.Invoke(false);
-                    onFinished = null;
-                }
             });
         }
 
@@ -68,7 +64,7 @@ namespace Network
         /// 요청 가능한지 체크
         /// </summary>
         /// <returns></returns>
-        public bool IsCanRequest()
+        public bool CanRequest()
         {
             if (!string.IsNullOrEmpty(group))
             {

@@ -165,24 +165,26 @@ namespace Network
 
     public class HandlerTicker : ProtocolHandler
     {
+        private List<TickerRes> res = null;
+
         public HandlerTicker()
         {
             this.URI = new Uri(ProtocolManager.BASE_URL + "ticker?");
             this.Method = Method.Get;
         }
 
-        public void Request(string market, Action<bool> onFinished = null)
+        public void Request(string market, Action<bool, List<TickerRes>> onFinished = null)
         {
             RestRequest request = new RestRequest(URI + $"markets={market}", Method);
             request.AddHeader("Accept", "application/json");
-            base.RequestProcess(request, onFinished);
+            base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
         }
 
         protected override void Response(RestRequest request, RestResponse response)
         {
             if (response.IsSuccessful)
             {
-                List<TickerRes> res = JsonParser<TickerRes>(response.Content);
+                res = JsonParser<TickerRes>(response.Content);
             }
             else
             {

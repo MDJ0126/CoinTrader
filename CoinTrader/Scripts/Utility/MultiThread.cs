@@ -65,11 +65,19 @@ public class MultiThread
     public static readonly int THREAD_MIN = 50;
     public static readonly int THREAD_MAX = 2000;   // 동시 사용 메모리 최대 2GB로 하자
 
+    private static Thread _mainThread = null;
+
     static MultiThread()
     {
+        _mainThread = Thread.CurrentThread;
         ThreadPool.SetMinThreads(THREAD_MIN, THREAD_MIN);
         ThreadPool.SetMaxThreads(THREAD_MAX, THREAD_MAX);
     }
+
+    /// <summary>
+    /// 현재 쓰레드가 메인 쓰레드인지 여부
+    /// </summary>
+    public static bool IsCurrentMainThread() => _mainThread.Equals(Thread.CurrentThread);
 
     /// <summary>
     /// 쓰레드로 함수 실행
