@@ -62,8 +62,8 @@ public class MultiThread
 
     // 쓰레드가 사용되고 있을 때는 메모리 1MB 가량 차지한다.
     // 동시 실행되고 있는 쓰레드가 1000개는 곧 메모리 1GB를 사용하고 있다는 것을 의미한다.
-    public static readonly int THREAD_MIN = 50;
-    public static readonly int THREAD_MAX = 2000;   // 동시 사용 메모리 최대 2GB로 하자
+    public static readonly int THREAD_MIN = 32;
+    public static readonly int THREAD_MAX = 1024;   // 동시 사용 메모리 최대 1GB로 하자
 
     private static Thread _mainThread = null;
 

@@ -1,15 +1,98 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
+using System.IO;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public static class Utils
 {
-	/// <summary>
-	/// Enum 확장메소드, Description 읽어오기
-	/// </summary>
-	/// <param name="source"></param>
-	/// <returns></returns>
-	public static string ToDescription(this Enum source)
+    private static string SOLUTION_NAME = Assembly.GetEntryAssembly().GetName().Name;
+    private static string APPDATA_PATH = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"/{SOLUTION_NAME}";
+
+    /// <summary>
+    /// 파일 저장
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="name"></param>
+    /// <param name="instance"></param>
+    public static void FileSave<T>(string name, T instance)
+    {
+        using (MemoryStream ms = new MemoryStream())
+        {
+            try
+            {
+                // 부모 폴더가 없으면 생성
+                DirectoryInfo di = new DirectoryInfo(APPDATA_PATH);
+                if (!di.Exists) di.Create();
+
+                // 바이너리 직렬화 후 파일로 저장
+                var bf = new BinaryFormatter();
+                bf.Serialize(ms, instance);
+                using (StreamWriter writer = new StreamWriter(APPDATA_PATH + $"/{name}.dat"))
+                {
+                    writer.Write(Convert.ToBase64String(ms.ToArray()));
+                    writer.Close();
+                }
+            }
+            catch { }
+        }
+    }
+
+    /// <summary>
+    /// 파일 불러오기
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public static T FileLoad<T>(string name)
+    {
+        try
+        {
+            // 파일 읽기
+            byte[] bytes;
+            using (StreamReader reader = new StreamReader(APPDATA_PATH + $"/{name}.dat"))
+            {
+                bytes = Convert.FromBase64String(reader.ReadToEnd());
+                reader.Close();
+            }
+
+            // 바이너리 역직렬화 후 반환
+            using (MemoryStream ms = new MemoryStream(bytes))
+            {
+                object obj = new BinaryFormatter().Deserialize(ms);
+                return (T)obj;
+            }
+        }
+        catch
+        {
+            return default(T);
+        }
+    }
+
+    /// <summary>
+    /// 폼 캡쳐
+    /// </summary>
+    /// <param name="control"></param>
+    /// <returns></returns>
+    public static string Capture(this System.Windows.Forms.Control control)
+    {
+        // 경로 참고: https://pcsak3.com/502
+        string strFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+        string strOutput = $"{strFolder}/{SOLUTION_NAME}.png";
+        Bitmap bmp = new Bitmap(control.Size.Width, control.Size.Height);
+        Graphics grp = Graphics.FromImage(bmp);
+        grp.CopyFromScreen(new Point(control.Bounds.X, control.Bounds.Y), new Point(0, 0), control.Size);
+        bmp.Save(strOutput, System.Drawing.Imaging.ImageFormat.Png);
+        return strOutput;
+    }
+
+    /// <summary>
+    /// Enum 확장메소드, Description 읽어오기
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string ToDescription(this Enum source)
 	{
 		FieldInfo fi = source.GetType().GetField(source.ToString());
 		var att = (DescriptionAttribute)fi.GetCustomAttribute(typeof(DescriptionAttribute));

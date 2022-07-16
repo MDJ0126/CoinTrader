@@ -1,14 +1,17 @@
-﻿using Network;
+﻿using MetroFramework.Forms;
+using Network;
 using System;
 using System.Windows.Forms;
 
 namespace CoinTrader
 {
-    public partial class Form1 : Form
+    public partial class Form1 : MetroForm
     {
         public Form1()
         {
             InitializeComponent();
+            this.StyleManager = metroStyleManager;
+            //this.StyleManager.Theme = MetroFramework.MetroThemeStyle.Dark;
             ProtocolManager.GetHandler<HandlerAccount>().Request();
             ProtocolManager.GetHandler<HandlerApiKey>().Request();
             ProtocolManager.GetHandler<HandlerTicker>().Request("KRW-BTC, BTC-ETH");

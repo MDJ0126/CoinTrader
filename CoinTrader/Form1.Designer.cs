@@ -29,18 +29,21 @@ namespace CoinTrader
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.listView1 = new System.Windows.Forms.ListView();
+            this.listView1 = new MetroFramework.Controls.MetroListView();
             this.Log = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.metroStyleManager = new MetroFramework.Components.MetroStyleManager(this.components);
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
             // 
             this.panel1.Controls.Add(this.listView1);
-            this.panel1.Location = new System.Drawing.Point(12, 12);
+            this.panel1.Location = new System.Drawing.Point(12, 63);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(776, 426);
+            this.panel1.Size = new System.Drawing.Size(776, 375);
             this.panel1.TabIndex = 1;
             // 
             // listView1
@@ -53,7 +56,7 @@ namespace CoinTrader
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(0, 0);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(776, 426);
+            this.listView1.Size = new System.Drawing.Size(776, 375);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -62,6 +65,10 @@ namespace CoinTrader
             // 
             this.Log.Text = "";
             this.Log.Width = 770;
+            // 
+            // metroStyleManager
+            // 
+            this.metroStyleManager.Owner = null;
             // 
             // Form1
             // 
@@ -73,14 +80,16 @@ namespace CoinTrader
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.ListView listView1;
+        private MetroFramework.Controls.MetroListView listView1;
         internal System.Windows.Forms.ColumnHeader Log;
+        private MetroFramework.Components.MetroStyleManager metroStyleManager;
     }
 }
 
