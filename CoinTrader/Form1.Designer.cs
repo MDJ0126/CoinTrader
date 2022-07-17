@@ -39,6 +39,7 @@ namespace CoinTrader
             this.listView1 = new MetroFramework.Controls.MetroListView();
             this.Log = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.optionTabPage = new MetroFramework.Controls.MetroTabPage();
+            this.metroButton1 = new MetroFramework.Controls.MetroButton();
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).BeginInit();
             this.metroTabControl1.SuspendLayout();
             this.logTabPage.SuspendLayout();
@@ -129,11 +130,22 @@ namespace CoinTrader
             this.optionTabPage.VerticalScrollbarHighlightOnWheel = false;
             this.optionTabPage.VerticalScrollbarSize = 10;
             // 
+            // metroButton1
+            // 
+            this.metroButton1.Location = new System.Drawing.Point(520, 36);
+            this.metroButton1.Name = "metroButton1";
+            this.metroButton1.Size = new System.Drawing.Size(139, 35);
+            this.metroButton1.TabIndex = 3;
+            this.metroButton1.Text = "metroButton1";
+            this.metroButton1.UseSelectable = true;
+            this.metroButton1.Click += new System.EventHandler(this.metroButton1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.metroButton1);
             this.Controls.Add(this.metroTabControl1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -157,6 +169,7 @@ namespace CoinTrader
         internal System.Windows.Forms.ColumnHeader Log;
         private MetroFramework.Controls.MetroTabPage logTabPage;
         private MetroFramework.Controls.MetroTabPage optionTabPage;
+        private MetroFramework.Controls.MetroButton metroButton1;
     }
 }
 

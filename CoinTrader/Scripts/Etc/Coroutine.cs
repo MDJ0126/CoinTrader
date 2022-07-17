@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace System.Windows.Forms
@@ -14,7 +15,6 @@ namespace System.Windows.Forms
 
     public static class CoroutineSchedule
     {
-
         private static List<Coroutine> coroutines = new List<Coroutine>();
         private static List<Coroutine> waitAdds = new List<Coroutine>();
         private static List<Coroutine> waitRemoves = new List<Coroutine>();
@@ -23,6 +23,9 @@ namespace System.Windows.Forms
 
         public static Coroutine StartCoroutine(this Control control, IEnumerator enumerator)
         {
+            var form = control as Form;
+            if (form != null) form.FormClosing += FormCloseing;
+
             Coroutine coroutine = new Coroutine { control = control, enumerator = enumerator };
             coroutines.Add(coroutine);
             if (!isStarted) Updater();
@@ -33,6 +36,12 @@ namespace System.Windows.Forms
         {
             if (coroutine != null)
                 waitRemoves.Add(coroutine);
+        }
+
+        private static void FormCloseing(object sender, FormClosingEventArgs e)
+        {
+            List<Coroutine> closeCoroutines = coroutines.FindAll(co => co.control.Equals(sender));
+            waitRemoves.AddRange(closeCoroutines);
         }
 
         private static void YieldCoroutine(Coroutine coroutineInfo)
