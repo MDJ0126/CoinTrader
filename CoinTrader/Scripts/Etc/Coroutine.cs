@@ -15,40 +15,62 @@ namespace System.Windows.Forms
 
     public static class CoroutineSchedule
     {
+        private const int UPDATE_INTERVAL = 100;    // 0.1초
+
         private static List<Coroutine> coroutines = new List<Coroutine>();
         private static List<Coroutine> waitAdds = new List<Coroutine>();
         private static List<Coroutine> waitRemoves = new List<Coroutine>();
 
         private static bool isStarted = false;
 
+        /// <summary>
+        /// 코루틴 시작
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="enumerator"></param>
+        /// <returns></returns>
         public static Coroutine StartCoroutine(this Control control, IEnumerator enumerator)
         {
-            var form = control as Form;
-            if (form != null) form.FormClosing += FormCloseing;
-
+            control.HandleDestroyed += HandleDestroyed;
             Coroutine coroutine = new Coroutine { control = control, enumerator = enumerator };
             coroutines.Add(coroutine);
             if (!isStarted) Updater();
             return coroutine;
         }
 
+        /// <summary>
+        /// 코루틴 중지
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="coroutine"></param>
         public static void StopCoroutine(this Control control, Coroutine coroutine)
         {
             if (coroutine != null)
                 waitRemoves.Add(coroutine);
         }
 
-        private static void FormCloseing(object sender, FormClosingEventArgs e)
+        /// <summary>
+        /// 핸들러 소멸 이벤트 (코루틴에서 삭제 처리)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void HandleDestroyed(object sender, EventArgs e)
         {
-            List<Coroutine> closeCoroutines = coroutines.FindAll(co => co.control.Equals(sender));
-            waitRemoves.AddRange(closeCoroutines);
+            waitRemoves.Add(coroutines.Find(co => co.control.Equals(sender)));
         }
 
+        /// <summary>
+        /// 코루틴 연장 처리
+        /// </summary>
+        /// <param name="coroutineInfo"></param>
         private static void YieldCoroutine(Coroutine coroutineInfo)
         {
             coroutines.Add(new Coroutine { parent = coroutineInfo, control = coroutineInfo.control, enumerator = coroutineInfo.enumerator.Current as IEnumerator });
         }
 
+        /// <summary>
+        /// UPdater
+        /// </summary>
         public static async void Updater()
         {
             isStarted = true;
@@ -106,7 +128,7 @@ namespace System.Windows.Forms
                 }
                 waitRemoves.Clear();
 
-                // 반복기에서 연장되는 경우
+                // 반복기에서 반복기로 연장되는 경우
                 for (int i = 0; i < waitAdds.Count; i++)
                 {
                     YieldCoroutine(waitAdds[i]);
@@ -114,7 +136,7 @@ namespace System.Windows.Forms
                 waitAdds.Clear();
 
                 // 반복 주기
-                await Task.Delay(100);
+                await Task.Delay(UPDATE_INTERVAL);
             }
             isStarted = false;
         }
