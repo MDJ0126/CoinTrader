@@ -22,6 +22,12 @@ namespace CoinTrader
                 // UI 쓰레드 접근 가능 (현재 여기서 호출했으므로 해당 쓰레드를 가져옴)
                 Logger.Log("Ya!");
             });
+
+            // 계좌 리스트 뿌리기
+            // 종목 리스트 뿌리기
+            // 매입 리스트 뿌리기
+            // 그래프는 시간 날 때
+            // 폰트 적용
         }
 
         private void Form1_Load(object sender, EventArgs e)
