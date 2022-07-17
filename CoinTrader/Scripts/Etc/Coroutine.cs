@@ -69,7 +69,7 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        /// UPdater
+        /// Updater
         /// </summary>
         public static async void Updater()
         {
