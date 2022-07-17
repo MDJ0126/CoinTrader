@@ -2,6 +2,7 @@
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Reflection;
 
 namespace Network
@@ -15,6 +16,16 @@ namespace Network
 
         protected Uri URI { get; set; }
         protected Method Method { get; set; }
+
+        /// <summary>
+        /// 데이터 사용량
+        /// </summary>
+        public ulong dataUsage = 0;
+
+        /// <summary>
+        /// 총 요청 횟수
+        /// </summary>
+        public int requestCount = 0;
 
         /// <summary>
         /// 통신 요청 정보 캐싱
@@ -32,9 +43,11 @@ namespace Network
         /// <param name="onFinished"></param>
         protected void RequestProcess(RestRequest req, Action<bool> onFinished)
         {
+            ++requestCount;
             this.onFinished = onFinished;
             restRequest?.Invoke(this, req, (res) =>
             {
+                CheckDataUsage();
                 if (res.IsSuccessful)
                 {
                     // 남은 요청 수 갱신
@@ -176,9 +189,7 @@ namespace Network
                                     fieldInfo.SetValue(convertRes, jToken.ToObject<Boolean>());
                                     break;
                                 case "DateTime":
-                                    {
-                                        fieldInfo.SetValue(convertRes, jToken.ToObject<DateTime>());
-                                    }
+                                    fieldInfo.SetValue(convertRes, jToken.ToObject<DateTime>());
                                     break;
                                 case "String":
                                     fieldInfo.SetValue(convertRes, jToken.ToString());
@@ -196,6 +207,27 @@ namespace Network
                 Logger.Error(e.Message);
             }
             return list;
+        }
+
+        /// <summary>
+        /// 데이터 사용량 측적하기
+        /// </summary>
+        public void CheckDataUsage()
+        {
+            //if (NetworkInterface.GetIsNetworkAvailable())
+            //{
+            //    NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
+
+            //    for (int i = 0; i < interfaces.Length; i++)
+            //    {
+            //        NetworkInterface ni = interfaces[i];
+
+            //        var statics = ni.GetIPv4Statistics();
+            //        Logger.Log($"Bytes Sent: {statics.BytesSent}");
+            //        Logger.Log($"Bytes Received: {statics.BytesReceived}");
+            //        dataUsage += (ulong)(statics.BytesSent + statics.BytesReceived);
+            //    }
+            //}
         }
     }
 }

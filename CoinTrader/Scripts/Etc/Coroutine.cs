@@ -65,6 +65,7 @@ namespace System.Windows.Forms
         /// <param name="coroutineInfo"></param>
         private static void YieldCoroutine(Coroutine coroutineInfo)
         {
+            coroutineInfo.control.HandleDestroyed += HandleDestroyed;
             coroutines.Add(new Coroutine { parent = coroutineInfo, control = coroutineInfo.control, enumerator = coroutineInfo.enumerator.Current as IEnumerator });
         }
 
@@ -124,6 +125,7 @@ namespace System.Windows.Forms
                 // 반복기 종료 처리
                 for (int i = 0; i < waitRemoves.Count; i++)
                 {
+                    waitRemoves[i].control.HandleDestroyed -= HandleDestroyed;
                     coroutines.Remove(waitRemoves[i]);
                 }
                 waitRemoves.Clear();

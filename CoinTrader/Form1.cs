@@ -3,6 +3,7 @@ using System;
 using MetroFramework.Forms;
 using System.Collections;
 using System.Windows.Forms;
+using System.Net.NetworkInformation;
 
 namespace CoinTrader
 {
@@ -27,17 +28,6 @@ namespace CoinTrader
         {
             Initialize();
             Logger.OnLogger += OnLogger;
-            this.StartCoroutine(Test());
-        }
-
-        private IEnumerator Test()
-        {
-            int count = 0;
-            while (true)
-            {
-                metroButton1.Text = (++count).ToString();
-                yield return new WaitForSeconds(0.1f);
-            }
         }
 
         private void Initialize()
@@ -50,12 +40,6 @@ namespace CoinTrader
         {
             listView1.Items.Add(text);
             listView1.EnsureVisible(listView1.Items.Count - 1);
-        }
-
-        private void metroButton1_Click(object sender, EventArgs e)
-        {
-            Form1 form = new Form1();
-            form.Show();
         }
     }
 }
