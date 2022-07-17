@@ -18,8 +18,10 @@ namespace CoinTrader
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
-                Logger.Start();
+                MultiThread.SetMainThread();
                 Time.Start();
+                Logger.Start();
+
                 Application.Run(new Form1());
                 MultiThread.Release();
                 mutex.ReleaseMutex();

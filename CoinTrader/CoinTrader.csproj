@@ -110,6 +110,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scripts\Config.cs" />
+    <Compile Include="Scripts\Etc\Coroutine.cs" />
+    <Compile Include="Scripts\Etc\iKeepWait.cs" />
     <Compile Include="Scripts\Model\MarketModel.cs" />
     <Compile Include="Scripts\Model\ModelCenter.cs" />
     <Compile Include="Scripts\Network\ProtocolHandlers\HandlerMarket.cs" />

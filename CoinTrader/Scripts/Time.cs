@@ -16,7 +16,7 @@ public static class Time
     /// <summary>
     /// 경과 시간 업데이트 간격
     /// </summary>
-    private const float realtimeSinceStartup_UpdateInterval = 1f;
+    private const float realtimeSinceStartup_UpdateInterval = 0.1f;
     public static DateTime NowTime
     {
         get
@@ -39,7 +39,7 @@ public static class Time
             {
                 Thread.Sleep(UPDATE_INTERVAL);
                 realtimeSinceStartup += UPDATE_VALUE;
-                Logger.Log(realtimeSinceStartup);
+                //Logger.Log(realtimeSinceStartup);
             }
         });
     }

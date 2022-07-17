@@ -1,7 +1,6 @@
 ﻿using Network;
 using System;
 using MetroFramework.Forms;
-using System.Windows.Forms;
 
 namespace CoinTrader
 {
@@ -17,8 +16,8 @@ namespace CoinTrader
             ProtocolManager.GetHandler<HandlerTicker>().Request("KRW-BTC, BTC-ETH");
             ProtocolManager.GetHandler<HandlerMarket>().Request((result, res) => 
             {
-                Logger.Error(MultiThread.IsCurrentMainThread());
-                listView1.Items.Clear();    // UI 쓰레드 접근 가능
+                // UI 쓰레드 접근 가능 (현재 여기서 호출했으므로 해당 쓰레드를 가져옴)
+                Logger.Log("Ya!");
             });
         }
 
@@ -38,11 +37,6 @@ namespace CoinTrader
         {
             listView1.Items.Add(text);
             listView1.EnsureVisible(listView1.Items.Count - 1);
-        }
-
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }

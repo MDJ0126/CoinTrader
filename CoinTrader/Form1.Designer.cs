@@ -34,13 +34,14 @@ namespace CoinTrader
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.metroStyleManager = new MetroFramework.Components.MetroStyleManager(this.components);
             this.metroTabControl1 = new MetroFramework.Controls.MetroTabControl();
-            this.metroTabPage1 = new MetroFramework.Controls.MetroTabPage();
-            this.metroTabPage2 = new MetroFramework.Controls.MetroTabPage();
+            this.mainTabPage = new MetroFramework.Controls.MetroTabPage();
+            this.logTabPage = new MetroFramework.Controls.MetroTabPage();
             this.listView1 = new MetroFramework.Controls.MetroListView();
             this.Log = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.optionTabPage = new MetroFramework.Controls.MetroTabPage();
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).BeginInit();
             this.metroTabControl1.SuspendLayout();
-            this.metroTabPage1.SuspendLayout();
+            this.logTabPage.SuspendLayout();
             this.SuspendLayout();
             // 
             // metroStyleManager
@@ -49,8 +50,9 @@ namespace CoinTrader
             // 
             // metroTabControl1
             // 
-            this.metroTabControl1.Controls.Add(this.metroTabPage1);
-            this.metroTabControl1.Controls.Add(this.metroTabPage2);
+            this.metroTabControl1.Controls.Add(this.mainTabPage);
+            this.metroTabControl1.Controls.Add(this.logTabPage);
+            this.metroTabControl1.Controls.Add(this.optionTabPage);
             this.metroTabControl1.Location = new System.Drawing.Point(1, 71);
             this.metroTabControl1.Name = "metroTabControl1";
             this.metroTabControl1.SelectedIndex = 0;
@@ -58,34 +60,34 @@ namespace CoinTrader
             this.metroTabControl1.TabIndex = 2;
             this.metroTabControl1.UseSelectable = true;
             // 
-            // metroTabPage1
+            // mainTabPage
             // 
-            this.metroTabPage1.Controls.Add(this.listView1);
-            this.metroTabPage1.HorizontalScrollbarBarColor = true;
-            this.metroTabPage1.HorizontalScrollbarHighlightOnWheel = false;
-            this.metroTabPage1.HorizontalScrollbarSize = 10;
-            this.metroTabPage1.Location = new System.Drawing.Point(4, 38);
-            this.metroTabPage1.Name = "metroTabPage1";
-            this.metroTabPage1.Size = new System.Drawing.Size(790, 336);
-            this.metroTabPage1.TabIndex = 0;
-            this.metroTabPage1.Text = "metroTabPage1";
-            this.metroTabPage1.VerticalScrollbarBarColor = true;
-            this.metroTabPage1.VerticalScrollbarHighlightOnWheel = false;
-            this.metroTabPage1.VerticalScrollbarSize = 10;
+            this.mainTabPage.HorizontalScrollbarBarColor = true;
+            this.mainTabPage.HorizontalScrollbarHighlightOnWheel = false;
+            this.mainTabPage.HorizontalScrollbarSize = 10;
+            this.mainTabPage.Location = new System.Drawing.Point(4, 38);
+            this.mainTabPage.Name = "mainTabPage";
+            this.mainTabPage.Size = new System.Drawing.Size(790, 336);
+            this.mainTabPage.TabIndex = 0;
+            this.mainTabPage.Text = "메인";
+            this.mainTabPage.VerticalScrollbarBarColor = true;
+            this.mainTabPage.VerticalScrollbarHighlightOnWheel = false;
+            this.mainTabPage.VerticalScrollbarSize = 10;
             // 
-            // metroTabPage2
+            // logTabPage
             // 
-            this.metroTabPage2.HorizontalScrollbarBarColor = true;
-            this.metroTabPage2.HorizontalScrollbarHighlightOnWheel = false;
-            this.metroTabPage2.HorizontalScrollbarSize = 10;
-            this.metroTabPage2.Location = new System.Drawing.Point(4, 38);
-            this.metroTabPage2.Name = "metroTabPage2";
-            this.metroTabPage2.Size = new System.Drawing.Size(790, 336);
-            this.metroTabPage2.TabIndex = 1;
-            this.metroTabPage2.Text = "metroTabPage2";
-            this.metroTabPage2.VerticalScrollbarBarColor = true;
-            this.metroTabPage2.VerticalScrollbarHighlightOnWheel = false;
-            this.metroTabPage2.VerticalScrollbarSize = 10;
+            this.logTabPage.Controls.Add(this.listView1);
+            this.logTabPage.HorizontalScrollbarBarColor = true;
+            this.logTabPage.HorizontalScrollbarHighlightOnWheel = false;
+            this.logTabPage.HorizontalScrollbarSize = 10;
+            this.logTabPage.Location = new System.Drawing.Point(4, 38);
+            this.logTabPage.Name = "logTabPage";
+            this.logTabPage.Size = new System.Drawing.Size(790, 336);
+            this.logTabPage.TabIndex = 1;
+            this.logTabPage.Text = "로그";
+            this.logTabPage.VerticalScrollbarBarColor = true;
+            this.logTabPage.VerticalScrollbarHighlightOnWheel = false;
+            this.logTabPage.VerticalScrollbarSize = 10;
             // 
             // listView1
             // 
@@ -107,12 +109,25 @@ namespace CoinTrader
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.UseSelectable = true;
             this.listView1.View = System.Windows.Forms.View.Details;
-            this.listView1.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
             // 
             // Log
             // 
             this.Log.Text = "";
             this.Log.Width = 768;
+            // 
+            // optionTabPage
+            // 
+            this.optionTabPage.HorizontalScrollbarBarColor = true;
+            this.optionTabPage.HorizontalScrollbarHighlightOnWheel = false;
+            this.optionTabPage.HorizontalScrollbarSize = 10;
+            this.optionTabPage.Location = new System.Drawing.Point(4, 38);
+            this.optionTabPage.Name = "optionTabPage";
+            this.optionTabPage.Size = new System.Drawing.Size(790, 336);
+            this.optionTabPage.TabIndex = 2;
+            this.optionTabPage.Text = "옵션";
+            this.optionTabPage.VerticalScrollbarBarColor = true;
+            this.optionTabPage.VerticalScrollbarHighlightOnWheel = false;
+            this.optionTabPage.VerticalScrollbarSize = 10;
             // 
             // Form1
             // 
@@ -129,7 +144,7 @@ namespace CoinTrader
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).EndInit();
             this.metroTabControl1.ResumeLayout(false);
-            this.metroTabPage1.ResumeLayout(false);
+            this.logTabPage.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -137,10 +152,11 @@ namespace CoinTrader
         #endregion
         private MetroFramework.Components.MetroStyleManager metroStyleManager;
         private MetroFramework.Controls.MetroTabControl metroTabControl1;
-        private MetroFramework.Controls.MetroTabPage metroTabPage1;
+        private MetroFramework.Controls.MetroTabPage mainTabPage;
         private MetroFramework.Controls.MetroListView listView1;
         internal System.Windows.Forms.ColumnHeader Log;
-        private MetroFramework.Controls.MetroTabPage metroTabPage2;
+        private MetroFramework.Controls.MetroTabPage logTabPage;
+        private MetroFramework.Controls.MetroTabPage optionTabPage;
     }
 }
 

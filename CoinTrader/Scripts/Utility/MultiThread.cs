@@ -69,10 +69,14 @@ public class MultiThread
 
     static MultiThread()
     {
-        _mainThread = Thread.CurrentThread;
         ThreadPool.SetMinThreads(THREAD_MIN, THREAD_MIN);
         ThreadPool.SetMaxThreads(THREAD_MAX, THREAD_MAX);
     }
+
+    /// <summary>
+    /// 메인 쓰레드 지정
+    /// </summary>
+    public static void SetMainThread() => _mainThread = Thread.CurrentThread;
 
     /// <summary>
     /// 현재 쓰레드가 메인 쓰레드인지 여부
