@@ -4,6 +4,7 @@ using MetroFramework.Forms;
 using System.Collections;
 using System.Windows.Forms;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 
 namespace CoinTrader
 {
@@ -17,11 +18,6 @@ namespace CoinTrader
             ProtocolManager.GetHandler<HandlerAccount>().Request();
             ProtocolManager.GetHandler<HandlerApiKey>().Request();
             ProtocolManager.GetHandler<HandlerTicker>().Request("KRW-BTC, BTC-ETH");
-            ProtocolManager.GetHandler<HandlerMarket>().Request((result, res) => 
-            {
-                // UI 쓰레드 접근 가능 (현재 여기서 호출했으므로 해당 쓰레드를 가져옴)
-                Logger.Log("Ya!");
-            });
 
             // 계좌 리스트 뿌리기
             // 종목 리스트 뿌리기
@@ -38,8 +34,23 @@ namespace CoinTrader
 
         private void Initialize()
         {
+            SetStockList();
+
             listView1.Items.Clear();
             listView1.DoubleBuffered(true);
+        }
+
+        private void SetStockList()
+        {
+            ProtocolManager.GetHandler<HandlerMarket>().Request((result, res) =>
+            {
+                metroListView1.BeginUpdate();
+                for (int i = 0; i < res.Count; i++)
+                {
+                    metroListView1.Items.Add(res[i].korean_name);
+                }
+                metroListView1.EndUpdate();
+            });
         }
 
         private void OnLogger(string text)

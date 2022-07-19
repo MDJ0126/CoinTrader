@@ -30,6 +30,8 @@ namespace CoinTrader
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.metroStyleManager = new MetroFramework.Components.MetroStyleManager(this.components);
@@ -40,6 +42,7 @@ namespace CoinTrader
             this.listView1 = new MetroFramework.Controls.MetroListView();
             this.Log = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.optionTabPage = new MetroFramework.Controls.MetroTabPage();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).BeginInit();
             this.metroTabControl1.SuspendLayout();
             this.mainTabPage.SuspendLayout();
@@ -84,16 +87,27 @@ namespace CoinTrader
             // 
             this.metroListView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.metroListView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1});
             this.metroListView1.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.metroListView1.FullRowSelect = true;
-            this.metroListView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.metroListView1.Location = new System.Drawing.Point(872, 0);
+            this.metroListView1.GridLines = true;
+            listViewGroup1.Header = "ListViewGroup";
+            listViewGroup1.Name = "보유 리스트";
+            listViewGroup2.Header = "ListViewGroup";
+            listViewGroup2.Name = "미보유 리스트";
+            this.metroListView1.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
+            listViewGroup1,
+            listViewGroup2});
+            this.metroListView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.metroListView1.Location = new System.Drawing.Point(0, 0);
             this.metroListView1.Name = "metroListView1";
             this.metroListView1.OwnerDraw = true;
-            this.metroListView1.Size = new System.Drawing.Size(317, 486);
+            this.metroListView1.Size = new System.Drawing.Size(1189, 486);
             this.metroListView1.TabIndex = 2;
             this.metroListView1.UseCompatibleStateImageBehavior = false;
             this.metroListView1.UseSelectable = true;
+            this.metroListView1.View = System.Windows.Forms.View.Details;
             // 
             // logTabPage
             // 
@@ -153,6 +167,11 @@ namespace CoinTrader
             this.optionTabPage.VerticalScrollbarHighlightOnWheel = false;
             this.optionTabPage.VerticalScrollbarSize = 10;
             // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "종목 이름";
+            this.columnHeader1.Width = 278;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -183,6 +202,7 @@ namespace CoinTrader
         private MetroFramework.Controls.MetroTabPage logTabPage;
         private MetroFramework.Controls.MetroTabPage optionTabPage;
         private MetroFramework.Controls.MetroListView metroListView1;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
     }
 }
 
