@@ -1,16 +1,26 @@
-﻿using Newtonsoft.Json.Linq;
-using RestSharp;
+﻿using RestSharp;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Network
 {
     /// <summary>
-    /// 전체 계좌 조회
+    /// 마켓 코드 조회
     /// </summary>
     public class MarketRes : iResponse
     {
+        public enum eWarning
+        {
+            /// <summary>
+            /// 해당 사항 없음
+            /// </summary>
+            NONE,
+            /// <summary>
+            /// 투자유의
+            /// </summary>
+            CAUTION,
+        }
+
         /// <summary>
         /// 업비트에서 제공중인 시장 정보
         /// </summary>
@@ -28,6 +38,22 @@ namespace Network
         /// NONE(해당 사항 없음), CAUTION(투자유의)
         /// </summary>
         public string market_warning;
+
+        /// <summary>
+        /// 유의 종목 여부
+        /// </summary>
+        /// <returns></returns>
+        public eWarning GetWarning()
+        {
+            if (!string.IsNullOrEmpty(market_warning))
+            {
+                if (market_warning == "CAUTION")
+                {
+                    return eWarning.CAUTION;
+                }
+            }
+            return eWarning.NONE;
+        }
     }
 
     public class HandlerMarket : ProtocolHandler
@@ -53,7 +79,7 @@ namespace Network
             if (response.IsSuccessful)
             {
                 res = JsonParser<MarketRes>(response.Content);
-                ModelCenter.MarketModel.MarketRes = res;
+                ModelCenter.Market.SetBaseInfo(res);
             }
             else
             {

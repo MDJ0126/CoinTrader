@@ -44,7 +44,7 @@ namespace Network
         /// </summary>
         public double low_price;
         /// <summary>
-        /// 종가
+        /// 종가(현재가)
         /// </summary>
         public double trade_price;
         /// <summary>
@@ -185,6 +185,7 @@ namespace Network
             if (response.IsSuccessful)
             {
                 res = JsonParser<TickerRes>(response.Content);
+                ModelCenter.Market.UpdateTickers(res);
             }
             else
             {

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Windows.Forms;
 
 public static class Utils
 {
@@ -105,15 +106,48 @@ public static class Utils
 		{
 			return source.ToString();
 		}
-	}
+    }
 
-	/// <summary>
-	/// 헤더 변수 읽어오기
-	/// </summary>
-	/// <param name="headerValue"></param>
-	/// <param name="variableName"></param>
-	/// <returns></returns>
-	public static string GetHeaderValue(string headerValue, string variableName)
+    /// <summary>
+    /// index로 Enum 값 찾기
+    /// </summary>
+    /// <typeparam name="T">Enum Type</typeparam>
+    /// <param name="index">Enum item index</param>
+    /// <returns></returns>
+
+    public static T FindEnumValue<T>(int index) where T : Enum
+    {
+        return (T)Enum.ToObject(typeof(T), index);
+    }
+
+    /// <summary>
+    /// string으로 Enum 값 찾기
+    /// </summary>
+    /// <typeparam name="T">Enum Type</typeparam>
+    /// <param name="str">Enum item string</param>
+    /// <returns></returns>
+    public static T FindEnumValue<T>(string str) where T : Enum
+    {
+        string[] enums = Enum.GetNames(typeof(T));
+
+        T result = (T)Enum.ToObject(typeof(T), 0);
+
+        for (int i = 0; i < enums.Length; i++)
+        {
+            if (str == enums[i])
+                result = (T)Enum.ToObject(typeof(T), i);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 헤더 변수 읽어오기
+    /// </summary>
+    /// <param name="headerValue"></param>
+    /// <param name="variableName"></param>
+    /// <returns></returns>
+    public static string GetHeaderValue(string headerValue, string variableName)
 	{
 		int startIndex = headerValue.IndexOf(variableName, 0, System.StringComparison.OrdinalIgnoreCase);
 		int endIndex = startIndex + variableName.Length;
@@ -132,9 +166,25 @@ public static class Utils
 	/// </summary>
 	/// <param name="control"></param>
 	/// <param name="enabled"></param>
-	public static void DoubleBuffered(this System.Windows.Forms.Control control, bool enabled)
+	public static void DoubleBuffered(this Control control, bool enabled)
 	{
 		var prop = control.GetType().GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
 		prop.SetValue(control, enabled, null);
 	}
+
+    /// <summary>
+    /// 리스트 아이템 찾기
+    /// </summary>
+    /// <param name="listView"></param>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    public static ListViewItem Find(this ListView listView, string text)
+    {
+        for (int i = 0; i < listView.Items.Count; i++)
+        {
+            if (listView.Items[i].Text == text)
+                return listView.Items[i];
+        }
+        return null;
+    }
 }

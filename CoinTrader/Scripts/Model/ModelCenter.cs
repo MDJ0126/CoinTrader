@@ -1,9 +1,11 @@
 ﻿public static class ModelCenter
 {
-    public static MarketModel MarketModel { get; private set; } = new MarketModel();
+    public static AccountModel Account { get; private set; } = new AccountModel();
+    public static MarketModel Market { get; private set; } = new MarketModel();
 
     public static void Release()
     {
-        MarketModel = new MarketModel();
+        Account = new AccountModel();
+        Market = new MarketModel();
     }
 }
