@@ -35,17 +35,17 @@ namespace CoinTrader
             this.metroStyleManager = new MetroFramework.Components.MetroStyleManager(this.components);
             this.metroTabControl1 = new MetroFramework.Controls.MetroTabControl();
             this.mainTabPage = new MetroFramework.Controls.MetroTabPage();
-            this.metroListView1 = new MetroFramework.Controls.MetroListView();
+            this.metroListView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.logTabPage = new MetroFramework.Controls.MetroTabPage();
             this.listView1 = new MetroFramework.Controls.MetroListView();
             this.Log = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.optionTabPage = new MetroFramework.Controls.MetroTabPage();
-            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).BeginInit();
             this.metroTabControl1.SuspendLayout();
             this.mainTabPage.SuspendLayout();
@@ -97,17 +97,16 @@ namespace CoinTrader
             this.columnHeader4,
             this.columnHeader5,
             this.columnHeader6});
-            this.metroListView1.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.metroListView1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.metroListView1.FullRowSelect = true;
             this.metroListView1.GridLines = true;
             this.metroListView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.metroListView1.HideSelection = false;
             this.metroListView1.Location = new System.Drawing.Point(0, 0);
             this.metroListView1.Name = "metroListView1";
-            this.metroListView1.OwnerDraw = true;
             this.metroListView1.Size = new System.Drawing.Size(1189, 486);
             this.metroListView1.TabIndex = 2;
             this.metroListView1.UseCompatibleStateImageBehavior = false;
-            this.metroListView1.UseSelectable = true;
             this.metroListView1.View = System.Windows.Forms.View.Details;
             // 
             // columnHeader1
@@ -134,6 +133,11 @@ namespace CoinTrader
             // 
             this.columnHeader5.Text = "목표 매수 단가";
             this.columnHeader5.Width = 100;
+            // 
+            // columnHeader6
+            // 
+            this.columnHeader6.Text = "목표 매도 단가";
+            this.columnHeader6.Width = 100;
             // 
             // logTabPage
             // 
@@ -193,11 +197,6 @@ namespace CoinTrader
             this.optionTabPage.VerticalScrollbarHighlightOnWheel = false;
             this.optionTabPage.VerticalScrollbarSize = 10;
             // 
-            // columnHeader6
-            // 
-            this.columnHeader6.Text = "목표 매도 단가";
-            this.columnHeader6.Width = 100;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -227,7 +226,7 @@ namespace CoinTrader
         internal System.Windows.Forms.ColumnHeader Log;
         private MetroFramework.Controls.MetroTabPage logTabPage;
         private MetroFramework.Controls.MetroTabPage optionTabPage;
-        private MetroFramework.Controls.MetroListView metroListView1;
+        private System.Windows.Forms.ListView metroListView1;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
