@@ -12,4 +12,22 @@
     /// 종가(현재가)
     /// </summary>
     public double trade_price;
+    /// <summary>
+    /// 전일 종가
+    /// </summary>
+    public double? yesterday_trade_price;
+
+    /// <summary>
+    /// 변동성 퍼센테이지 Normalize (-1f ~ 1f)
+    /// </summary>
+    /// <returns></returns>
+    public double GetVariabilityNormalize()
+    {
+        return (trade_price - yesterday_trade_price.Value) / yesterday_trade_price.Value;
+    }
+
+    public override string ToString()
+    {
+        return $"{name}, {korean_name}, 현재가: {trade_price:N0}";
+    }
 }

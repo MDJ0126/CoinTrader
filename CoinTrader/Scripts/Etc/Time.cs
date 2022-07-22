@@ -6,7 +6,7 @@ public static class Time
     /// <summary>
     /// 기준 시간
     /// </summary>
-    private static DateTime startedTime = DateTime.Now;
+    private static DateTime startedTime = DateTime.UtcNow;
 
     /// <summary>
     /// 프로그램이 시작한 이후 경과 시간(seconds)
@@ -29,7 +29,6 @@ public static class Time
 
     public static void Start()
     {
-        startedTime = DateTime.Now;
         realtimeSinceStartup = 0f;
         MultiThread.Start(() =>
         {

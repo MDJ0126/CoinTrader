@@ -150,52 +150,55 @@ namespace Network
                         string name = fieldInfo.Name;
                         if (jObject.TryGetValue(name, out var jToken))
                         {
-                            switch (fieldInfo.FieldType.Name)
+                            if (jToken.Value<string>() != null)
                             {
-                                case "Byte":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<Byte>());
-                                    break;
-                                case "SByte":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<SByte>());
-                                    break;
-                                case "Int16":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<Int16>());
-                                    break;
-                                case "Int32":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<Int32>());
-                                    break;
-                                case "Int64":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<Int64>());
-                                    break;
-                                case "Decimal":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<Decimal>());
-                                    break;
-                                case "UInt16":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<UInt16>());
-                                    break;
-                                case "UInt32":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<UInt32>());
-                                    break;
-                                case "UInt64":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<UInt64>());
-                                    break;
-                                case "Single":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<Single>());
-                                    break;
-                                case "Double":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<Double>());
-                                    break;
-                                case "Boolean":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<Boolean>());
-                                    break;
-                                case "DateTime":
-                                    fieldInfo.SetValue(convertRes, jToken.ToObject<DateTime>());
-                                    break;
-                                case "String":
-                                    fieldInfo.SetValue(convertRes, jToken.ToString());
-                                    break;
-                                default:
-                                    break;
+                                switch (fieldInfo.FieldType.Name)
+                                {
+                                    case "Byte":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<Byte>());
+                                        break;
+                                    case "SByte":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<SByte>());
+                                        break;
+                                    case "Int16":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<Int16>());
+                                        break;
+                                    case "Int32":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<Int32>());
+                                        break;
+                                    case "Int64":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<Int64>());
+                                        break;
+                                    case "Decimal":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<Decimal>());
+                                        break;
+                                    case "UInt16":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<UInt16>());
+                                        break;
+                                    case "UInt32":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<UInt32>());
+                                        break;
+                                    case "UInt64":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<UInt64>());
+                                        break;
+                                    case "Single":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<Single>());
+                                        break;
+                                    case "Double":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<Double>());
+                                        break;
+                                    case "Boolean":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<Boolean>());
+                                        break;
+                                    case "DateTime":
+                                        fieldInfo.SetValue(convertRes, jToken.ToObject<DateTime>());
+                                        break;
+                                    case "String":
+                                        fieldInfo.SetValue(convertRes, jToken.ToString());
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         }
                     }

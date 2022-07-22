@@ -173,9 +173,15 @@ namespace Network
             this.Method = Method.Get;
         }
 
-        public void Request(string market, Action<bool, List<TickerRes>> onFinished = null)
+        /// <summary>
+        /// 요청
+        /// </summary>
+        /// <param name="market">반점으로 구분되는 마켓 코드 (ex. KRW-BTC, BTC-ETH)</param>
+        /// <param name="onFinished"></param>
+        public void Request(eMarketType marketType, Action<bool, List<TickerRes>> onFinished = null)
         {
-            RestRequest request = new RestRequest(URI + $"markets={market}", Method);
+            string marketStr = ModelCenter.Market.GetAllMarketStr(marketType);
+            RestRequest request = new RestRequest(URI + $"markets={marketStr}", Method);
             request.AddHeader("Accept", "application/json");
             base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
         }
