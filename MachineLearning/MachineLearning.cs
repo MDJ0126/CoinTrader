@@ -6,15 +6,63 @@ namespace CoinTrader.ML
 {
     public static class MachineLearning
     {
+        static MachineLearning()
+        {
+            var path = Utils.CSV_DATA_PATH;
+            DeleteDirectory(path);
+        }
+
+        /// <summary>
+        /// Depth-first recursive delete, with handling for descendant 
+        /// directories open in Windows Explorer.
+        /// </summary>
+        public static void DeleteDirectory(string path)
+        {
+            foreach (string directory in Directory.GetDirectories(path))
+            {
+                DeleteDirectory(directory);
+            }
+
+            try
+            {
+                Directory.Delete(path, true);
+            }
+            catch (IOException)
+            {
+                Directory.Delete(path, true);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Directory.Delete(path, true);
+            }
+        }
+
         /// <summary>
         /// CSV 파일 만들기
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="collection"></param>
         /// <param name="name"></param>
-        public static void CreateCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
+        public static bool CreateCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
         {
-            Utils.CreateCSVFile(collection, Path.Combine(Environment.CurrentDirectory, "Data", type, name));
+            string path = Path.Combine(Environment.CurrentDirectory, "Data", name);
+            bool create = Utils.CreateCSVFile(collection, path, overwrite: false);
+            if (!create)
+                Utils.AppendCSVFile(collection, path);
+            return Utils.CreateCSVFile(collection, Path.Combine(Environment.CurrentDirectory, "Data", type, name), overwrite: false);
+        }
+
+        /// <summary>
+        /// 이어쓰기
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="name"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool AppendCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
+        {
+            return Utils.AppendCSVFile(collection, Path.Combine(Environment.CurrentDirectory, "Data", type, name));
         }
 
         /// <summary>

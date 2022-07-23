@@ -38,14 +38,6 @@ public class MarketInfo
     /// 전일 종가
     /// </summary>
     public double? yesterday_trade_price;
-    /// <summary>
-    /// 분(Minute) 캔들 데이터 리스트
-    /// </summary>
-    public List<CandlesMinutesRes> candlesMinutesRes = null;
-    /// <summary>
-    /// 일(Day) 캔들 데이터 리스트
-    /// </summary>
-    public List<CandlesDaysRes> candlesDaysRes = null;
 
     /// <summary>
     /// 변동성 퍼센테이지 Normalize (-1f ~ 1f)

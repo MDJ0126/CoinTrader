@@ -146,6 +146,37 @@ namespace CoinTrader
                     isFinished = true;
                 });
                 yield return new WaitUntil(() => isFinished);
+
+                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(15, marketStrs[i].name, onFinished: (result, res) =>
+                {
+                    isFinished = true;
+                });
+                yield return new WaitUntil(() => isFinished);
+
+                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(10, marketStrs[i].name, onFinished: (result, res) =>
+                {
+                    isFinished = true;
+                });
+                yield return new WaitUntil(() => isFinished);
+
+                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(5, marketStrs[i].name, onFinished: (result, res) =>
+                {
+                    isFinished = true;
+                });
+                yield return new WaitUntil(() => isFinished);
+
+                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(3, marketStrs[i].name, onFinished: (result, res) =>
+                {
+                    isFinished = true;
+                });
+                yield return new WaitUntil(() => isFinished);
+
+                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(1, marketStrs[i].name, onFinished: (result, res) =>
+                {
+                    isFinished = true;
+                });
+                yield return new WaitUntil(() => isFinished);
+
                 yield return new WaitForSeconds(INTERVAL);
             }
             Logger.Log($"총 {marketStrs.Count}개의 캔들 확인, 소요 시간: {(Time.NowTime - start).TotalSeconds}초");

@@ -138,7 +138,10 @@ public class MarketModel
     {
         if (res != null)
         {
-            MachineLearning.CreateCSV(res, res[0].market, "Days");
+            bool create = MachineLearning.CreateCSV(res, res[0].market, "Days");
+            if (!create)
+                MachineLearning.AppendCSV(res, res[0].market, "Days");
+
             for (int i = 0; i < res.Count; i++)
             {
                 var candlesDays = res[i];
@@ -151,7 +154,6 @@ public class MarketModel
                         var marketInfo = marketInfos.Find(info => info.name == candlesDays.market);
                         if (marketInfo != null)
                         {
-                            marketInfo.candlesDaysRes = res;
                             var date = candlesDays.GetTradeDateTime(CandlesDaysRes.eTimeType.UTC);
                             if (date == Time.NowTime.Date.AddDays(-1))
                             {
@@ -176,7 +178,10 @@ public class MarketModel
     {
         if (res != null)
         {
-            MachineLearning.CreateCSV(res, res[0].market, "Minutes");
+            bool create = MachineLearning.CreateCSV(res, res[0].market, "Minutes");
+            if (!create)
+                MachineLearning.AppendCSV(res, res[0].market, "Minutes");
+
             for (int i = 0; i < res.Count; i++)
             {
                 var candlesDays = res[i];
@@ -189,7 +194,6 @@ public class MarketModel
                         var marketInfo = marketInfos.Find(info => info.name == candlesDays.market);
                         if (marketInfo != null)
                         {
-                            marketInfo.candlesMinutesRes = res;
                             var date = candlesDays.GetTradeDateTime(CandlesMinutesRes.eTimeType.UTC);
                             if (date == Time.NowTime.Date.AddDays(-1))
                             {

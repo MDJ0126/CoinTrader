@@ -8,6 +8,8 @@ internal static class Utils
 {
     public static string CSV_DATA_PATH = Path.Combine(Environment.CurrentDirectory, "Data");
 
+    private static StringBuilder sb = new StringBuilder();
+
     /// <summary>
     /// 컬렉션 CSV 파일 만들기
     /// </summary>
@@ -15,7 +17,7 @@ internal static class Utils
     /// <param name="collection">컬렉션</param>
     /// <param name="path">생성 위치</param>
     /// <param name="overwrite">덮어쓰기 여부</param>
-    public static void CreateCSVFile<T>(ICollection<T> collection, string path, bool overwrite = true)
+    public static bool CreateCSVFile<T>(ICollection<T> collection, string path, bool overwrite = true)
     {
         if (collection.Count > 0)
         {
@@ -29,11 +31,12 @@ internal static class Utils
                 if (!di.Exists) di.Create();
             }
 
-            StringBuilder sb = new StringBuilder();
+            sb.Length = 0;
+            path += ".csv";
             if (!File.Exists(path) || overwrite)
             {
                 // 텍스트 파일 생성
-                using (var writer = File.CreateText(path + ".csv"))
+                using (var writer = File.CreateText(path))
                 {
                     // 1. 컬럼 입력
                     var enumerator = collection.GetEnumerator();
@@ -64,11 +67,50 @@ internal static class Utils
                     writer.WriteLine(sb);
                     writer.Close();
                 }
+                return true;
             }
             else
-            {
                 Console.WriteLine("이미 파일이 존재합니다.");
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 이어쓰기
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="collection"></param>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static bool AppendCSVFile<T>(ICollection<T> collection, string path)
+    {
+        if (collection.Count > 0)
+        {
+            sb.Length = 0;
+            path += ".csv";
+            if (File.Exists(path))
+            {
+                var enumerator = collection.GetEnumerator();
+                using (var writer = File.AppendText(path))
+                {
+                    // 데이터 입력
+                    while (enumerator.MoveNext())
+                    {
+                        FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+                        for (int i = 0; i < fieldInfos.Length; i++)
+                        {
+                            sb.Append(fieldInfos[i].GetValue(enumerator.Current));
+                            sb.Append(',');
+                        }
+                        sb.Append('\n');
+                    };
+
+                    writer.WriteLine(sb);
+                    writer.Close();
+                }
+                return true;
             }
         }
+        return false;
     }
 }
