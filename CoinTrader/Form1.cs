@@ -141,7 +141,7 @@ namespace CoinTrader
             for (int i = 0; i < marketStrs.Count; i++)
             {
                 bool isFinished = false;
-                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketStrs[i].name, onFinished: (result, res) =>
+                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(30, marketStrs[i].name, onFinished: (result, res) =>
                 {
                     isFinished = true;
                 });
