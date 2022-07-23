@@ -194,7 +194,7 @@ public class MarketModel
                             if (date == Time.NowTime.Date.AddDays(-1))
                             {
                                 marketInfo.yesterday_trade_price = candlesDays.trade_price;
-                                marketInfo.predictePrice = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date, "Minutes");
+                                marketInfo.predictePrice = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.AddDays(1).Date, "Minutes");
                                 //marketInfo.predictePrice_D1 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(1));
                                 //marketInfo.predictePrice_D2 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(2));
                                 onUpdateTicker?.Invoke(marketInfo);
