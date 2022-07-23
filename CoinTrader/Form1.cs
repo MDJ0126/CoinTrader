@@ -141,7 +141,7 @@ namespace CoinTrader
             for (int i = 0; i < marketStrs.Count; i++)
             {
                 bool isFinished = false;
-                ProtocolManager.GetHandler<HandlerCandlesDays>().Request(marketStrs[i].name, onFinished: (result, res) =>
+                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketStrs[i].name, onFinished: (result, res) =>
                 {
                     isFinished = true;
                 });
@@ -162,6 +162,8 @@ namespace CoinTrader
             ListViewItem item = metroListView1.Find(marketInfo.name);
             if (item != null)
             {
+                item.UseItemStyleForSubItems = false;
+
                 // 현재가
                 item.SubItems[(int)eTickerHeader.Price].Text = $"{marketInfo.trade_price:N0}원";
 
@@ -179,20 +181,24 @@ namespace CoinTrader
                     color = Color.Blue;
                     symbol = "▽";
                 }
-                item.ForeColor= color;
+                item.SubItems[(int)eTickerHeader.YesterDay].ForeColor = color;
                 item.SubItems[(int)eTickerHeader.YesterDay].Text = $"{symbol} {marketInfo.trade_price - marketInfo.yesterday_trade_price:N0}원 ({percentage:F2}%)";
 
                 // 금일 예상 종가
                 percentage = marketInfo.GetTodayPredicteNormalize(MarketInfo.eDay.Today) * 100f;
                 symbol = string.Empty;
+                color = Color.Black;
                 if (percentage > 0f)
                 {
+                    color = Color.Red;
                     symbol = "▲";
                 }
                 else if (percentage < 0f)
                 {
+                    color = Color.Blue;
                     symbol = "▽";
                 }
+                item.SubItems[(int)eTickerHeader.TodayPredicteClosePrice].ForeColor = color;
                 item.SubItems[(int)eTickerHeader.TodayPredicteClosePrice].Text = $"{symbol} {marketInfo.predictePrice:N0}원 ({percentage:F2}%)";
             }
             metroListView1.EndUpdate();

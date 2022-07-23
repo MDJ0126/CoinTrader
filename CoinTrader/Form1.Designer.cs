@@ -99,7 +99,7 @@ namespace CoinTrader
             this.columnHeader5,
             this.columnHeader6,
             this.columnHeader7});
-            this.metroListView1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.metroListView1.Font = new System.Drawing.Font("Segoe UI", 8F);
             this.metroListView1.FullRowSelect = true;
             this.metroListView1.GridLines = true;
             this.metroListView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;

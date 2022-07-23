@@ -184,6 +184,7 @@
     <Compile Include="Scripts\Model\AccountModel.cs" />
     <Compile Include="Scripts\Model\MarketModel.cs" />
     <Compile Include="Scripts\Model\ModelCenter.cs" />
+    <Compile Include="Scripts\Network\ProtocolHandlers\HandlerCandlesMinutes.cs" />
     <Compile Include="Scripts\Network\ProtocolHandlers\HandlerMarket.cs" />
     <Compile Include="Scripts\Network\ProtocolHandlers\HandlerCandlesDays.cs" />
     <Compile Include="Scripts\Network\ProtocolHandlers\HandlerTicker.cs" />

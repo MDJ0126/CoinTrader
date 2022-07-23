@@ -90,24 +90,18 @@ namespace Network
         /// <returns>거래 시간</returns>
         public DateTime GetTradeDateTime(eTimeType timeType = eTimeType.UTC)
         {
-            string strDate = string.Empty;
-
+            DateTime dateTime;
             switch (timeType)
             {
-                case eTimeType.UTC:
-                    strDate = candle_date_time_utc.ToString();
-                    break;
                 case eTimeType.KST:
-                    strDate = candle_date_time_kst.ToString();
+                    DateTime.TryParse(candle_date_time_kst, out dateTime);
                     break;
+                case eTimeType.UTC:
                 default:
+                    DateTime.TryParse(candle_date_time_utc, out dateTime);
                     break;
             }
-
-            int year = int.Parse(strDate.Substring(0, 4));
-            int month = int.Parse(strDate.Substring(5, 2));
-            int day = int.Parse(strDate.Substring(8, 2));
-            return new DateTime(year, month, day);
+            return dateTime;
         }
     }
 

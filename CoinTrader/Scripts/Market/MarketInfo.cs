@@ -25,19 +25,23 @@ public class MarketInfo
     /// <summary>
     /// 금일 예상 종가
     /// </summary>
-    public double predictePrice;
+    public double? predictePrice;
     /// <summary>
     /// D+1 예상 종가
     /// </summary>
-    public double predictePrice_D1;
+    public double? predictePrice_D1;
     /// <summary>
     /// D+2 예상 종가
     /// </summary>
-    public double predictePrice_D2;
+    public double? predictePrice_D2;
     /// <summary>
     /// 전일 종가
     /// </summary>
     public double? yesterday_trade_price;
+    /// <summary>
+    /// 분(Minute) 캔들 데이터 리스트
+    /// </summary>
+    public List<CandlesMinutesRes> candlesMinutesRes = null;
     /// <summary>
     /// 일(Day) 캔들 데이터 리스트
     /// </summary>
@@ -62,13 +66,13 @@ public class MarketInfo
         switch (day)
         {
             case eDay.Today:
-                price = predictePrice;
+                price = predictePrice.Value;
                 break;
             case eDay.D1day:
-                price = predictePrice_D1;
+                price = predictePrice_D1.Value;
                 break;
             case eDay.D2day:
-                price = predictePrice_D2;
+                price = predictePrice_D2.Value;
                 break;
             default:
                 break;

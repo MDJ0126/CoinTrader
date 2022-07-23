@@ -24,6 +24,11 @@ public static class Logger
 
     private static StringBuilder sb = new StringBuilder();
 
+    static Logger()
+    {
+
+    }
+
     private static string CurrentTime()
     {
         return Time.NowTime.ToString("[HH:mm:ss]");

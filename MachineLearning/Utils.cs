@@ -19,9 +19,15 @@ internal static class Utils
     {
         if (collection.Count > 0)
         {
-            // 부모 폴더가 없으면 생성
-            DirectoryInfo di = new DirectoryInfo(CSV_DATA_PATH);
-            if (!di.Exists) di.Create();
+            // 경로에 폴더가 없으면 생성
+            string[] folderNames = path.Split('\\');
+            string fullPath = string.Empty;
+            for (int i = 0; i < folderNames.Length - 1; i++)
+            {
+                fullPath += folderNames[i] + '\\';
+                DirectoryInfo di = new DirectoryInfo(fullPath);
+                if (!di.Exists) di.Create();
+            }
 
             StringBuilder sb = new StringBuilder();
             if (!File.Exists(path) || overwrite)

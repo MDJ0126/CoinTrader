@@ -119,6 +119,8 @@ public class MarketModel
                                 marketInfo.trade_price = tickerRes.trade_price;
                                 if (marketInfo.yesterday_trade_price == null)
                                     marketInfo.yesterday_trade_price = tickerRes.trade_price;
+                                if (marketInfo.predictePrice == null)
+                                    marketInfo.predictePrice = tickerRes.trade_price;
                                 onUpdateTicker?.Invoke(marketInfo);
                             }
                         }
@@ -136,7 +138,7 @@ public class MarketModel
     {
         if (res != null)
         {
-            MachineLearning.CreateCSV(res, res[0].market);
+            MachineLearning.CreateCSV(res, res[0].market, "Days");
             for (int i = 0; i < res.Count; i++)
             {
                 var candlesDays = res[i];
@@ -154,7 +156,45 @@ public class MarketModel
                             if (date == Time.NowTime.Date.AddDays(-1))
                             {
                                 marketInfo.yesterday_trade_price = candlesDays.trade_price;
-                                marketInfo.predictePrice = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date);
+                                //marketInfo.predictePrice = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date, "Days");
+                                //marketInfo.predictePrice_D1 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(1));
+                                //marketInfo.predictePrice_D2 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(2));
+                                onUpdateTicker?.Invoke(marketInfo);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 분(Minute) 캔들 업데이트
+    /// </summary>
+    /// <param name="res"></param>
+    public void UpdateCandlesMinutes(List<CandlesMinutesRes> res)
+    {
+        if (res != null)
+        {
+            MachineLearning.CreateCSV(res, res[0].market, "Minutes");
+            for (int i = 0; i < res.Count; i++)
+            {
+                var candlesDays = res[i];
+                var enumerator = markets.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    var marketInfos = enumerator.Current.Value;
+                    if (marketInfos != null)
+                    {
+                        var marketInfo = marketInfos.Find(info => info.name == candlesDays.market);
+                        if (marketInfo != null)
+                        {
+                            marketInfo.candlesMinutesRes = res;
+                            var date = candlesDays.GetTradeDateTime(CandlesMinutesRes.eTimeType.UTC);
+                            if (date == Time.NowTime.Date.AddDays(-1))
+                            {
+                                marketInfo.yesterday_trade_price = candlesDays.trade_price;
+                                marketInfo.predictePrice = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date, "Minutes");
                                 //marketInfo.predictePrice_D1 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(1));
                                 //marketInfo.predictePrice_D2 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(2));
                                 onUpdateTicker?.Invoke(marketInfo);
