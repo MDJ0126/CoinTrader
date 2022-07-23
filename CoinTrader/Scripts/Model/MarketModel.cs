@@ -147,6 +147,7 @@ public class MarketModel
                         var marketInfo = marketInfos.Find(info => info.name == candlesDays.market);
                         if (marketInfo != null)
                         {
+                            marketInfo.candlesDaysRes = res;
                             var date = candlesDays.GetTradeDateTime(CandlesDaysRes.eTimeType.UTC);
                             if (date == Time.NowTime.Date.AddDays(-1))
                             {

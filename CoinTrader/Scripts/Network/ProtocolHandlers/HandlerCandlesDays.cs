@@ -88,7 +88,7 @@ namespace Network
         /// </summary>
         /// <param name="timeType">표준 시간 기준</param>
         /// <returns>거래 시간</returns>
-        public DateTime GetTradeDateTime(eTimeType timeType)
+        public DateTime GetTradeDateTime(eTimeType timeType = eTimeType.UTC)
         {
             string strDate = string.Empty;
 

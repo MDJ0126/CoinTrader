@@ -123,12 +123,12 @@ namespace CoinTrader
 
         private Coroutine candlesDaysCoroutine = null;
         /// <summary>
-        ///  캔들 요청 (초당 5개씩 확인함)
+        ///  캔들 요청
         /// </summary>
         /// <returns></returns>
         private IEnumerator RequestCandlesDays()
         {
-            const float INTERVAL = 0.2f;
+            const float INTERVAL = 0.1f;
             var marketStrs = ModelCenter.Market.GetMarketInfos(eMarketType.KRW);
 
             DateTime start = Time.NowTime;

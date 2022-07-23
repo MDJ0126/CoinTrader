@@ -1,4 +1,7 @@
-﻿public class MarketInfo
+﻿using Network;
+using System.Collections.Generic;
+
+public class MarketInfo
 {
     /// <summary>
     /// 종목 구분 코드
@@ -16,6 +19,10 @@
     /// 전일 종가
     /// </summary>
     public double? yesterday_trade_price;
+    /// <summary>
+    /// 일(Day) 캔들 데이터 리스트
+    /// </summary>
+    public List<CandlesDaysRes> candlesDaysRes = null;
 
     /// <summary>
     /// 변동성 퍼센테이지 Normalize (-1f ~ 1f)
