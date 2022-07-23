@@ -1,4 +1,5 @@
-﻿using Network;
+﻿using CoinTrader.ML;
+using Network;
 using System;
 using System.Collections.Generic;
 
@@ -135,6 +136,9 @@ public class MarketModel
     {
         if (res != null)
         {
+            MachineLearning.CreateCSV(res, res[0].market);
+            var predictePrice = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date);
+            Logger.Log($"predictePrice : {predictePrice}");
             for (int i = 0; i < res.Count; i++)
             {
                 var candlesDays = res[i];

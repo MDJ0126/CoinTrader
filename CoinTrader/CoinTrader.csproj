@@ -230,6 +230,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MachineLearning\MachineLearning.csproj">
+      <Project>{dbaa1208-26fd-40c8-9b76-cb8912f2e9c9}</Project>
+      <Name>MachineLearning</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
