@@ -40,7 +40,7 @@ namespace CoinTrader.ML
             var candleDaysSample = new CandleDays()
             {
                 market = market,
-                candle_date_time_utc = date.ToString()
+                candle_date_time_utc = date.ToString(),
             };
             var prediction = predictionFunction.Predict(candleDaysSample);
             return prediction.trade_price;
@@ -59,7 +59,20 @@ namespace CoinTrader.ML
             var pipeline = mlContext.Transforms.CopyColumns(outputColumnName: "Label", inputColumnName: nameof(CandleDaysPrediction.trade_price))
                     .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedMarket", inputColumnName: nameof(CandleDays.market)))
                     .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedCandle_date_time_utc", inputColumnName: nameof(CandleDays.candle_date_time_utc)))
-                    .Append(mlContext.Transforms.Concatenate("Features", "EncodedMarket", "EncodedCandle_date_time_utc", "trade_price"))
+                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedCandle_date_time_kst", inputColumnName: nameof(CandleDays.candle_date_time_kst)))
+                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedOpening_price", inputColumnName: nameof(CandleDays.opening_price)))
+                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedHigh_price", inputColumnName: nameof(CandleDays.high_price)))
+                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedLow_price", inputColumnName: nameof(CandleDays.low_price)))
+                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedTimestamp", inputColumnName: nameof(CandleDays.timestamp)))
+                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedCandle_acc_trade_price", inputColumnName: nameof(CandleDays.candle_acc_trade_price)))
+                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedCandle_acc_trade_volume", inputColumnName: nameof(CandleDays.candle_acc_trade_volume)))
+                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedPrev_closing_price", inputColumnName: nameof(CandleDays.prev_closing_price)))
+                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedChange_price", inputColumnName: nameof(CandleDays.change_price)))
+                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedChange_rate", inputColumnName: nameof(CandleDays.change_rate)))
+                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedConverted_trade_price", inputColumnName: nameof(CandleDays.converted_trade_price)))
+                    .Append(mlContext.Transforms.Concatenate("Features", "EncodedMarket", "EncodedCandle_date_time_utc", "EncodedCandle_date_time_kst", "EncodedOpening_price",
+                    "EncodedHigh_price", "EncodedLow_price", "trade_price", "EncodedTimestamp", "EncodedCandle_acc_trade_price", "EncodedCandle_acc_trade_volume",
+                    "EncodedPrev_closing_price", "EncodedChange_price", "EncodedChange_rate", "EncodedConverted_trade_price"))
                     .Append(mlContext.Regression.Trainers.FastTree());
 
             // 모델 학습
