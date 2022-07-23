@@ -43,13 +43,12 @@ internal static class Utils
                     }
 
                     // 2. 데이터 입력
-                    var obj = enumerator.Current;
                     do
                     {
                         FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
                         for (int i = 0; i < fieldInfos.Length; i++)
                         {
-                            sb.Append(fieldInfos[i].GetValue(obj));
+                            sb.Append(fieldInfos[i].GetValue(enumerator.Current));
                             sb.Append(',');
                         }
                         sb.Append('\n');

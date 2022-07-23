@@ -137,8 +137,6 @@ public class MarketModel
         if (res != null)
         {
             MachineLearning.CreateCSV(res, res[0].market);
-            var predictePrice = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date);
-            Logger.Log($"predictePrice : {predictePrice}");
             for (int i = 0; i < res.Count; i++)
             {
                 var candlesDays = res[i];
@@ -156,6 +154,9 @@ public class MarketModel
                             if (date == Time.NowTime.Date.AddDays(-1))
                             {
                                 marketInfo.yesterday_trade_price = candlesDays.trade_price;
+                                marketInfo.predictePrice = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date);
+                                marketInfo.predictePrice_D1 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(1));
+                                marketInfo.predictePrice_D2 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(2));
                                 onUpdateTicker?.Invoke(marketInfo);
                             }
                         }

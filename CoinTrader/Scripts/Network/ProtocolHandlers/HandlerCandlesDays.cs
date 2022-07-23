@@ -131,6 +131,8 @@ namespace Network
         /// <param name="onFinished"></param>
         public void Request(string market, string to = "", int count = 200, string convertingPriceUnit = "KRW", Action<bool, List<CandlesDaysRes>> onFinished = null)
         {
+            if (string.IsNullOrEmpty(to))
+                to = Time.NowTime.Date.ToString("yyyy-MM-dd HH:mm:ss");
             RestRequest request = new RestRequest(URI + $"market={market}&to={to}&count={count}&convertingPriceUnit={convertingPriceUnit}", Method);
             request.AddHeader("Accept", "application/json");
             base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
