@@ -155,8 +155,8 @@ public class MarketModel
                             {
                                 marketInfo.yesterday_trade_price = candlesDays.trade_price;
                                 marketInfo.predictePrice = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date);
-                                marketInfo.predictePrice_D1 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(1));
-                                marketInfo.predictePrice_D2 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(2));
+                                //marketInfo.predictePrice_D1 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(1));
+                                //marketInfo.predictePrice_D2 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(2));
                                 onUpdateTicker?.Invoke(marketInfo);
                             }
                         }

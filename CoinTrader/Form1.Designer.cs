@@ -42,13 +42,11 @@ namespace CoinTrader
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.logTabPage = new MetroFramework.Controls.MetroTabPage();
             this.listView1 = new MetroFramework.Controls.MetroListView();
             this.Log = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.optionTabPage = new MetroFramework.Controls.MetroTabPage();
-            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).BeginInit();
             this.metroTabControl1.SuspendLayout();
             this.mainTabPage.SuspendLayout();
@@ -100,9 +98,7 @@ namespace CoinTrader
             this.columnHeader4,
             this.columnHeader5,
             this.columnHeader6,
-            this.columnHeader7,
-            this.columnHeader8,
-            this.columnHeader9});
+            this.columnHeader7});
             this.metroListView1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.metroListView1.FullRowSelect = true;
             this.metroListView1.GridLines = true;
@@ -144,6 +140,11 @@ namespace CoinTrader
             // 
             this.columnHeader6.Text = "목표 매도 단가";
             this.columnHeader6.Width = 100;
+            // 
+            // columnHeader7
+            // 
+            this.columnHeader7.Text = "금일 예상 종가";
+            this.columnHeader7.Width = 150;
             // 
             // logTabPage
             // 
@@ -203,21 +204,6 @@ namespace CoinTrader
             this.optionTabPage.VerticalScrollbarHighlightOnWheel = false;
             this.optionTabPage.VerticalScrollbarSize = 10;
             // 
-            // columnHeader7
-            // 
-            this.columnHeader7.Text = "금일 예상 종가";
-            this.columnHeader7.Width = 150;
-            // 
-            // columnHeader8
-            // 
-            this.columnHeader8.Text = "D+1 예상 종가";
-            this.columnHeader8.Width = 150;
-            // 
-            // columnHeader9
-            // 
-            this.columnHeader9.Text = "D+2 예상 종가";
-            this.columnHeader9.Width = 150;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -255,8 +241,6 @@ namespace CoinTrader
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.ColumnHeader columnHeader6;
         private System.Windows.Forms.ColumnHeader columnHeader7;
-        private System.Windows.Forms.ColumnHeader columnHeader8;
-        private System.Windows.Forms.ColumnHeader columnHeader9;
     }
 }
 

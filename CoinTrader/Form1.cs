@@ -18,8 +18,6 @@ namespace CoinTrader
             TargetSell,
             TargetBuy,
             TodayPredicteClosePrice,
-            TodayPredicteClosePrice_D1,
-            TodayPredicteClosePrice_D2,
         }
 
         public Form1()
@@ -196,32 +194,6 @@ namespace CoinTrader
                     symbol = "▽";
                 }
                 item.SubItems[(int)eTickerHeader.TodayPredicteClosePrice].Text = $"{symbol} {marketInfo.predictePrice:N0}원 ({percentage:F2}%)";
-
-                // D+1 예상 종가
-                percentage = marketInfo.GetTodayPredicteNormalize(MarketInfo.eDay.D1day) * 100f;
-                symbol = string.Empty;
-                if (percentage > 0f)
-                {
-                    symbol = "▲";
-                }
-                else if (percentage < 0f)
-                {
-                    symbol = "▽";
-                }
-                item.SubItems[(int)eTickerHeader.TodayPredicteClosePrice_D1].Text = $"{symbol} {marketInfo.predictePrice_D1:N0}원 ({percentage:F2}%)";
-
-                // D+2 예상 종가
-                percentage = marketInfo.GetTodayPredicteNormalize(MarketInfo.eDay.D2day) * 100f;
-                symbol = string.Empty;
-                if (percentage > 0f)
-                {
-                    symbol = "▲";
-                }
-                else if (percentage < 0f)
-                {
-                    symbol = "▽";
-                }
-                item.SubItems[(int)eTickerHeader.TodayPredicteClosePrice_D2].Text = $"{symbol} {marketInfo.predictePrice_D2:N0}원 ({percentage:F2}%)";
             }
             metroListView1.EndUpdate();
         }
