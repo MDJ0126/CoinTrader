@@ -16,3 +16,18 @@ public enum eMarketType
     /// </summary>
     USDT,
 }
+
+/// <summary>
+/// 표준 시간 구분
+/// </summary>
+public enum eTimeType
+{
+    /// <summary>
+    /// 세계협정시
+    /// </summary>
+    UTC,
+    /// <summary>
+    /// 한국 표준 시간
+    /// </summary>
+    KST,
+}

@@ -154,13 +154,10 @@ public class MarketModel
                         var marketInfo = marketInfos.Find(info => info.name == candlesDays.market);
                         if (marketInfo != null)
                         {
-                            var date = candlesDays.GetTradeDateTime(CandlesDaysRes.eTimeType.UTC);
-                            if (date == Time.NowTime.Date.AddDays(-1))
+                            var date = candlesDays.GetTradeDateTime(eTimeType.KST);
+                            if (date.Date == Time.NowTime.Date.AddDays(-1))
                             {
                                 marketInfo.yesterday_trade_price = candlesDays.trade_price;
-                                //marketInfo.predictePrice = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date, "Days");
-                                //marketInfo.predictePrice_D1 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(1));
-                                //marketInfo.predictePrice_D2 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(2));
                                 onUpdateTicker?.Invoke(marketInfo);
                             }
                         }
@@ -194,13 +191,12 @@ public class MarketModel
                         var marketInfo = marketInfos.Find(info => info.name == candlesDays.market);
                         if (marketInfo != null)
                         {
-                            var date = candlesDays.GetTradeDateTime(CandlesMinutesRes.eTimeType.UTC);
+                            var date = candlesDays.GetTradeDateTime(eTimeType.KST);
                             if (date == Time.NowTime.Date.AddDays(-1))
                             {
-                                marketInfo.yesterday_trade_price = candlesDays.trade_price;
                                 marketInfo.predictePrice = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.AddDays(1).Date, "Minutes");
-                                //marketInfo.predictePrice_D1 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(1));
-                                //marketInfo.predictePrice_D2 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.Date.AddDays(2));
+                                //marketInfo.predictePrice_D1 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.AddDays(2).Date, "Minutes");
+                                //marketInfo.predictePrice_D2 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.AddDays(3).Date, "Minutes");
                                 onUpdateTicker?.Invoke(marketInfo);
                             }
                         }

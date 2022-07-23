@@ -88,6 +88,7 @@ namespace CoinTrader.ML
             var candleDaysSample = new CandleData()
             {
                 market = market,
+                candle_date_time_kst = date.ToString(),
                 candle_date_time_utc = date.ToString(),
             };
             var prediction = predictionFunction.Predict(candleDaysSample);

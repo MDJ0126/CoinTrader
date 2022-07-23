@@ -141,6 +141,13 @@ namespace CoinTrader
             for (int i = 0; i < marketStrs.Count; i++)
             {
                 bool isFinished = false;
+                ProtocolManager.GetHandler<HandlerCandlesDays>().Request(marketStrs[i].name, onFinished: (result, res) =>
+                {
+                    isFinished = true;
+                });
+                yield return new WaitUntil(() => isFinished);
+
+                isFinished = false;
                 ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(30, marketStrs[i].name, onFinished: (result, res) =>
                 {
                     isFinished = true;

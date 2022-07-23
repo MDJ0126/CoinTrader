@@ -24,7 +24,7 @@ namespace Network
         /// </summary>
         public string trade_time;
         /// <summary>
-        ///  최근 거래 일자(KST)
+        /// 최근 거래 일자(KST)
         /// </summary>
         public string trade_date_kst;
         /// <summary>
@@ -113,21 +113,6 @@ namespace Network
         /// 타임스탬프
         /// </summary>
         public long timestamp;
-
-        /// <summary>
-        /// 표준 시간 구분
-        /// </summary>
-        public enum eTimeType
-        {
-            /// <summary>
-            /// 세계협정시
-            /// </summary>
-            UTC,
-            /// <summary>
-            /// 한국 표준 시간
-            /// </summary>
-            KST,
-        }
 
         /// <summary>
         /// 거래 DateTime 가져오기

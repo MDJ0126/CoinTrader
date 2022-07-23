@@ -69,21 +69,6 @@ namespace Network
         public double converted_trade_price;
 
         /// <summary>
-        /// 표준 시간 구분
-        /// </summary>
-        public enum eTimeType
-        {
-            /// <summary>
-            /// 세계협정시
-            /// </summary>
-            UTC,
-            /// <summary>
-            /// 한국 표준 시간
-            /// </summary>
-            KST,
-        }
-
-        /// <summary>
         /// 거래 DateTime 가져오기
         /// </summary>
         /// <param name="timeType">표준 시간 기준</param>
