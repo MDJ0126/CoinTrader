@@ -138,10 +138,6 @@ public class MarketModel
     {
         if (res != null)
         {
-            bool create = MachineLearning.CreateCSV(res, res[0].market, "Days");
-            if (!create)
-                MachineLearning.AppendCSV(res, res[0].market, "Days");
-
             for (int i = 0; i < res.Count; i++)
             {
                 var candlesDays = res[i];
@@ -175,33 +171,44 @@ public class MarketModel
     {
         if (res != null)
         {
-            bool create = MachineLearning.CreateCSV(res, res[0].market, "Minutes");
-            if (!create)
-                MachineLearning.AppendCSV(res, res[0].market, "Minutes");
+            var first = res[0];
 
-            for (int i = 0; i < res.Count; i++)
+            if (first.unit > 10)
             {
-                var candlesDays = res[i];
-                var enumerator = markets.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    var marketInfos = enumerator.Current.Value;
-                    if (marketInfos != null)
-                    {
-                        var marketInfo = marketInfos.Find(info => info.name == candlesDays.market);
-                        if (marketInfo != null)
-                        {
-                            var date = candlesDays.GetTradeDateTime(eTimeType.KST);
-                            if (date == Time.NowTime.Date.AddDays(-1))
-                            {
-                                marketInfo.predictePrice = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.AddDays(1).Date, "Minutes");
-                                //marketInfo.predictePrice_D1 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.AddDays(2).Date, "Minutes");
-                                //marketInfo.predictePrice_D2 = MachineLearning.GetPredictePrice(res[0].market, Time.NowTime.AddDays(3).Date, "Minutes");
-                                onUpdateTicker?.Invoke(marketInfo);
-                            }
-                        }
-                    }
-                }
+                bool create = MachineLearning.CreateTrainCSV(res, first.market, "Minutes");
+                if (!create)
+                    MachineLearning.AppendTrainCSV(res, first.market, "Minutes");
+            }
+            else
+            {
+                bool create = MachineLearning.CreateEvaluateCSV(res, first.market, "Minutes");
+                if (!create)
+                    MachineLearning.AppendEvaluateCSV(res, first.market, "Minutes");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 예상 종가 도출
+    /// </summary>
+    /// <param name="marketType"></param>
+    /// <param name="market"></param>
+    public void UpdatePredictePrice(eMarketType marketType, string market)
+    {
+        var marketInfos = GetMarketInfos(marketType);
+        if (marketInfos != null)
+        {
+            var marketInfo = marketInfos.Find(info => info.name == market);
+            if (marketInfo != null)
+            {
+                marketInfo.predictePrice = MachineLearning.GetPredictePrice(market, Time.NowTime.AddDays(1).Date, "Minutes");
+
+                //double[] predictePrices = new double[10];
+                //for (int i = 0; i < 10; i++)
+                //{
+                //    predictePrices[i] = MachineLearning.GetPredictePrice(market, Time.NowTime.AddDays(i + 1).Date, "Minutes");
+                //}
+                onUpdateTicker?.Invoke(marketInfo);
             }
         }
     }

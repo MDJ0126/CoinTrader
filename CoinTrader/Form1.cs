@@ -28,11 +28,8 @@ namespace CoinTrader
             ProtocolManager.GetHandler<HandlerAccount>().Request();
             ProtocolManager.GetHandler<HandlerApiKey>().Request();
 
-            // 계좌 리스트 뿌리기
-            // 종목 리스트 뿌리기
-            // 매입 리스트 뿌리기
-            // 그래프는 시간 날 때
-            // 폰트 적용
+            // 매입량
+            // 이동평균선
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -184,11 +181,12 @@ namespace CoinTrader
                 });
                 yield return new WaitUntil(() => isFinished);
 
+                ModelCenter.Market.UpdatePredictePrice(eMarketType.KRW, marketStrs[i].name);
+
                 yield return new WaitForSeconds(INTERVAL);
             }
             Logger.Log($"총 {marketStrs.Count}개의 캔들 확인, 소요 시간: {(Time.NowTime - start).TotalSeconds}초");
         }
-
 
         /// <summary>
         /// 현재가 갱신

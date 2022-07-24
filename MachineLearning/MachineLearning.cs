@@ -1,5 +1,7 @@
 ﻿using Microsoft.ML;
+using Microsoft.ML.TimeSeries;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace CoinTrader.ML
@@ -8,61 +10,72 @@ namespace CoinTrader.ML
     {
         static MachineLearning()
         {
-            var path = Utils.CSV_DATA_PATH;
-            DeleteDirectory(path);
+            Initialize();
         }
 
         /// <summary>
-        /// Depth-first recursive delete, with handling for descendant 
-        /// directories open in Windows Explorer.
+        /// 초기화
         /// </summary>
-        public static void DeleteDirectory(string path)
+        public static void Initialize()
         {
-            foreach (string directory in Directory.GetDirectories(path))
-            {
-                DeleteDirectory(directory);
-            }
-
-            try
-            {
-                Directory.Delete(path, true);
-            }
-            catch (IOException)
-            {
-                Directory.Delete(path, true);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                Directory.Delete(path, true);
-            }
+            var path = Utils.CSV_DATA_PATH;
+            Utils.DeleteDirectory(path);
         }
 
         /// <summary>
-        /// CSV 파일 만들기
+        /// 학습 CSV 파일 만들기
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="collection"></param>
         /// <param name="name"></param>
-        public static bool CreateCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
+        public static bool CreateTrainCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
         {
-            string path = Path.Combine(Environment.CurrentDirectory, "Data", name);
+            string path = Path.Combine(Utils.CSV_DATA_PATH, type, name + "_Train");
             bool create = Utils.CreateCSVFile(collection, path, overwrite: false);
             if (!create)
                 Utils.AppendCSVFile(collection, path);
-            return Utils.CreateCSVFile(collection, Path.Combine(Environment.CurrentDirectory, "Data", type, name), overwrite: false);
+            return Utils.CreateCSVFile(collection, path, overwrite: false);
         }
 
         /// <summary>
-        /// 이어쓰기
+        /// 학습 CSV 파일 이어쓰기
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="collection"></param>
         /// <param name="name"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static bool AppendCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
+        public static bool AppendTrainCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
         {
-            return Utils.AppendCSVFile(collection, Path.Combine(Environment.CurrentDirectory, "Data", type, name));
+            return Utils.AppendCSVFile(collection, Path.Combine(Utils.CSV_DATA_PATH, type, name + "_Train"));
+        }
+
+        /// <summary>
+        /// 평가 CSV 파일 만들기
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="name"></param>
+        public static bool CreateEvaluateCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
+        {
+            string path = Path.Combine(Utils.CSV_DATA_PATH, type, name + "_Evaluate");
+            bool create = Utils.CreateCSVFile(collection, path, overwrite: false);
+            if (!create)
+                Utils.AppendCSVFile(collection, path);
+            return Utils.CreateCSVFile(collection, path, overwrite: false);
+        }
+
+        /// <summary>
+        /// 평가 CSV 파일 이어쓰기
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="name"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool AppendEvaluateCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
+        {
+            return Utils.AppendCSVFile(collection, Path.Combine(Utils.CSV_DATA_PATH, type, name + "_Evaluate"));
         }
 
         /// <summary>
@@ -75,16 +88,16 @@ namespace CoinTrader.ML
         {
             MLContext mlContext = new MLContext(seed: 0);
 
-            var path = Path.Combine(Environment.CurrentDirectory, "Data", type, market + ".csv");
-
             // 학습하기
+            var path = Path.Combine(Utils.CSV_DATA_PATH, type, market + "_Train.csv");
             var model = Train(mlContext, path);
 
             // 평가하기
+            path = Path.Combine(Utils.CSV_DATA_PATH, type, market + "_Evaluate.csv");
             Evaluate(mlContext, model, path);
 
             // 예상 가격 추출
-            var predictionFunction = mlContext.Model.CreatePredictionEngine<CandleData, CandleDaysPrediction>(model);
+            var predictionFunction = mlContext.Model.CreatePredictionEngine<CandleData, CandlePrediction>(model);
             var candleDaysSample = new CandleData()
             {
                 market = market,
@@ -105,7 +118,7 @@ namespace CoinTrader.ML
         {
             IDataView dataView = mlContext.Data.LoadFromTextFile<CandleData>(dataPath, hasHeader: true, separatorChar: ',');
 
-            var pipeline = mlContext.Transforms.CopyColumns(outputColumnName: "Label", inputColumnName: nameof(CandleDaysPrediction.trade_price))
+            var pipeline = mlContext.Transforms.CopyColumns(outputColumnName: "Label", inputColumnName: nameof(CandlePrediction.trade_price))
                     .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedMarket", inputColumnName: nameof(CandleData.market)))
                     .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedCandle_date_time_utc", inputColumnName: nameof(CandleData.candle_date_time_utc)))
                     .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedCandle_date_time_kst", inputColumnName: nameof(CandleData.candle_date_time_kst)))

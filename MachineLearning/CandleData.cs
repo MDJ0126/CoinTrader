@@ -76,9 +76,12 @@ namespace CoinTrader.ML
         public double converted_trade_price;
     }
 
-    public class CandleDaysPrediction
+    public class CandlePrediction
     {
         [ColumnName("Score")]
         public float trade_price;
+
+        [VectorType(7)]
+        public double[] Prediction { get; set; }
     }
 }

@@ -15,8 +15,9 @@ internal static class Utils
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="collection">컬렉션</param>
-    /// <param name="path">생성 위치</param>
+    /// <param name="path">파일 위치</param>
     /// <param name="overwrite">덮어쓰기 여부</param>
+    /// <returns>작업 완료 여부</returns>
     public static bool CreateCSVFile<T>(ICollection<T> collection, string path, bool overwrite = true)
     {
         if (collection.Count > 0)
@@ -79,9 +80,9 @@ internal static class Utils
     /// 이어쓰기
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="collection"></param>
-    /// <param name="path"></param>
-    /// <returns></returns>
+    /// <param name="collection">컬렉션</param>
+    /// <param name="path">파일 위치</param>
+    /// <returns>작업 완료 여부</returns>
     public static bool AppendCSVFile<T>(ICollection<T> collection, string path)
     {
         if (collection.Count > 0)
@@ -112,5 +113,30 @@ internal static class Utils
             }
         }
         return false;
+    }
+
+    /// <summary>
+    /// Depth-first recursive delete, with handling for descendant 
+    /// directories open in Windows Explorer.
+    /// </summary>
+    public static void DeleteDirectory(string path)
+    {
+        foreach (string directory in Directory.GetDirectories(path))
+        {
+            DeleteDirectory(directory);
+        }
+
+        try
+        {
+            Directory.Delete(path, true);
+        }
+        catch (IOException)
+        {
+            Directory.Delete(path, true);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            Directory.Delete(path, true);
+        }
     }
 }
