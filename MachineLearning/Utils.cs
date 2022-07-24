@@ -11,6 +11,22 @@ internal static class Utils
     private static StringBuilder sb = new StringBuilder();
 
     /// <summary>
+    /// 경로에 폴더가 없으면 생성
+    /// </summary>
+    /// <param name="path"></param>
+    public static void CreatePathFolder(string path)
+    {
+        string[] folderNames = path.Split('\\');
+        string fullPath = string.Empty;
+        for (int i = 0; i < folderNames.Length - 1; i++)
+        {
+            fullPath += folderNames[i] + '\\';
+            DirectoryInfo di = new DirectoryInfo(fullPath);
+            if (!di.Exists) di.Create();
+        }
+    }
+
+    /// <summary>
     /// 컬렉션 CSV 파일 만들기
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -22,15 +38,7 @@ internal static class Utils
     {
         if (collection.Count > 0)
         {
-            // 경로에 폴더가 없으면 생성
-            string[] folderNames = path.Split('\\');
-            string fullPath = string.Empty;
-            for (int i = 0; i < folderNames.Length - 1; i++)
-            {
-                fullPath += folderNames[i] + '\\';
-                DirectoryInfo di = new DirectoryInfo(fullPath);
-                if (!di.Exists) di.Create();
-            }
+            CreatePathFolder(path);
 
             sb.Length = 0;
             path += ".csv";
@@ -49,23 +57,22 @@ internal static class Utils
                             sb.Append(fieldInfos[i].Name);
                             sb.Append(',');
                         }
-                        sb.Append('\n');
                     }
 
                     // 2. 데이터 입력
                     do
                     {
+                        sb.Append('\n');
                         FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
                         for (int i = 0; i < fieldInfos.Length; i++)
                         {
                             sb.Append(fieldInfos[i].GetValue(enumerator.Current));
                             sb.Append(',');
                         }
-                        sb.Append('\n');
 
                     } while (enumerator.MoveNext());
 
-                    writer.WriteLine(sb);
+                    writer.Write(sb);
                     writer.Close();
                 }
                 return true;
@@ -97,16 +104,16 @@ internal static class Utils
                     // 데이터 입력
                     while (enumerator.MoveNext())
                     {
+                        sb.Append('\n');
                         FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
                         for (int i = 0; i < fieldInfos.Length; i++)
                         {
                             sb.Append(fieldInfos[i].GetValue(enumerator.Current));
                             sb.Append(',');
                         }
-                        sb.Append('\n');
                     };
 
-                    writer.WriteLine(sb);
+                    writer.Write(sb);
                     writer.Close();
                 }
                 return true;

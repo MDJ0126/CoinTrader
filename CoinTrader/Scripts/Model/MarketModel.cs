@@ -138,6 +138,11 @@ public class MarketModel
     {
         if (res != null)
         {
+            var first = res[0];
+            bool create = MachineLearning.CreateTrainCSV(res, first.market, "Days");
+            if (!create)
+                MachineLearning.AppendTrainCSV(res, first.market, "Days");
+
             for (int i = 0; i < res.Count; i++)
             {
                 var candlesDays = res[i];
@@ -172,19 +177,9 @@ public class MarketModel
         if (res != null)
         {
             var first = res[0];
-
-            if (first.unit > 10)
-            {
-                bool create = MachineLearning.CreateTrainCSV(res, first.market, "Minutes");
-                if (!create)
-                    MachineLearning.AppendTrainCSV(res, first.market, "Minutes");
-            }
-            else
-            {
-                bool create = MachineLearning.CreateEvaluateCSV(res, first.market, "Minutes");
-                if (!create)
-                    MachineLearning.AppendEvaluateCSV(res, first.market, "Minutes");
-            }
+            bool create = MachineLearning.CreateTrainCSV(res, first.market, "Minutes");
+            if (!create)
+                MachineLearning.AppendTrainCSV(res, first.market, "Minutes");
         }
     }
 
@@ -201,13 +196,7 @@ public class MarketModel
             var marketInfo = marketInfos.Find(info => info.name == market);
             if (marketInfo != null)
             {
-                marketInfo.predictePrice = MachineLearning.GetPredictePrice(market, Time.NowTime.AddDays(1).Date, "Minutes");
-
-                //double[] predictePrices = new double[10];
-                //for (int i = 0; i < 10; i++)
-                //{
-                //    predictePrices[i] = MachineLearning.GetPredictePrice(market, Time.NowTime.AddDays(i + 1).Date, "Minutes");
-                //}
+                marketInfo.predictePrice = MachineLearning.GetPredictePrice(market, Time.NowTime.AddDays(1).Date, "Days");
                 onUpdateTicker?.Invoke(marketInfo);
             }
         }

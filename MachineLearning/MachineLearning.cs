@@ -1,8 +1,12 @@
 ﻿using Microsoft.ML;
 using Microsoft.ML.TimeSeries;
+using Microsoft.ML.Transforms.TimeSeries;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+
+// '시계열' 예제: https://docs.microsoft.com/ko-kr/dotnet/machine-learning/tutorials/time-series-demand-forecasting
 
 namespace CoinTrader.ML
 {
@@ -30,10 +34,7 @@ namespace CoinTrader.ML
         /// <param name="name"></param>
         public static bool CreateTrainCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
         {
-            string path = Path.Combine(Utils.CSV_DATA_PATH, type, name + "_Train");
-            bool create = Utils.CreateCSVFile(collection, path, overwrite: false);
-            if (!create)
-                Utils.AppendCSVFile(collection, path);
+            string path = Path.Combine(Utils.CSV_DATA_PATH, type, name);
             return Utils.CreateCSVFile(collection, path, overwrite: false);
         }
 
@@ -47,35 +48,8 @@ namespace CoinTrader.ML
         /// <returns></returns>
         public static bool AppendTrainCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
         {
-            return Utils.AppendCSVFile(collection, Path.Combine(Utils.CSV_DATA_PATH, type, name + "_Train"));
-        }
-
-        /// <summary>
-        /// 평가 CSV 파일 만들기
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="collection"></param>
-        /// <param name="name"></param>
-        public static bool CreateEvaluateCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
-        {
-            string path = Path.Combine(Utils.CSV_DATA_PATH, type, name + "_Evaluate");
-            bool create = Utils.CreateCSVFile(collection, path, overwrite: false);
-            if (!create)
-                Utils.AppendCSVFile(collection, path);
-            return Utils.CreateCSVFile(collection, path, overwrite: false);
-        }
-
-        /// <summary>
-        /// 평가 CSV 파일 이어쓰기
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="collection"></param>
-        /// <param name="name"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static bool AppendEvaluateCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
-        {
-            return Utils.AppendCSVFile(collection, Path.Combine(Utils.CSV_DATA_PATH, type, name + "_Evaluate"));
+            string path = Path.Combine(Utils.CSV_DATA_PATH, type, name);
+            return Utils.AppendCSVFile(collection, path);
         }
 
         /// <summary>
@@ -86,72 +60,107 @@ namespace CoinTrader.ML
         /// <returns>예상 가격</returns>
         public static double GetPredictePrice(string market, DateTime date, string type)
         {
-            MLContext mlContext = new MLContext(seed: 0);
+            var path = Path.Combine(Utils.CSV_DATA_PATH, type, market + ".csv");
+            var modelPath = Path.Combine(Utils.CSV_DATA_PATH, "Models", $"{market}_Model.zip");
 
-            // 학습하기
-            var path = Path.Combine(Utils.CSV_DATA_PATH, type, market + "_Train.csv");
-            var model = Train(mlContext, path);
+            MLContext mlContext = new MLContext(/*seed: 0*/);
 
-            // 평가하기
-            path = Path.Combine(Utils.CSV_DATA_PATH, type, market + "_Evaluate.csv");
-            Evaluate(mlContext, model, path);
+            // 데이터뷰 생성
+            IDataView dataView = mlContext.Data.LoadFromTextFile<ModelInput>(path: path, hasHeader: true, separatorChar: ',');
 
-            // 예상 가격 추출
-            var predictionFunction = mlContext.Model.CreatePredictionEngine<CandleData, CandlePrediction>(model);
-            var candleDaysSample = new CandleData()
-            {
-                market = market,
-                candle_date_time_kst = date.ToString(),
-                candle_date_time_utc = date.ToString(),
-            };
-            var prediction = predictionFunction.Predict(candleDaysSample);
-            return prediction.trade_price;
+            // 평가
+            IDataView firstYearData = mlContext.Data.FilterRowsByColumn(dataView, "timestamp", upperBound: 1);
+            IDataView secondYearData = mlContext.Data.FilterRowsByColumn(dataView, "timestamp", lowerBound: 1);
+
+            var forecastingPipeline = mlContext.Forecasting.ForecastBySsa(
+                                    outputColumnName: "ForecastedTradePrice",
+                                    inputColumnName: "trade_price",
+                                    windowSize: 7,
+                                    seriesLength: 30,
+                                    trainSize: 365,
+                                    horizon: 7,
+                                    confidenceLevel: 0.95f,
+                                    confidenceLowerBoundColumn: "LowerBoundTradePrice",
+                                    confidenceUpperBoundColumn: "UpperBoundTradePrice");
+
+            SsaForecastingTransformer forecaster = forecastingPipeline.Fit(firstYearData);
+            Evaluate(secondYearData, forecaster, mlContext);
+
+            // 모델 저장
+            var forecastEngine = forecaster.CreateTimeSeriesEngine<ModelInput, ModelOutput>(mlContext);
+            Utils.CreatePathFolder(modelPath);
+            forecastEngine.CheckPoint(mlContext, modelPath);
+
+            // 예측하기
+            Forecast(secondYearData, 7, forecastEngine, mlContext);
+
+            return 0d;
         }
 
         /// <summary>
-        /// 학습하기
+        /// 평가
         /// </summary>
-        /// <param name="mlContext"></param>
-        /// <param name="dataPath"></param>
-        /// <returns></returns>
-        public static ITransformer Train(MLContext mlContext, string dataPath)
-        {
-            IDataView dataView = mlContext.Data.LoadFromTextFile<CandleData>(dataPath, hasHeader: true, separatorChar: ',');
-
-            var pipeline = mlContext.Transforms.CopyColumns(outputColumnName: "Label", inputColumnName: nameof(CandlePrediction.trade_price))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedMarket", inputColumnName: nameof(CandleData.market)))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedCandle_date_time_utc", inputColumnName: nameof(CandleData.candle_date_time_utc)))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedCandle_date_time_kst", inputColumnName: nameof(CandleData.candle_date_time_kst)))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedOpening_price", inputColumnName: nameof(CandleData.opening_price)))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedHigh_price", inputColumnName: nameof(CandleData.high_price)))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedLow_price", inputColumnName: nameof(CandleData.low_price)))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedTimestamp", inputColumnName: nameof(CandleData.timestamp)))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedCandle_acc_trade_price", inputColumnName: nameof(CandleData.candle_acc_trade_price)))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedCandle_acc_trade_volume", inputColumnName: nameof(CandleData.candle_acc_trade_volume)))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedPrev_closing_price", inputColumnName: nameof(CandleData.prev_closing_price)))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedChange_price", inputColumnName: nameof(CandleData.change_price)))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedChange_rate", inputColumnName: nameof(CandleData.change_rate)))
-                    .Append(mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "EncodedConverted_trade_price", inputColumnName: nameof(CandleData.converted_trade_price)))
-                    .Append(mlContext.Transforms.Concatenate("Features", "EncodedMarket", "EncodedCandle_date_time_utc", "EncodedCandle_date_time_kst", "EncodedOpening_price",
-                    "EncodedHigh_price", "EncodedLow_price", "trade_price", "EncodedTimestamp", "EncodedCandle_acc_trade_price", "EncodedCandle_acc_trade_volume",
-                    "EncodedPrev_closing_price", "EncodedChange_price", "EncodedChange_rate", "EncodedConverted_trade_price"))
-                    .Append(mlContext.Regression.Trainers.FastTree());
-
-            // 모델 학습
-            var model = pipeline.Fit(dataView);
-            return model;
-        }
-
-        /// <summary>
-        /// 평가하기
-        /// </summary>
-        /// <param name="mlContext"></param>
+        /// <param name="testData"></param>
         /// <param name="model"></param>
-        private static void Evaluate(MLContext mlContext, ITransformer model, string dataPath)
+        /// <param name="mlContext"></param>
+        private static void Evaluate(IDataView testData, ITransformer model, MLContext mlContext)
         {
-            IDataView dataView = mlContext.Data.LoadFromTextFile<CandleData>(dataPath, hasHeader: true, separatorChar: ',');
-            var predictions = model.Transform(dataView);
-            var metrics = mlContext.Regression.Evaluate(predictions, "Label", "Score");
+            IDataView predictions = model.Transform(testData);
+
+            // 실제값 가져오기
+            IEnumerable<float> actual = mlContext.Data.CreateEnumerable<ModelInput>(testData, true).Select(observed => observed.trade_price);
+
+            // 예측값 가져오기
+            IEnumerable<float> forecast = mlContext.Data.CreateEnumerable<ModelOutput>(predictions, true).Select(prediction => prediction.ForecastedTradePrice[0]);
+
+            // 일반적으로 오류라고 하는 실제 값과 예측 값의 차이를 계산합니다.
+            var metrics = actual.Zip(forecast, (actualValue, forecastValue) => actualValue - forecastValue);
+
+            // 절대 평균 오차 및 제곱 평균 오차 값을 계산하여 성능을 측정합니다.
+            // 1) 절대 평균 오차: 예측이 실제 값과 얼마나 근접한지 측정합니다. 이 값의 범위는 0과 무한대 사이입니다. 0에 가까울수록 모델의 품질이 좋습니다.
+            var MAE = metrics.Average(error => Math.Abs(error)); // Mean Absolute Error
+            // 2) 제곱 평균 오차: 모델의 오류를 요약합니다. 이 값의 범위는 0과 무한대 사이입니다. 0에 가까울수록 모델의 품질이 좋습니다.
+            var RMSE = Math.Sqrt(metrics.Average(error => Math.Pow(error, 2))); // Root Mean Squared Error
+
+            Console.WriteLine("Evaluation Metrics");
+            Console.WriteLine("---------------------");
+            Console.WriteLine($"Mean Absolute Error: {MAE:F3}");
+            Console.WriteLine($"Root Mean Squared Error: {RMSE:F3}\n");
+        }
+
+        /// <summary>
+        /// 모델을 사용하여 값 예측하기
+        /// </summary>
+        /// <param name="testData"></param>
+        /// <param name="horizon"></param>
+        /// <param name="forecaster"></param>
+        /// <param name="mlContext"></param>
+        private static void Forecast(IDataView testData, int horizon, TimeSeriesPredictionEngine<ModelInput, ModelOutput> forecaster, MLContext mlContext)
+        {
+            ModelOutput forecast = forecaster.Predict();
+            IEnumerable<string> forecastOutput = 
+                mlContext.Data.CreateEnumerable<ModelInput>(testData, reuseRowObject: false)
+                .Take(horizon)
+                .Select((ModelInput rental, int index) =>
+                {
+                    string rentalDate = rental.candle_date_time_utc;
+                    float actualRentals = rental.trade_price;
+                    float lowerEstimate = Math.Max(0, forecast.LowerBoundTradePrice[index]);
+                    float estimate = forecast.ForecastedTradePrice[index];
+                    float upperEstimate = forecast.UpperBoundTradePrice[index];
+                    return $"Date: {rentalDate}\n" +
+                    $"Actual Rentals: {actualRentals}\n" +
+                    $"Lower Estimate: {lowerEstimate}\n" +
+                    $"Forecast: {estimate}\n" + // <- Predict
+                    $"Upper Estimate: {upperEstimate}\n";
+                });
+
+            Console.WriteLine("Rental Forecast");
+            Console.WriteLine("---------------------");
+            foreach (var prediction in forecastOutput)
+            {
+                Console.WriteLine(prediction);
+            }
         }
     }
 }

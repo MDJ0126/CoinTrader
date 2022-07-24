@@ -1,8 +1,12 @@
 ﻿using Microsoft.ML.Data;
+using System;
 
 namespace CoinTrader.ML
 {
-    public class CandleData
+    /// <summary>
+    /// 캔들 구조
+    /// </summary>
+    public class ModelInput
     {
         /// <summary>
         /// 마켓명
@@ -43,7 +47,7 @@ namespace CoinTrader.ML
         /// 마지막 틱이 저장된 시각
         /// </summary>
         [LoadColumn(7)]
-        public long timestamp;
+        public double timestamp;
         /// <summary>
         /// 누적 거래 금액
         /// </summary>
@@ -76,12 +80,21 @@ namespace CoinTrader.ML
         public double converted_trade_price;
     }
 
-    public class CandlePrediction
+    public class ModelOutput
     {
-        [ColumnName("Score")]
-        public float trade_price;
+        /// <summary>
+        /// ForecastedRentals: 예측 기간의 예측 값입니다.
+        /// </summary>
+        public float[] ForecastedTradePrice { get; set; }
 
-        [VectorType(7)]
-        public double[] Prediction { get; set; }
+        /// <summary>
+        /// LowerBoundRentals: 예측 기간의 예측 최소값입니다.
+        /// </summary>
+        public float[] LowerBoundTradePrice { get; set; }
+
+        /// <summary>
+        /// UpperBoundRentals: 예측 기간의 예측 최대값입니다.
+        /// </summary>
+        public float[] UpperBoundTradePrice { get; set; }
     }
 }

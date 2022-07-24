@@ -145,37 +145,7 @@ namespace CoinTrader
                 yield return new WaitUntil(() => isFinished);
 
                 isFinished = false;
-                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(30, marketStrs[i].name, onFinished: (result, res) =>
-                {
-                    isFinished = true;
-                });
-                yield return new WaitUntil(() => isFinished);
-
-                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(15, marketStrs[i].name, onFinished: (result, res) =>
-                {
-                    isFinished = true;
-                });
-                yield return new WaitUntil(() => isFinished);
-
-                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(10, marketStrs[i].name, onFinished: (result, res) =>
-                {
-                    isFinished = true;
-                });
-                yield return new WaitUntil(() => isFinished);
-
-                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(5, marketStrs[i].name, onFinished: (result, res) =>
-                {
-                    isFinished = true;
-                });
-                yield return new WaitUntil(() => isFinished);
-
-                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(3, marketStrs[i].name, onFinished: (result, res) =>
-                {
-                    isFinished = true;
-                });
-                yield return new WaitUntil(() => isFinished);
-
-                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(1, marketStrs[i].name, onFinished: (result, res) =>
+                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketStrs[i].name, onFinished: (result, res) =>
                 {
                     isFinished = true;
                 });
