@@ -139,6 +139,8 @@ public class MarketModel
         if (res != null)
         {
             var first = res[0];
+            
+            res.Insert(0, new CandlesDaysRes { market = first.market, candle_date_time_utc = Time.NowTime.Date.ToString(), candle_date_time_kst = Time.NowTime.Date.AddHours(9).ToString() });
             bool create = MachineLearning.CreateTrainCSV(res, first.market, "Days");
             if (!create)
                 MachineLearning.AppendTrainCSV(res, first.market, "Days");
