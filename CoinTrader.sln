@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoinTrader", "CoinTrader\Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MachineLearning", "MachineLearning\MachineLearning.csproj", "{DBAA1208-26FD-40C8-9B76-CB8912F2E9C9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoinTraderML.Model", "CoinTraderML.Model\CoinTraderML.Model.csproj", "{9182DDF8-BDC1-424F-81F2-541177AABBFD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoinTraderML.ConsoleApp", "CoinTraderML.ConsoleApp\CoinTraderML.ConsoleApp.csproj", "{BF3480EE-1CA3-4840-B83B-F0B8504D727C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +35,22 @@ Global
 		{DBAA1208-26FD-40C8-9B76-CB8912F2E9C9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DBAA1208-26FD-40C8-9B76-CB8912F2E9C9}.Release|x86.ActiveCfg = Release|Any CPU
 		{DBAA1208-26FD-40C8-9B76-CB8912F2E9C9}.Release|x86.Build.0 = Release|Any CPU
+		{9182DDF8-BDC1-424F-81F2-541177AABBFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9182DDF8-BDC1-424F-81F2-541177AABBFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9182DDF8-BDC1-424F-81F2-541177AABBFD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9182DDF8-BDC1-424F-81F2-541177AABBFD}.Debug|x86.Build.0 = Debug|Any CPU
+		{9182DDF8-BDC1-424F-81F2-541177AABBFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9182DDF8-BDC1-424F-81F2-541177AABBFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9182DDF8-BDC1-424F-81F2-541177AABBFD}.Release|x86.ActiveCfg = Release|Any CPU
+		{9182DDF8-BDC1-424F-81F2-541177AABBFD}.Release|x86.Build.0 = Release|Any CPU
+		{BF3480EE-1CA3-4840-B83B-F0B8504D727C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF3480EE-1CA3-4840-B83B-F0B8504D727C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF3480EE-1CA3-4840-B83B-F0B8504D727C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BF3480EE-1CA3-4840-B83B-F0B8504D727C}.Debug|x86.Build.0 = Debug|Any CPU
+		{BF3480EE-1CA3-4840-B83B-F0B8504D727C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF3480EE-1CA3-4840-B83B-F0B8504D727C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF3480EE-1CA3-4840-B83B-F0B8504D727C}.Release|x86.ActiveCfg = Release|Any CPU
+		{BF3480EE-1CA3-4840-B83B-F0B8504D727C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

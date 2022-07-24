@@ -54,25 +54,29 @@ internal static class Utils
                         FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
                         for (int i = 0; i < fieldInfos.Length; i++)
                         {
+                            if (sb.Length > 0)
+                                sb.Append(',');
                             sb.Append(fieldInfos[i].Name);
-                            sb.Append(',');
                         }
+                        writer.Write(sb);
                     }
 
                     // 2. 데이터 입력
                     do
                     {
+                        sb.Length = 0;
                         sb.Append('\n');
                         FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
                         for (int i = 0; i < fieldInfos.Length; i++)
                         {
+                            if (sb.Length > 1)
+                                sb.Append(',');
                             sb.Append(fieldInfos[i].GetValue(enumerator.Current));
-                            sb.Append(',');
                         }
+                        writer.Write(sb);
 
                     } while (enumerator.MoveNext());
 
-                    writer.Write(sb);
                     writer.Close();
                 }
                 return true;
@@ -108,8 +112,9 @@ internal static class Utils
                         FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
                         for (int i = 0; i < fieldInfos.Length; i++)
                         {
+                            if (sb.Length > 0)
+                                sb.Append(',');
                             sb.Append(fieldInfos[i].GetValue(enumerator.Current));
-                            sb.Append(',');
                         }
                     };
 
