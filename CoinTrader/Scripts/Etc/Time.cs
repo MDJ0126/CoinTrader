@@ -6,7 +6,7 @@ public static class Time
     /// <summary>
     /// 기준 시간
     /// </summary>
-    private static DateTime startedTime = DateTime.UtcNow;
+    private static DateTime startedTime = DateTime.Now;
 
     /// <summary>
     /// 프로그램이 시작한 이후 경과 시간(seconds)

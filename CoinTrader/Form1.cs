@@ -44,9 +44,12 @@ namespace CoinTrader
         /// </summary>
         private void Initialize()
         {
+            // 타이머 작동
+            this.StartCoroutine(Timer());
+
+            // 워터풀 프로세스 시작
             WaterfallProcess wfp = new WaterfallProcess();
             wfp.Add(SetCoinList);
-            wfp.Add(RequestCandlesDays);
             wfp.Start(result =>
             {
                 ModelCenter.Market.OnUpdateTicker += OnUpdateTicker;
@@ -55,6 +58,19 @@ namespace CoinTrader
                 listView1.DoubleBuffered(true);
                 metroListView1.DoubleBuffered(true);
             });
+        }
+
+        /// <summary>
+        /// 타이머 코루틴
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator Timer()
+        {
+            while (true)
+            {
+                timeLabel.Text = Time.NowTime.ToString("yyyy년 M월 d일 tt hh:mm:ss");
+                yield return new WaitForSeconds(1f);
+            }
         }
 
         /// <summary>
@@ -113,52 +129,6 @@ namespace CoinTrader
         }
 
         /// <summary>
-        /// 캔들 요청
-        /// </summary>
-        /// <param name="onFinished"></param>
-        private void RequestCandlesDays(Action<bool> onFinished)
-        {
-            if (candlesDaysCoroutine != null)
-                this.StopCoroutine(candlesDaysCoroutine);
-            candlesDaysCoroutine = this.StartCoroutine(RequestCandlesDays());
-            onFinished?.Invoke(true);
-        }
-
-        private Coroutine candlesDaysCoroutine = null;
-        /// <summary>
-        ///  캔들 요청
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerator RequestCandlesDays()
-        {
-            const float INTERVAL = 0.1f;
-            var marketStrs = ModelCenter.Market.GetMarketInfos(eMarketType.KRW);
-
-            DateTime start = Time.NowTime;
-            for (int i = 0; i < marketStrs.Count; i++)
-            {
-                bool isFinished = false;
-                ProtocolManager.GetHandler<HandlerCandlesDays>().Request(marketStrs[i].name, onFinished: (result, res) =>
-                {
-                    isFinished = true;
-                });
-                yield return new WaitUntil(() => isFinished);
-
-                isFinished = false;
-                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketStrs[i].name, onFinished: (result, res) =>
-                {
-                    isFinished = true;
-                });
-                yield return new WaitUntil(() => isFinished);
-
-                ModelCenter.Market.UpdatePredictePrice(eMarketType.KRW, marketStrs[i].name);
-
-                yield return new WaitForSeconds(INTERVAL);
-            }
-            Logger.Log($"총 {marketStrs.Count}개의 캔들 확인, 소요 시간: {(Time.NowTime - start).TotalSeconds}초");
-        }
-
-        /// <summary>
         /// 현재가 갱신
         /// </summary>
         /// <param name="marketInfo"></param>
@@ -191,21 +161,24 @@ namespace CoinTrader
                 item.SubItems[(int)eTickerHeader.YesterDay].Text = $"{symbol} {marketInfo.trade_price - marketInfo.yesterday_trade_price:N0}원 ({percentage:F2}%)";
 
                 // 금일 예상 종가
-                percentage = marketInfo.GetTodayPredicteNormalize(MarketInfo.eDay.Today) * 100f;
-                symbol = string.Empty;
-                color = Color.Black;
-                if (percentage > 0f)
+                if (marketInfo.predictPrices != null && marketInfo.predictPrices.Count > 0)
                 {
-                    color = Color.Red;
-                    symbol = "▲";
+                    percentage = marketInfo.GetTodayPredicteNormalize() * 100f;
+                    symbol = string.Empty;
+                    color = Color.Black;
+                    if (percentage > 0f)
+                    {
+                        color = Color.Red;
+                        symbol = "▲";
+                    }
+                    else if (percentage < 0f)
+                    {
+                        color = Color.Blue;
+                        symbol = "▽";
+                    }
+                    item.SubItems[(int)eTickerHeader.TodayPredicteClosePrice].ForeColor = color;
+                    item.SubItems[(int)eTickerHeader.TodayPredicteClosePrice].Text = $"{symbol} {marketInfo.predictPrices[0].forecasted:N0}원 ({percentage:F2}%)";
                 }
-                else if (percentage < 0f)
-                {
-                    color = Color.Blue;
-                    symbol = "▽";
-                }
-                item.SubItems[(int)eTickerHeader.TodayPredicteClosePrice].ForeColor = color;
-                item.SubItems[(int)eTickerHeader.TodayPredicteClosePrice].Text = $"{symbol} {marketInfo.predictePrice:N0}원 ({percentage:F2}%)";
             }
             metroListView1.EndUpdate();
         }

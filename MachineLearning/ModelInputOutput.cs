@@ -1,11 +1,7 @@
 ﻿using Microsoft.ML.Data;
-using System;
 
 namespace CoinTrader.ML
 {
-    /// <summary>
-    /// 캔들 구조
-    /// </summary>
     public class ModelInput
     {
         /// <summary>
@@ -38,18 +34,18 @@ namespace CoinTrader.ML
     public class ModelOutput
     {
         /// <summary>
-        /// ForecastedRentals: 예측 기간의 예측 값입니다.
+        /// 예측 기간의 예측 값입니다.
         /// </summary>
-        public float[] ForecastedTradePrice { get; set; }
+        public float[] Forecasted { get; set; }
 
         /// <summary>
-        /// LowerBoundRentals: 예측 기간의 예측 최소값입니다.
+        /// 예측 기간의 예측 최소값입니다.
         /// </summary>
-        public float[] LowerBoundTradePrice { get; set; }
+        public float[] LowerBound { get; set; }
 
         /// <summary>
-        /// UpperBoundRentals: 예측 기간의 예측 최대값입니다.
+        /// 예측 기간의 예측 최대값입니다.
         /// </summary>
-        public float[] UpperBoundTradePrice { get; set; }
+        public float[] UpperBound { get; set; }
     }
 }

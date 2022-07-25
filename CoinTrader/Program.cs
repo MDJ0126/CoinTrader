@@ -21,6 +21,7 @@ namespace CoinTrader
                 MultiThread.SetMainThread();
                 Time.Start();
                 Logger.Start();
+                DeeplearningProcess.Start();
 
                 Application.Run(new Form1());
                 MultiThread.Release();

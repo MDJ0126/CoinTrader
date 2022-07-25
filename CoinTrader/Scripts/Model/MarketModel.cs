@@ -119,8 +119,6 @@ public class MarketModel
                                 marketInfo.trade_price = tickerRes.trade_price;
                                 if (marketInfo.yesterday_trade_price == null)
                                     marketInfo.yesterday_trade_price = tickerRes.trade_price;
-                                if (marketInfo.predictePrice == null)
-                                    marketInfo.predictePrice = tickerRes.trade_price;
                                 onUpdateTicker?.Invoke(marketInfo);
                             }
                         }
@@ -140,10 +138,9 @@ public class MarketModel
         {
             var first = res[0];
             
-            //res.Insert(0, new CandlesDaysRes { market = first.market, candle_date_time_utc = Time.NowTime.Date.ToString(), candle_date_time_kst = Time.NowTime.Date.AddHours(9).ToString() });
-            bool create = MachineLearning.CreateTrainCSV(res, first.market, "Days");
-            if (!create)
-                MachineLearning.AppendTrainCSV(res, first.market, "Days");
+            //bool create = MachineLearning.CreateTrainCSV(res, first.market, "Days");
+            //if (!create)
+            //    MachineLearning.AppendTrainCSV(res, first.market, "Days");
 
             for (int i = 0; i < res.Count; i++)
             {
@@ -171,36 +168,11 @@ public class MarketModel
     }
 
     /// <summary>
-    /// 분(Minute) 캔들 업데이트
-    /// </summary>
-    /// <param name="res"></param>
-    public void UpdateCandlesMinutes(List<CandlesMinutesRes> res)
-    {
-        if (res != null)
-        {
-            var first = res[0];
-            bool create = MachineLearning.CreateTrainCSV(res, first.market, "Minutes");
-            if (!create)
-                MachineLearning.AppendTrainCSV(res, first.market, "Minutes");
-        }
-    }
-
-    /// <summary>
     /// 예상 종가 도출
     /// </summary>
     /// <param name="marketType"></param>
     /// <param name="market"></param>
     public void UpdatePredictePrice(eMarketType marketType, string market)
     {
-        var marketInfos = GetMarketInfos(marketType);
-        if (marketInfos != null)
-        {
-            var marketInfo = marketInfos.Find(info => info.name == market);
-            if (marketInfo != null)
-            {
-                marketInfo.predictePrice = MachineLearning.GetPredictePrice(market, Time.NowTime.AddDays(1).Date, "Days");
-                onUpdateTicker?.Invoke(marketInfo);
-            }
-        }
     }
 }

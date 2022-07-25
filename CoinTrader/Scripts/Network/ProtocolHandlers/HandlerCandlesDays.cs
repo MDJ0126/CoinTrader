@@ -122,6 +122,15 @@ namespace Network
             if (response.IsSuccessful)
             {
                 res = JsonParser<CandlesDaysRes>(response.Content);
+
+                // 정렬
+                res.Sort((a, b) =>
+                {
+                    DateTime A = Convert.ToDateTime(a.candle_date_time_utc);
+                    DateTime B = Convert.ToDateTime(b.candle_date_time_utc);
+                    return A.CompareTo(B);
+                });
+
                 ModelCenter.Market.UpdateCandlesDays(res);
             }
             else

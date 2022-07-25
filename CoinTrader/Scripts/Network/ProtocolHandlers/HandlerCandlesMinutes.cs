@@ -99,7 +99,11 @@ namespace Network
         public void Request(int unit, string market, string to = "", int count = 200, Action<bool, List<CandlesMinutesRes>> onFinished = null)
         {
             if (string.IsNullOrEmpty(to))
-                to = Time.NowTime.Date.ToString("yyyy-MM-dd HH:mm:ss");
+            {
+                var nowTime = Time.NowTime;
+                var dateTime = new DateTime(nowTime.Year, nowTime.Month, nowTime.Day, nowTime.Hour, 0, 0);
+                to = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
+            }
             RestRequest request = new RestRequest(URI + $"{unit}?market={market}&to={to}&count={count}", Method);
             request.AddHeader("Accept", "application/json");
             base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
@@ -110,7 +114,14 @@ namespace Network
             if (response.IsSuccessful)
             {
                 res = JsonParser<CandlesMinutesRes>(response.Content);
-                ModelCenter.Market.UpdateCandlesMinutes(res);
+
+                // 정렬
+                res.Sort((a, b) =>
+                {
+                    DateTime A = Convert.ToDateTime(a.candle_date_time_utc);
+                    DateTime B = Convert.ToDateTime(b.candle_date_time_utc);
+                    return A.CompareTo(B);
+                });
             }
             else
             {

@@ -184,6 +184,8 @@
     <Compile Include="Scripts\Etc\Coroutine\Coroutine.cs" />
     <Compile Include="Scripts\Etc\Coroutine\iKeepWait.cs" />
     <Compile Include="Scripts\Etc\Enumeration.cs" />
+    <Compile Include="Scripts\Market\DeeplearningProcess.cs" />
+    <Compile Include="Scripts\Market\PredictPrice.cs" />
     <Compile Include="Scripts\Model\AccountModel.cs" />
     <Compile Include="Scripts\Model\MarketModel.cs" />
     <Compile Include="Scripts\Model\ModelCenter.cs" />
@@ -231,10 +233,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CoinTraderML.Model\CoinTraderML.Model.csproj">
-      <Project>{9182DDF8-BDC1-424F-81F2-541177AABBFD}</Project>
-      <Name>CoinTraderML.Model</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MachineLearning\MachineLearning.csproj">
       <Project>{dbaa1208-26fd-40c8-9b76-cb8912f2e9c9}</Project>
       <Name>MachineLearning</Name>
