@@ -32,7 +32,7 @@ namespace CoinTrader.ML
         /// <typeparam name="T"></typeparam>
         /// <param name="collection"></param>
         /// <param name="name"></param>
-        public static bool CreateTrainCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
+        public static bool CreateTrainCSV<T>(ICollection<T> collection, string name, string type)
         {
             string path = Path.Combine(Utils.CSV_DATA_PATH, type, name);
             return Utils.CreateCSVFile(collection, path, overwrite: false);
@@ -46,7 +46,7 @@ namespace CoinTrader.ML
         /// <param name="name"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static bool AppendTrainCSV<T>(System.Collections.Generic.ICollection<T> collection, string name, string type)
+        public static bool AppendTrainCSV<T>(ICollection<T> collection, string name, string type)
         {
             string path = Path.Combine(Utils.CSV_DATA_PATH, type, name);
             return Utils.AppendCSVFile(collection, path);
@@ -68,9 +68,11 @@ namespace CoinTrader.ML
             // 데이터뷰 생성
             IDataView dataView = mlContext.Data.LoadFromTextFile<ModelInput>(path: path, hasHeader: true, separatorChar: ',');
 
-            // 평가
-            IDataView firstYearData = mlContext.Data.FilterRowsByColumn(dataView, "timestamp", upperBound: 1);
-            IDataView secondYearData = mlContext.Data.FilterRowsByColumn(dataView, "timestamp", lowerBound: 1);
+            // 학습용 데이터뷰
+            IDataView trainData = mlContext.Data.FilterRowsByColumn(dataView, "timestemp", upperBound: 1);
+
+            // 예측할 데이터뷰 (미래의 데이터를 넘겨줘야함)
+            IDataView testData = null;
 
             var forecastingPipeline = mlContext.Forecasting.ForecastBySsa(
                                     outputColumnName: "ForecastedTradePrice",
@@ -83,8 +85,8 @@ namespace CoinTrader.ML
                                     confidenceLowerBoundColumn: "LowerBoundTradePrice",
                                     confidenceUpperBoundColumn: "UpperBoundTradePrice");
 
-            SsaForecastingTransformer forecaster = forecastingPipeline.Fit(firstYearData);
-            Evaluate(secondYearData, forecaster, mlContext);
+            SsaForecastingTransformer forecaster = forecastingPipeline.Fit(trainData);
+            Evaluate(testData, forecaster, mlContext);
 
             // 모델 저장
             var forecastEngine = forecaster.CreateTimeSeriesEngine<ModelInput, ModelOutput>(mlContext);
@@ -92,7 +94,7 @@ namespace CoinTrader.ML
             forecastEngine.CheckPoint(mlContext, modelPath);
 
             // 예측하기
-            Forecast(secondYearData, 7, forecastEngine, mlContext);
+            Forecast(testData, 7, forecastEngine, mlContext);
 
             return 0d;
         }
