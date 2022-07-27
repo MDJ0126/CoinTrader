@@ -18,21 +18,11 @@ public class MarketInfo
     /// <summary>
     /// 전일 종가
     /// </summary>
-    public double? yesterday_trade_price;
+    public double? prev_closing_price;
     /// <summary>
     /// 예상 종가
     /// </summary>
     public List<PredictPrice> predictPrices = new List<PredictPrice>();
-
-    /// <summary>
-    /// 과거 캔들 데이터 모두 받았는지 여부
-    /// </summary>
-    public bool isCandleOldDataSuccess = false;
-
-    /// <summary>
-    /// 최신 캔들 데이터 모두 받았는지 여부
-    /// </summary>
-    public bool isCandleNewDataSuccess = false;
 
     /// <summary>
     /// 예상 종가 세팅
@@ -69,7 +59,7 @@ public class MarketInfo
     /// <returns></returns>
     public double GetVariabilityNormalize()
     {
-        return (trade_price - yesterday_trade_price.Value) / yesterday_trade_price.Value;
+        return (trade_price - prev_closing_price.Value) / prev_closing_price.Value;
     }
 
     /// <summary>
@@ -79,7 +69,7 @@ public class MarketInfo
     public double GetTodayPredicteNormalize()
     {
         if (predictPrices != null && predictPrices.Count > 0)
-            return (predictPrices[0].forecasted - yesterday_trade_price.Value) / yesterday_trade_price.Value;
+            return (predictPrices[0].forecasted - prev_closing_price.Value) / prev_closing_price.Value;
         return 0d;
     }
 

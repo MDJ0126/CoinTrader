@@ -183,7 +183,7 @@ namespace CoinTrader
                     symbol = "▽";
                 }
                 item.SubItems[(int)eTickerHeader.YesterDay].ForeColor = color;
-                item.SubItems[(int)eTickerHeader.YesterDay].Text = $"{symbol} {marketInfo.trade_price - marketInfo.yesterday_trade_price:N0}원 ({percentage:F2}%)";
+                item.SubItems[(int)eTickerHeader.YesterDay].Text = $"{symbol} {marketInfo.trade_price - marketInfo.prev_closing_price:N0}원 ({percentage:F2}%)";
 
                 // 금일 예상 종가
                 if (marketInfo.predictPrices != null && marketInfo.predictPrices.Count > 0)

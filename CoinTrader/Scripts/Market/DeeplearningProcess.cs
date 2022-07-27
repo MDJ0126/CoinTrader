@@ -8,6 +8,8 @@ public static class DeeplearningProcess
 {
     private static List<MarketInfo> onUpdates = new List<MarketInfo>();
 
+    private static List<string> completedOldDataMarketNames = new List<string>();
+
     public static MarketInfo DequeueUpdatedMarketInfo()
     {
         MarketInfo marketInfo = null;
@@ -38,12 +40,12 @@ public static class DeeplearningProcess
                     if (marketInfo != null)
                     {
                         // 과거 데이터들 불러오기
-                        if (!marketInfo.isCandleOldDataSuccess)
+                        if (!completedOldDataMarketNames.Exists(name => name.Equals(marketInfo.name)))
                         {
-                            DateTime time = MachineLearning.GetOldDateTime(marketInfo.name);
-                            if (time == DateTime.MaxValue)
-                                time = Time.NowTime;
-                            string to = time.ToString("yyyy-MM-dd HH:mm:ss");
+                            DateTime oldTime = MachineLearning.GetOldDateTime(marketInfo.name);
+                            if (oldTime == DateTime.MaxValue)
+                                oldTime = Time.NowTime;
+                            string to = oldTime.ToString("yyyy-MM-dd HH:mm:ss");
 
                             bool isFinished = false;
                             ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, onFinished: (result, res) =>
@@ -57,7 +59,7 @@ public static class DeeplearningProcess
                                 }
                                 else
                                 {
-                                    marketInfo.isCandleOldDataSuccess = true;
+                                    completedOldDataMarketNames.Add(marketInfo.name);
                                 }
                                 isFinished = true;
                             });
@@ -69,42 +71,35 @@ public static class DeeplearningProcess
                         }
 
                         // 최신 데이터들 불러오기
-                        if (!marketInfo.isCandleNewDataSuccess)
+                        DateTime lastTime = MachineLearning.GetLastDateTime(marketInfo.name);
+                        if (lastTime == DateTime.MinValue)
+                            lastTime = Time.NowTime;
+                        TimeSpan ts = Time.NowTime - lastTime;
+                        int addHours = (int)ts.TotalHours;
+                        if (ts.TotalHours > 200f) // 200개 초과하면 줄인다
+                            addHours -= (int)(ts.TotalHours - 200f);
+                        lastTime = lastTime.AddHours(addHours);
+
+                        if (addHours > 0f)
                         {
-                            DateTime time = MachineLearning.GetLastDateTime(marketInfo.name);
-                            if (time == DateTime.MinValue)
-                                time = Time.NowTime;
-                            TimeSpan ts = Time.NowTime - time;
-                            int addHours = (int)ts.TotalHours;
-                            if (ts.TotalHours > 200f) // 200개 초과하면 줄인다
-                                addHours -= (int)(ts.TotalHours - 200f);
-                            time = time.AddHours(addHours);
-
-                            if (addHours > 0f)
+                            string to = lastTime.ToString("yyyy-MM-dd HH:mm:ss");
+                            bool isFinished = false;
+                            ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, count: addHours, onFinished: (result, res) =>
                             {
-                                string to = time.ToString("yyyy-MM-dd HH:mm:ss");
-                                bool isFinished = false;
-                                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, count: addHours, onFinished: (result, res) =>
+                                if (res != null && res.Count > 0)
                                 {
-                                    if (res != null && res.Count > 0)
+                                    for (int k = 0; k < res.Count; k++)
                                     {
-                                        for (int k = 0; k < res.Count; k++)
-                                        {
-                                            MachineLearning.Add(res[k].market, ConvertData(res[k]));
-                                        }
+                                        MachineLearning.Add(res[k].market, ConvertData(res[k]));
                                     }
-                                    isFinished = true;
-                                });
-
-
-                                while (!isFinished)
-                                {
-                                    Thread.Sleep(100);
                                 }
-                            }
-                            else
+                                isFinished = true;
+                            });
+
+
+                            while (!isFinished)
                             {
-                                marketInfo.isCandleNewDataSuccess = true;
+                                Thread.Sleep(100);
                             }
                         }
 

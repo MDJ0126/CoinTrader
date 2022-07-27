@@ -115,7 +115,7 @@ namespace CoinTrader
             // columnHeader1
             // 
             this.columnHeader1.Text = "제공 시장";
-            this.columnHeader1.Width = 200;
+            this.columnHeader1.Width = 100;
             // 
             // columnHeader2
             // 
@@ -144,7 +144,7 @@ namespace CoinTrader
             // 
             // columnHeader7
             // 
-            this.columnHeader7.Text = "금일 예상 종가";
+            this.columnHeader7.Text = "금일 예상 종가(딥러닝)";
             this.columnHeader7.Width = 150;
             // 
             // logTabPage

@@ -130,8 +130,6 @@ namespace Network
                     DateTime B = Convert.ToDateTime(b.candle_date_time_utc);
                     return A.CompareTo(B);
                 });
-
-                ModelCenter.Market.UpdateCandlesDays(res);
             }
             else
             {

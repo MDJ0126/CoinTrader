@@ -117,8 +117,7 @@ public class MarketModel
                             if (marketInfo.trade_price != tickerRes.trade_price)
                             {
                                 marketInfo.trade_price = tickerRes.trade_price;
-                                if (marketInfo.yesterday_trade_price == null)
-                                    marketInfo.yesterday_trade_price = tickerRes.trade_price;
+                                marketInfo.prev_closing_price = tickerRes.prev_closing_price;
                                 onUpdateTicker?.Invoke(marketInfo);
                             }
                         }
@@ -126,53 +125,5 @@ public class MarketModel
                 }
             }
         }
-    }
-
-    /// <summary>
-    /// 일(Day) 캔들 업데이트
-    /// </summary>
-    /// <param name="res"></param>
-    public void UpdateCandlesDays(List<Network.CandlesDaysRes> res)
-    {
-        if (res != null)
-        {
-            var first = res[0];
-            
-            //bool create = MachineLearning.CreateTrainCSV(res, first.market, "Days");
-            //if (!create)
-            //    MachineLearning.AppendTrainCSV(res, first.market, "Days");
-
-            for (int i = 0; i < res.Count; i++)
-            {
-                var candlesDays = res[i];
-                var enumerator = markets.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    var marketInfos = enumerator.Current.Value;
-                    if (marketInfos != null)
-                    {
-                        var marketInfo = marketInfos.Find(info => info.name == candlesDays.market);
-                        if (marketInfo != null)
-                        {
-                            var date = candlesDays.GetTradeDateTime(eTimeType.KST);
-                            if (date.Date == Time.NowTime.Date.AddDays(-1))
-                            {
-                                marketInfo.yesterday_trade_price = candlesDays.trade_price;
-                                onUpdateTicker?.Invoke(marketInfo);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 예상 종가 도출
-    /// </summary>
-    /// <param name="marketType"></param>
-    /// <param name="market"></param>
-    public void UpdatePredictePrice(eMarketType marketType, string market)
-    {
     }
 }
