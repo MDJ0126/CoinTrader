@@ -97,27 +97,35 @@ internal static class Utils
     /// <returns></returns>
     public static string[,] OpenCSVFile(string path)
     {
-        path += ".csv";
-        if (File.Exists(path))
+        try
         {
-            string[] strs = File.ReadAllLines(path);
-            if (strs != null && strs.Length > 0)
+            path += ".csv";
+            if (File.Exists(path))
             {
-                int col = strs[0].Split(',').Length;
-                int row = strs.Length;
-
-                string[,] result = new string[row, col];
-                for (int i = 0; i < result.GetLength(0); i++)
+                string[] strs = File.ReadAllLines(path);
+                if (strs != null && strs.Length > 0)
                 {
-                    string[] split = strs[i].Split(',');
-                    for (int j = 0; j < result.GetLength(1); j++)
+                    int col = strs[0].Split(',').Length;
+                    int row = strs.Length;
+
+                    string[,] result = new string[row, col];
+                    for (int i = 0; i < result.GetLength(0); i++)
                     {
-                        result[i, j] = split[j];
+                        string[] split = strs[i].Split(',');
+                        for (int j = 0; j < result.GetLength(1); j++)
+                        {
+                            result[i, j] = split[j];
+                        }
                     }
+                    return result;
                 }
-                return result;
             }
         }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+
         return null;
     }
 
