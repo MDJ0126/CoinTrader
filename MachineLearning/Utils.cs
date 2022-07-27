@@ -65,7 +65,6 @@ internal static class Utils
                         }
                     }
 
-
                     // 2. 데이터 입력
                     enumerator = collection.GetEnumerator();
                     while (enumerator.MoveNext())
@@ -78,6 +77,7 @@ internal static class Utils
                         }
                         sb.Append('\n');
                     }
+                    sb.Length -= 1;
 
                     writer.Write(sb);
                     writer.Close();
@@ -86,67 +86,6 @@ internal static class Utils
             }
             else
                 Console.WriteLine("이미 파일이 존재합니다.");
-        }
-        return false;
-    }
-
-    /// <summary>
-    /// 이어쓰기
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="collection">컬렉션</param>
-    /// <param name="path">파일 위치</param>
-    /// <param name="pasteInFront">앞에 붙여넣을지 여부</param>
-    /// <returns>작업 완료 여부</returns>
-    public static bool AppendCSVFile<T>(ICollection<T> collection, string path, bool pasteInFront = false)
-    {
-        if (collection.Count > 0)
-        {
-            sb.Length = 0;
-            path += ".csv";
-            if (File.Exists(path))
-            {
-                var enumerator = collection.GetEnumerator();
-                if (pasteInFront)
-                {
-                    string originalText = File.ReadAllText(path);
-                    while (enumerator.MoveNext())
-                    {
-                        FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-                        for (int i = 0; i < fieldInfos.Length; i++)
-                        {
-                            if (i > 0) sb.Append(',');
-                            sb.Append(fieldInfos[i].GetValue(enumerator.Current));
-                        }
-                        sb.Append('\n');
-                    };
-                    using (var writer = File.CreateText(path))
-                    {
-                        writer.Write(sb + originalText);
-                        writer.Close();
-                    }
-                }
-                else
-                {
-                    using (var writer = File.AppendText(path))
-                    {
-                        // 데이터 입력
-                        while (enumerator.MoveNext())
-                        {
-                            sb.Append('\n');
-                            FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-                            for (int i = 0; i < fieldInfos.Length; i++)
-                            {
-                                if (i > 0) sb.Append(',');
-                                sb.Append(fieldInfos[i].GetValue(enumerator.Current));
-                            }
-                        };
-                        writer.Write(sb);
-                        writer.Close();
-                    }
-                }
-                return true;
-            }
         }
         return false;
     }
@@ -162,19 +101,22 @@ internal static class Utils
         if (File.Exists(path))
         {
             string[] strs = File.ReadAllLines(path);
-            int col = strs[0].Split(',').Length;
-            int row = strs.Length;
-
-            string[,] result = new string[row, col];
-            for (int i = 0; i < result.GetLength(0); i++)
+            if (strs != null && strs.Length > 0)
             {
-                string[] split = strs[i].Split(',');
-                for (int j = 0; j < result.GetLength(1); j++)
+                int col = strs[0].Split(',').Length;
+                int row = strs.Length;
+
+                string[,] result = new string[row, col];
+                for (int i = 0; i < result.GetLength(0); i++)
                 {
-                    result[i, j] = split[j];
+                    string[] split = strs[i].Split(',');
+                    for (int j = 0; j < result.GetLength(1); j++)
+                    {
+                        result[i, j] = split[j];
+                    }
                 }
+                return result;
             }
-            return result;
         }
         return null;
     }

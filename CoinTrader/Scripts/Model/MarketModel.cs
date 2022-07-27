@@ -132,7 +132,7 @@ public class MarketModel
     /// 일(Day) 캔들 업데이트
     /// </summary>
     /// <param name="res"></param>
-    public void UpdateCandlesDays(List<CandlesDaysRes> res)
+    public void UpdateCandlesDays(List<Network.CandlesDaysRes> res)
     {
         if (res != null)
         {

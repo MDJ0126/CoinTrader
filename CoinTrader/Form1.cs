@@ -47,6 +47,9 @@ namespace CoinTrader
             // 타이머 작동
             this.StartCoroutine(Timer());
 
+            // 딥러닝 갱신 업데이터
+            this.StartCoroutine(DeeplearningPrecessOnUpdater());
+
             // 워터풀 프로세스 시작
             WaterfallProcess wfp = new WaterfallProcess();
             wfp.Add(SetCoinList);
@@ -70,6 +73,28 @@ namespace CoinTrader
             {
                 timeLabel.Text = Time.NowTime.ToString("yyyy년 M월 d일 tt hh:mm:ss");
                 yield return new WaitForSeconds(1f);
+            }
+        }
+
+        /// <summary>
+        /// 딥러닝 업데이터
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator DeeplearningPrecessOnUpdater()
+        {
+            while (true)
+            {
+                while (true)
+                {
+                    MarketInfo marketInfo = DeeplearningProcess.DequeueUpdatedMarketInfo();
+                    if (marketInfo != null)
+                    {
+                        OnUpdateTicker(marketInfo);
+                    }
+                    else
+                        break;
+                }
+                yield return new WaitForSeconds(0.5f);
             }
         }
 

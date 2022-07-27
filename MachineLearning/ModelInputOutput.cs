@@ -1,8 +1,27 @@
 ﻿using Microsoft.ML.Data;
+using System;
 
 namespace CoinTrader.ML
 {
-    public class ModelInput
+    public enum eModelInput
+    {
+        market,
+        candle_date_time_utc,
+        candle_date_time_kst,
+        opening_price,
+        high_price,
+        low_price,
+        trade_price,
+        timestamp,
+        candle_acc_trade_price,
+        candle_acc_trade_volume,
+        prev_closing_price,
+        change_price,
+        change_rate,
+        converted_trade_price,
+    }
+
+    public class CandlesDayData
     {
         /// <summary>
         /// 마켓명
@@ -13,12 +32,27 @@ namespace CoinTrader.ML
         /// 캔들 기준 시각(UTC 기준)
         /// </summary>
         [LoadColumn(1)]
-        public string candle_date_time_utc;
+        public DateTime candle_date_time_utc;
         /// <summary>
         /// 캔들 기준 시각(KST 기준)
         /// </summary>
         [LoadColumn(2)]
-        public string candle_date_time_kst;
+        public DateTime candle_date_time_kst;
+        /// <summary>
+        /// 시가
+        /// </summary>
+        [LoadColumn(3)]
+        public double opening_price;
+        /// <summary>
+        /// 고가
+        /// </summary>
+        [LoadColumn(4)]
+        public double high_price;
+        /// <summary>
+        /// 저가
+        /// </summary>
+        [LoadColumn(5)]
+        public double low_price;
         /// <summary>
         /// 종가
         /// </summary>
@@ -29,6 +63,21 @@ namespace CoinTrader.ML
         /// </summary>
         [LoadColumn(7)]
         public double timestamp;
+        /// <summary>
+        /// 누적 거래 금액
+        /// </summary>
+        [LoadColumn(8)]
+        public double candle_acc_trade_price;
+        /// <summary>
+        /// 누적 거래량
+        /// </summary>
+        [LoadColumn(9)]
+        public double candle_acc_trade_volume;
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
     }
 
     public class ModelOutput

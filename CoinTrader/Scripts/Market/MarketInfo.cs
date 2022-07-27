@@ -40,22 +40,25 @@ public class MarketInfo
     /// <param name="modelOutput"></param>
     public void SetPredictPrices(DateTime dateTime, CoinTrader.ML.ModelOutput modelOutput)
     {
-        dateTime = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, 0, 0);
-        predictPrices.Clear();
-        int length = modelOutput.Forecasted.Length;
-        for (int i = 0; i < length; i++)
+        if (modelOutput != null)
         {
-            var predictPrice = new PredictPrice
+            dateTime = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, 0, 0);
+            predictPrices.Clear();
+            int length = modelOutput.Forecasted.Length;
+            for (int i = 0; i < length; i++)
             {
-                dateTime = dateTime.AddHours(i),
-                forecasted = modelOutput.Forecasted[i],
-                lowerBound = modelOutput.LowerBound[i],
-                upperBound = modelOutput.UpperBound[i],
-            };
+                var predictPrice = new PredictPrice
+                {
+                    dateTime = dateTime.AddHours(i),
+                    forecasted = modelOutput.Forecasted[i],
+                    lowerBound = modelOutput.LowerBound[i],
+                    upperBound = modelOutput.UpperBound[i],
+                };
 
-            if (predictPrice.dateTime.Hour == 0)
-            {
-                predictPrices.Add(predictPrice);
+                if (predictPrice.dateTime.Hour == 0)
+                {
+                    predictPrices.Add(predictPrice);
+                }
             }
         }
     }
