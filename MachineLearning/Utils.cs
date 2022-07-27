@@ -48,7 +48,7 @@ internal static class Utils
                 if (!File.Exists(path) || overwrite)
                 {
                     // 텍스트 파일 생성
-                    using (var writer = File.CreateText(path))
+                    using (var writer = File.CreateText(path + ".temp"))
                     {
                         var enumerator = collection.GetEnumerator();
                         if (writeHeader)
@@ -84,6 +84,12 @@ internal static class Utils
                         writer.Write(sb);
                         writer.Close();
                     }
+                    try
+                    {
+                        File.Delete(path);
+                    }
+                    catch { }
+                    File.Move(path + ".temp", path);
                     return true;
                 }
                 else

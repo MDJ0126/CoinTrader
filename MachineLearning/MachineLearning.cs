@@ -101,7 +101,7 @@ namespace CoinTrader.ML
         }
 
         /// <summary>
-        /// 변동성 가격 가져오기
+        /// 전날 변동성 k 배수로 가져오기 가져오기
         /// </summary>
         /// <param name="date"></param>
         /// <param name="k">배수 세팅 0f ~ 1f</param>

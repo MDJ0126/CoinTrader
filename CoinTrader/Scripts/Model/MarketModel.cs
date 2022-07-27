@@ -73,9 +73,6 @@ public class MarketModel
                     // 이동평균
                     marketInfo.movingAverage_15 = MachineLearning.GetMovingAverage(marketInfo.name, today, 15);
                     marketInfo.movingAverage_30 = MachineLearning.GetMovingAverage(marketInfo.name, today, 30);
-
-                    // 변동성 타겟 가격 세팅
-                    marketInfo.SetTargetPrice(MachineLearning.GetTargetPrice(marketInfo.name, today, 0.5f));
                 }
             }
         }
@@ -128,9 +125,12 @@ public class MarketModel
                             if (marketInfo.trade_price != tickerRes.trade_price)
                             {
                                 marketInfo.trade_price = tickerRes.trade_price;
-                                marketInfo.prev_closing_price = tickerRes.prev_closing_price;
                                 onUpdateTicker?.Invoke(marketInfo);
                             }
+                            marketInfo.prev_closing_price = tickerRes.prev_closing_price;
+
+                            // 변동성 타겟 가격 세팅
+                            marketInfo.SetTargetPrice(marketInfo.prev_closing_price + MachineLearning.GetTargetPrice(marketInfo.name, Time.NowTime.Date, 0.5f));
                         }
                     }
                 }
