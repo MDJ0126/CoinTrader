@@ -21,7 +21,7 @@ namespace CoinTrader.ML
         converted_trade_price,
     }
 
-    public class CandlesDayData
+    public class CandlesData
     {
         /// <summary>
         /// 마켓명

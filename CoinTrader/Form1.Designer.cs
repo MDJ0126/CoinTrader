@@ -48,6 +48,8 @@ namespace CoinTrader
             this.Log = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.optionTabPage = new MetroFramework.Controls.MetroTabPage();
             this.timeLabel = new System.Windows.Forms.Label();
+            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).BeginInit();
             this.metroTabControl1.SuspendLayout();
             this.mainTabPage.SuspendLayout();
@@ -99,7 +101,9 @@ namespace CoinTrader
             this.columnHeader4,
             this.columnHeader5,
             this.columnHeader6,
-            this.columnHeader7});
+            this.columnHeader7,
+            this.columnHeader8,
+            this.columnHeader9});
             this.metroListView1.Font = new System.Drawing.Font("Segoe UI", 8F);
             this.metroListView1.FullRowSelect = true;
             this.metroListView1.GridLines = true;
@@ -134,13 +138,13 @@ namespace CoinTrader
             // 
             // columnHeader5
             // 
-            this.columnHeader5.Text = "목표 매수 단가";
-            this.columnHeader5.Width = 100;
+            this.columnHeader5.Text = "이동평균 15일";
+            this.columnHeader5.Width = 150;
             // 
             // columnHeader6
             // 
-            this.columnHeader6.Text = "목표 매도 단가";
-            this.columnHeader6.Width = 100;
+            this.columnHeader6.Text = "이동평균 30일";
+            this.columnHeader6.Width = 150;
             // 
             // columnHeader7
             // 
@@ -215,6 +219,16 @@ namespace CoinTrader
             this.timeLabel.TabIndex = 3;
             this.timeLabel.Text = "1999년12월31일";
             // 
+            // columnHeader8
+            // 
+            this.columnHeader8.Text = "매수 예상 가격";
+            this.columnHeader8.Width = 100;
+            // 
+            // columnHeader9
+            // 
+            this.columnHeader9.Text = "골든크로스";
+            this.columnHeader9.Width = 100;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -255,6 +269,8 @@ namespace CoinTrader
         private System.Windows.Forms.ColumnHeader columnHeader6;
         private System.Windows.Forms.ColumnHeader columnHeader7;
         private System.Windows.Forms.Label timeLabel;
+        private System.Windows.Forms.ColumnHeader columnHeader8;
+        private System.Windows.Forms.ColumnHeader columnHeader9;
     }
 }
 

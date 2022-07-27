@@ -15,9 +15,11 @@ namespace CoinTrader
             Name,
             Price,
             YesterDay,
-            TargetSell,
-            TargetBuy,
+            MovingAverage15,
+            MovingAverage30,
             TodayPredicteClosePrice,
+            BuyTargetPrice,
+            GoldenCross,
         }
 
         public Form1()
@@ -185,10 +187,44 @@ namespace CoinTrader
                 item.SubItems[(int)eTickerHeader.YesterDay].ForeColor = color;
                 item.SubItems[(int)eTickerHeader.YesterDay].Text = $"{symbol} {marketInfo.trade_price - marketInfo.prev_closing_price:N0}원 ({percentage:F2}%)";
 
+                // 이동평균 15일
+                percentage = (marketInfo.movingAverage_15 - marketInfo.prev_closing_price) / marketInfo.prev_closing_price;
+                symbol = string.Empty;
+                color = Color.Black;
+                if (percentage > 0f)
+                {
+                    color = Color.Red;
+                    symbol = "▲";
+                }
+                else if (percentage < 0f)
+                {
+                    color = Color.Blue;
+                    symbol = "▽";
+                }
+                item.SubItems[(int)eTickerHeader.MovingAverage15].ForeColor = color;
+                item.SubItems[(int)eTickerHeader.MovingAverage15].Text = $"{symbol} {marketInfo.movingAverage_15:N0}원 ({percentage:F2}%)";
+
+                // 이동평균 30일
+                percentage = (marketInfo.movingAverage_30 - marketInfo.prev_closing_price) / marketInfo.prev_closing_price;
+                symbol = string.Empty;
+                color = Color.Black;
+                if (percentage > 0f)
+                {
+                    color = Color.Red;
+                    symbol = "▲";
+                }
+                else if (percentage < 0f)
+                {
+                    color = Color.Blue;
+                    symbol = "▽";
+                }
+                item.SubItems[(int)eTickerHeader.MovingAverage30].ForeColor = color;
+                item.SubItems[(int)eTickerHeader.MovingAverage30].Text = $"{symbol} {marketInfo.movingAverage_30:N0}원 ({percentage:F2}%)";
+
                 // 금일 예상 종가
                 if (marketInfo.predictPrices != null && marketInfo.predictPrices.Count > 0)
                 {
-                    percentage = marketInfo.GetTodayPredicteNormalize() * 100f;
+                    percentage = (marketInfo.predictPrices[0].forecasted - marketInfo.prev_closing_price) / marketInfo.prev_closing_price * 100f;
                     symbol = string.Empty;
                     color = Color.Black;
                     if (percentage > 0f)
@@ -204,6 +240,40 @@ namespace CoinTrader
                     item.SubItems[(int)eTickerHeader.TodayPredicteClosePrice].ForeColor = color;
                     item.SubItems[(int)eTickerHeader.TodayPredicteClosePrice].Text = $"{symbol} {marketInfo.predictPrices[0].forecasted:N0}원 ({percentage:F2}%)";
                 }
+
+                // 매수 예상 가격
+                percentage = (marketInfo.buy_target_price - marketInfo.prev_closing_price) / marketInfo.prev_closing_price;
+                symbol = string.Empty;
+                color = Color.Black;
+                if (percentage > 0f)
+                {
+                    color = Color.Red;
+                    symbol = "▲";
+                }
+                else if (percentage < 0f)
+                {
+                    color = Color.Blue;
+                    symbol = "▽";
+                }
+                item.SubItems[(int)eTickerHeader.BuyTargetPrice].ForeColor = color;
+                item.SubItems[(int)eTickerHeader.BuyTargetPrice].Text = $"{symbol} {marketInfo.buy_target_price:N0}원 ({percentage:F2}%)";
+
+                // 골든 크로스
+                bool isGoldenCross = marketInfo.IsGoldenCross;
+                string text = string.Empty;
+                color = Color.Black;
+                if (isGoldenCross)
+                {
+                    color = Color.Red;
+                    text = "Golden Cross";
+                }
+                else
+                {
+                    color = Color.Black;
+                    text = "Dead Cross";
+                }
+                item.SubItems[(int)eTickerHeader.GoldenCross].ForeColor = color;
+                item.SubItems[(int)eTickerHeader.GoldenCross].Text = text;
             }
             metroListView1.EndUpdate();
         }

@@ -37,55 +37,62 @@ internal static class Utils
     /// <returns>작업 완료 여부</returns>
     public static bool CreateCSVFile<T>(ICollection<T> collection, string path, bool overwrite = true, bool writeHeader = true)
     {
-        if (collection.Count > 0)
+        try
         {
-            CreatePathFolder(path);
-
-            sb.Length = 0;
-            path += ".csv";
-            if (!File.Exists(path) || overwrite)
+            if (collection.Count > 0)
             {
-                // 텍스트 파일 생성
-                using (var writer = File.CreateText(path))
+                CreatePathFolder(path);
+
+                sb.Length = 0;
+                path += ".csv";
+                if (!File.Exists(path) || overwrite)
                 {
-                    var enumerator = collection.GetEnumerator();
-                    if (writeHeader)
+                    // 텍스트 파일 생성
+                    using (var writer = File.CreateText(path))
                     {
-                        // 1. 헤더 입력
-                        if (enumerator.MoveNext())
+                        var enumerator = collection.GetEnumerator();
+                        if (writeHeader)
+                        {
+                            // 1. 헤더 입력
+                            if (enumerator.MoveNext())
+                            {
+                                FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+                                for (int i = 0; i < fieldInfos.Length; i++)
+                                {
+                                    if (sb.Length > 0)
+                                        sb.Append(',');
+                                    sb.Append(fieldInfos[i].Name);
+                                }
+                                writer.WriteLine(sb);
+                            }
+                        }
+
+                        // 2. 데이터 입력
+                        enumerator = collection.GetEnumerator();
+                        while (enumerator.MoveNext())
                         {
                             FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
                             for (int i = 0; i < fieldInfos.Length; i++)
                             {
-                                if (sb.Length > 0)
-                                    sb.Append(',');
-                                sb.Append(fieldInfos[i].Name);
+                                if (i > 0) sb.Append(',');
+                                sb.Append(fieldInfos[i].GetValue(enumerator.Current));
                             }
-                            writer.WriteLine(sb);
+                            sb.Append('\n');
                         }
-                    }
+                        sb.Length -= 1;
 
-                    // 2. 데이터 입력
-                    enumerator = collection.GetEnumerator();
-                    while (enumerator.MoveNext())
-                    {
-                        FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-                        for (int i = 0; i < fieldInfos.Length; i++)
-                        {
-                            if (i > 0) sb.Append(',');
-                            sb.Append(fieldInfos[i].GetValue(enumerator.Current));
-                        }
-                        sb.Append('\n');
+                        writer.Write(sb);
+                        writer.Close();
                     }
-                    sb.Length -= 1;
-
-                    writer.Write(sb);
-                    writer.Close();
+                    return true;
                 }
-                return true;
+                else
+                    Console.WriteLine("이미 파일이 존재합니다.");
             }
-            else
-                Console.WriteLine("이미 파일이 존재합니다.");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
         }
         return false;
     }
@@ -155,5 +162,18 @@ internal static class Utils
             }
         }
         catch { }
+    }
+
+    public static float Clamp(float value, float min, float max)
+    {
+        if (value < min)
+        {
+            value = min;
+        }
+        else if (value > max)
+        {
+            value = max;
+        }
+        return value;
     }
 }

@@ -18,11 +18,27 @@ public class MarketInfo
     /// <summary>
     /// 전일 종가
     /// </summary>
-    public double? prev_closing_price;
+    public double prev_closing_price;
     /// <summary>
     /// 예상 종가
     /// </summary>
     public List<PredictPrice> predictPrices = new List<PredictPrice>();
+    /// <summary>
+    /// 이동평균 15일
+    /// </summary>
+    public double movingAverage_15 = 0f;
+    /// <summary>
+    /// 이동평균 30일
+    /// </summary>
+    public double movingAverage_30 = 0f;
+    /// <summary>
+    /// 골든크로스 (단기이동평균선이 장기이동평균선보다 높을때, 반의어: 데드크로스)
+    /// </summary>
+    public bool IsGoldenCross => movingAverage_30 < movingAverage_15;
+    /// <summary>
+    /// 변동성 타겟 가격 (어제의 고가 - 어제의 저가) * k)
+    /// </summary>
+    public double buy_target_price = 0f;
 
     /// <summary>
     /// 예상 종가 세팅
@@ -59,18 +75,16 @@ public class MarketInfo
     /// <returns></returns>
     public double GetVariabilityNormalize()
     {
-        return (trade_price - prev_closing_price.Value) / prev_closing_price.Value;
+        return (trade_price - prev_closing_price) / prev_closing_price;
     }
 
     /// <summary>
-    /// 금일 예상 종가 퍼센테이지 Normalize (-1f ~ 1f)
+    /// 변동성 타겟 가격 세팅
     /// </summary>
-    /// <returns></returns>
-    public double GetTodayPredicteNormalize()
+    /// <param name="targetPrice"></param>
+    public void SetTargetPrice(double targetPrice)
     {
-        if (predictPrices != null && predictPrices.Count > 0)
-            return (predictPrices[0].forecasted - prev_closing_price.Value) / prev_closing_price.Value;
-        return 0d;
+        buy_target_price = targetPrice;
     }
 
     public override string ToString()

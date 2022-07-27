@@ -6,6 +6,8 @@ using System.Threading;
 
 public static class DeeplearningProcess
 {
+    private static bool isStarted = false;
+
     private static List<MarketInfo> onUpdates = new List<MarketInfo>();
 
     private static List<string> completedOldDataMarketNames = new List<string>();
@@ -23,7 +25,11 @@ public static class DeeplearningProcess
 
     public static void Start()
     {
-        MultiThread.Start(() => Process());
+        if (!isStarted)
+        {
+            isStarted = true;
+            MultiThread.Start(() => Process());
+        }
     }
 
     private static void Process()
@@ -116,9 +122,9 @@ public static class DeeplearningProcess
         }
     }
 
-    private static CandlesDayData ConvertData(CandlesMinutesRes res)
+    private static CandlesData ConvertData(CandlesMinutesRes res)
     {
-        return new CandlesDayData
+        return new CandlesData
         {
             market = res.market,
             candle_date_time_utc = Convert.ToDateTime(res.candle_date_time_utc),

@@ -47,12 +47,13 @@ public class MarketModel
                         markets.Add(marketType, list);
                     }
 
-                    list.Add(new MarketInfo
+                    var marketInfo = new MarketInfo
                     {
                         name = marketRes.market,
                         korean_name = marketRes.korean_name,
                         trade_price = 0,
-                    });
+                    };
+                    list.Add(marketInfo);
 
                     // 스트링 리스트 따로 작성
                     if (!marketAllStrs.TryGetValue(marketType, out var str))
@@ -66,9 +67,19 @@ public class MarketModel
                     }
                     else
                         marketAllStrs[marketType] += marketRes.market;
+
+                    var today = Time.NowTime.Date;
+
+                    // 이동평균
+                    marketInfo.movingAverage_15 = MachineLearning.GetMovingAverage(marketInfo.name, today, 15);
+                    marketInfo.movingAverage_30 = MachineLearning.GetMovingAverage(marketInfo.name, today, 30);
+
+                    // 변동성 타겟 가격 세팅
+                    marketInfo.SetTargetPrice(MachineLearning.GetTargetPrice(marketInfo.name, today, 0.5f));
                 }
             }
         }
+        DeeplearningProcess.Start();
     }
 
     /// <summary>
