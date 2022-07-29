@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LoadingForm));
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.loadingProgressBar = new MetroFramework.Controls.MetroProgressBar();
+            this.loadingLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -53,6 +54,18 @@
             this.loadingProgressBar.Size = new System.Drawing.Size(260, 6);
             this.loadingProgressBar.TabIndex = 2;
             // 
+            // loadingLabel
+            // 
+            this.loadingLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.loadingLabel.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.loadingLabel.Font = new System.Drawing.Font("굴림", 8F);
+            this.loadingLabel.Location = new System.Drawing.Point(0, 234);
+            this.loadingLabel.Name = "loadingLabel";
+            this.loadingLabel.Size = new System.Drawing.Size(256, 14);
+            this.loadingLabel.TabIndex = 3;
+            this.loadingLabel.Text = "\'KRW-BTC\' 로드중..";
+            this.loadingLabel.UseCompatibleTextRendering = true;
+            // 
             // LoadingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -60,8 +73,10 @@
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(256, 254);
             this.ControlBox = false;
+            this.Controls.Add(this.loadingLabel);
             this.Controls.Add(this.loadingProgressBar);
             this.Controls.Add(this.pictureBox1);
+            this.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "LoadingForm";
@@ -78,5 +93,6 @@
 
         private System.Windows.Forms.PictureBox pictureBox1;
         private MetroFramework.Controls.MetroProgressBar loadingProgressBar;
+        private System.Windows.Forms.Label loadingLabel;
     }
 }

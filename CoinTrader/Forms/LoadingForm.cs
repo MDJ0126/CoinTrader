@@ -15,7 +15,7 @@ namespace CoinTrader.Forms
         private IEnumerator Start()
         {
             yield return new WaitForSeconds(0.5f);
-            MachineLearning.Initialize(value => UpdateProgressBar(value));
+            MachineLearning.Initialize((float total, float current, string text) => UpdateProgressBar(total, current, text));
             yield return new WaitForSeconds(0.5f);
             Completed();
         }
@@ -27,9 +27,12 @@ namespace CoinTrader.Forms
             mainForm.Show();
         }
 
-        private void UpdateProgressBar(float value)
+        private void UpdateProgressBar(float total, float current, string text)
         {
-            loadingProgressBar.Value = (int)(value * 100f);
+            loadingProgressBar.Value = (int)(current / total * 100f);
+            loadingProgressBar.Update();
+            loadingLabel.Text = $"{text}...({current}/{total})";
+            loadingLabel.Update();
         }
     }
 }

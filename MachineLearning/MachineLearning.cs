@@ -12,6 +12,8 @@ namespace CoinTrader.ML
 {
     public static class MachineLearning
     {
+        public delegate void OnProgress(float total, float current, string text);
+
         /// <summary>
         /// 데이터 Dictionary
         /// </summary>
@@ -20,18 +22,21 @@ namespace CoinTrader.ML
         /// <summary>
         /// 로드
         /// </summary>
-        public static void Initialize(Action<float> onProgress = null)
+        public static void Initialize(OnProgress onProgress = null)
         {
-            var dirs = Directory.GetDirectories(Utils.CSV_DATA_PATH);
-            for (int i = 0; i < dirs.Length; i++)
+            if (Directory.Exists(Utils.CSV_DATA_PATH))
             {
-                var market = Path.GetFileName(dirs[i]);
-                if (!CandleDatas.TryGetValue(market, out List<CandlesData> datas))
+                var dirs = Directory.GetDirectories(Utils.CSV_DATA_PATH);
+                for (int i = 0; i < dirs.Length; i++)
                 {
-                    datas = LoadData(market);
-                    CandleDatas.Add(market, datas);
+                    var market = Path.GetFileName(dirs[i]);
+                    if (!CandleDatas.TryGetValue(market, out List<CandlesData> datas))
+                    {
+                        datas = LoadData(market);
+                        CandleDatas.Add(market, datas);
+                    }
+                    onProgress?.Invoke((float)dirs.Length, (float)i, $"'{market}' 로드중..");
                 }
-                onProgress?.Invoke((float)i / dirs.Length);
             }
         }
 

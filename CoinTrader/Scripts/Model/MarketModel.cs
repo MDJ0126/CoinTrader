@@ -68,13 +68,6 @@ public class MarketModel
                     }
                     else
                         marketAllStrs[marketType] += marketRes.market;
-
-                    var today = Time.NowTime.Date;
-
-                    // 이동평균
-                    marketInfo.movingAverage_15 = MachineLearning.GetMovingAverage(marketInfo.name, today, 15);
-                    marketInfo.movingAverage_30 = MachineLearning.GetMovingAverage(marketInfo.name, today, 30);
-                    onUpdateMarketInfo?.Invoke(marketInfo);
                 }
             }
         }
@@ -147,6 +140,7 @@ public class MarketModel
                             if (marketInfo.trade_price != tickerRes.trade_price)
                             {
                                 isUpdate = true;
+                                
                                 // 현재가 세팅
                                 marketInfo.trade_price = tickerRes.trade_price;
                             }
@@ -154,8 +148,15 @@ public class MarketModel
                             if (marketInfo.prev_closing_price != tickerRes.prev_closing_price)
                             {
                                 isUpdate = true;
+
                                 // 전일 종가 세팅
                                 marketInfo.prev_closing_price = tickerRes.prev_closing_price;
+
+                                // 이동 평균 값 세팅
+                                var today = Time.NowTime.Date;
+                                marketInfo.movingAverage_15 = MachineLearning.GetMovingAverage(marketInfo.name, today, 15);
+                                marketInfo.movingAverage_30 = MachineLearning.GetMovingAverage(marketInfo.name, today, 30);
+                                
                                 // 변동성 타겟 가격 세팅
                                 Task.Run(() => marketInfo.SetTargetPrice(marketInfo.prev_closing_price + MachineLearning.GetTargetPrice(marketInfo.name, Time.NowTime.Date, 0.5f)));
                             }

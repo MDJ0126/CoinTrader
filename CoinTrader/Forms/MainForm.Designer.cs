@@ -154,7 +154,7 @@ namespace CoinTrader.Forms
             // columnHeader8
             // 
             this.columnHeader8.Text = "매수 예상 가격";
-            this.columnHeader8.Width = 100;
+            this.columnHeader8.Width = 150;
             // 
             // columnHeader9
             // 
