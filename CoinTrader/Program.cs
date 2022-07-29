@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoinTrader.Forms;
+using System;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -18,11 +19,15 @@ namespace CoinTrader
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
+                // 초기화
                 MultiThread.SetMainThread();
                 Time.Start();
                 Logger.Start();
 
-                Application.Run(new Form1());
+                // 폼 실행
+                Application.Run(new LoadingForm());
+
+                // 종료
                 MultiThread.Release();
                 mutex.ReleaseMutex();
             }

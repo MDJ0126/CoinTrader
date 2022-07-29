@@ -5,9 +5,9 @@ using System.Collections;
 using System.Windows.Forms;
 using System.Drawing;
 
-namespace CoinTrader
+namespace CoinTrader.Forms
 {
-    public partial class Form1 : MetroForm
+    public partial class MainForm : MetroForm
     {
         private enum eTickerHeader
         {
@@ -22,7 +22,7 @@ namespace CoinTrader
             GoldenCross,
         }
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
             this.StyleManager = metroStyleManager;
@@ -49,15 +49,13 @@ namespace CoinTrader
             // 타이머 작동
             this.StartCoroutine(Timer());
 
-            // 딥러닝 갱신 업데이터
-            this.StartCoroutine(DeeplearningPrecessOnUpdater());
-
             // 워터풀 프로세스 시작
             WaterfallProcess wfp = new WaterfallProcess();
             wfp.Add(SetCoinList);
             wfp.Start(result =>
             {
-                ModelCenter.Market.OnUpdateTicker += OnUpdateTicker;
+                ModelCenter.Market.OnUpdateMarketInfo += OnUpdateMarketInfo;
+                DeeplearningProcess.onUpdateMarketInfo += OnUpdateMarketInfo;
 
                 listView1.Items.Clear();
                 listView1.DoubleBuffered(true);
@@ -75,28 +73,6 @@ namespace CoinTrader
             {
                 timeLabel.Text = Time.NowTime.ToString("yyyy년 M월 d일 tt hh:mm:ss");
                 yield return new WaitForSeconds(1f);
-            }
-        }
-
-        /// <summary>
-        /// 딥러닝 업데이터
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerator DeeplearningPrecessOnUpdater()
-        {
-            while (true)
-            {
-                while (true)
-                {
-                    MarketInfo marketInfo = DeeplearningProcess.DequeueUpdatedMarketInfo();
-                    if (marketInfo != null)
-                    {
-                        OnUpdateTicker(marketInfo);
-                    }
-                    else
-                        break;
-                }
-                yield return new WaitForSeconds(0.5f);
             }
         }
 
@@ -159,7 +135,7 @@ namespace CoinTrader
         /// 현재가 갱신
         /// </summary>
         /// <param name="marketInfo"></param>
-        private void OnUpdateTicker(MarketInfo marketInfo)
+        private void OnUpdateMarketInfo(MarketInfo marketInfo)
         {
             metroListView1.BeginUpdate();
             ListViewItem item = metroListView1.Find(marketInfo.name);
@@ -286,6 +262,11 @@ namespace CoinTrader
         {
             listView1.Items.Add(text);
             listView1.EnsureVisible(listView1.Items.Count - 1);
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

@@ -3,36 +3,26 @@ using Network;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 public static class DeeplearningProcess
 {
+    public static Action<MarketInfo> onUpdateMarketInfo = null;
+
     private static bool isStarted = false;
 
-    private static List<MarketInfo> onUpdates = new List<MarketInfo>();
-
     private static List<string> completedOldDataMarketNames = new List<string>();
-
-    public static MarketInfo DequeueUpdatedMarketInfo()
-    {
-        MarketInfo marketInfo = null;
-        if (onUpdates.Count > 0)
-        {
-            marketInfo = onUpdates[0];
-            onUpdates.RemoveAt(0);
-        }
-        return marketInfo;
-    }
 
     public static void Start()
     {
         if (!isStarted)
         {
             isStarted = true;
-            MultiThread.Start(() => Process());
+            Process();
         }
     }
 
-    private static void Process()
+    private static async void Process()
     {
         while (true)
         {
@@ -45,80 +35,76 @@ public static class DeeplearningProcess
                     var marketInfo = marketInfos[i];
                     if (marketInfo != null)
                     {
-                        // 과거 데이터들 불러오기
-                        if (!completedOldDataMarketNames.Exists(name => name.Equals(marketInfo.name)))
+                        await Task.Run(async () =>
                         {
-                            DateTime oldTime = MachineLearning.GetOldDateTime(marketInfo.name);
-                            if (oldTime == DateTime.MaxValue)
-                                oldTime = Time.NowTime;
-                            string to = oldTime.ToString("yyyy-MM-dd HH:mm:ss");
-
-                            bool isFinished = false;
-                            ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, onFinished: (result, res) =>
+                            // 과거 데이터들 불러오기
+                            if (!completedOldDataMarketNames.Exists(name => name.Equals(marketInfo.name)))
                             {
-                                if (res != null && res.Count > 0)
+                                DateTime oldTime = MachineLearning.GetOldDateTime(marketInfo.name);
+                                if (oldTime == DateTime.MaxValue)
+                                    oldTime = Time.NowTime;
+                                string to = oldTime.ToString("yyyy-MM-dd HH:mm:ss");
+
+                                bool isFinished = false;
+                                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, onFinished: (result, res) =>
                                 {
-                                    for (int k = 0; k < res.Count; k++)
+                                    if (res != null && res.Count > 0)
                                     {
-                                        MachineLearning.Add(res[k].market, ConvertData(res[k]));
+                                        MachineLearning.Add(res[0].market, ConvertDatas(res));
                                     }
-                                }
-                                else
-                                {
-                                    completedOldDataMarketNames.Add(marketInfo.name);
-                                }
-                                isFinished = true;
-                            });
-
-                            while (!isFinished)
-                            {
-                                Thread.Sleep(100);
-                            }
-                        }
-
-                        // 최신 데이터들 불러오기
-                        DateTime lastTime = MachineLearning.GetLastDateTime(marketInfo.name);
-                        if (lastTime == DateTime.MinValue)
-                            lastTime = Time.NowTime;
-                        TimeSpan ts = Time.NowTime - lastTime;
-                        int addHours = (int)ts.TotalHours;
-                        if (ts.TotalHours > 200f) // 200개 초과하면 줄인다
-                            addHours -= (int)(ts.TotalHours - 200f);
-                        lastTime = lastTime.AddHours(addHours);
-
-                        if (addHours > 0f)
-                        {
-                            string to = lastTime.ToString("yyyy-MM-dd HH:mm:ss");
-                            bool isFinished = false;
-                            ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, count: addHours, onFinished: (result, res) =>
-                            {
-                                if (res != null && res.Count > 0)
-                                {
-                                    for (int k = 0; k < res.Count; k++)
+                                    else
                                     {
-                                        MachineLearning.Add(res[k].market, ConvertData(res[k]));
+                                        completedOldDataMarketNames.Add(marketInfo.name);
                                     }
+                                    isFinished = true;
+                                });
+
+                                while (!isFinished)
+                                {
+                                    await Task.Delay(100);
                                 }
-                                isFinished = true;
-                            });
-
-
-                            while (!isFinished)
-                            {
-                                Thread.Sleep(100);
                             }
-                        }
 
-                        // 예상 종가 도출
-                        marketInfo.SetPredictPrices(Time.NowTime, MachineLearning.GetPredictePrice(marketInfo.name));
+                            // 최신 데이터들 불러오기
+                            DateTime lastTime = MachineLearning.GetLastDateTime(marketInfo.name);
+                            if (lastTime == DateTime.MinValue)
+                                lastTime = Time.NowTime;
+                            TimeSpan ts = Time.NowTime - lastTime;
+                            int addHours = (int)ts.TotalHours;
+                            if (ts.TotalHours > 200f) // 200개 초과하면 줄인다
+                                addHours -= (int)(ts.TotalHours - 200f);
+                            lastTime = lastTime.AddHours(addHours);
 
-                        if (!onUpdates.Exists(info => info.Equals(marketInfo)))
-                            onUpdates.Add(marketInfo);
+                            if (addHours > 0f)
+                            {
+                                string to = lastTime.ToString("yyyy-MM-dd HH:mm:ss");
+                                bool isFinished = false;
+                                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, count: addHours, onFinished: (result, res) =>
+                                {
+                                    if (res != null && res.Count > 0)
+                                    {
+                                        MachineLearning.Add(res[0].market, ConvertDatas(res));
+                                    }
+                                    isFinished = true;
+                                });
+
+                                while (!isFinished)
+                                {
+                                    await Task.Delay(100);
+                                }
+                            }
+
+                            // 예상 종가 도출
+                            marketInfo.SetPredictPrices(Time.NowTime, MachineLearning.GetPredictePrice(marketInfo.name));
+
+                        });
+                        
+                        onUpdateMarketInfo?.Invoke(marketInfo);
                     }
                 }
             }
 
-            Thread.Sleep(100);
+            await Task.Delay(100);
         }
     }
 
@@ -137,5 +123,15 @@ public static class DeeplearningProcess
             candle_acc_trade_price = res.candle_acc_trade_price,
             candle_acc_trade_volume = res.candle_acc_trade_volume,
         };
+    }
+
+    private static List<CandlesData> ConvertDatas(List<CandlesMinutesRes> res)
+    {
+        List<CandlesData> datas = new List<CandlesData>();
+        for (int i = 0; i < res.Count; i++)
+        {
+            datas.Add(ConvertData(res[i]));
+        }
+        return datas;
     }
 }

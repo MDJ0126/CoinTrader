@@ -3,6 +3,8 @@ using Microsoft.ML.Transforms.TimeSeries;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 // '시계열' 예제: https://docs.microsoft.com/ko-kr/dotnet/machine-learning/tutorials/time-series-demand-forecasting
 
@@ -16,36 +18,59 @@ namespace CoinTrader.ML
         private static Dictionary<string, List<CandlesData>> CandleDatas = new Dictionary<string, List<CandlesData>>();
 
         /// <summary>
+        /// 로드
+        /// </summary>
+        public static void Initialize(Action<float> onProgress = null)
+        {
+            var dirs = Directory.GetDirectories(Utils.CSV_DATA_PATH);
+            for (int i = 0; i < dirs.Length; i++)
+            {
+                var market = Path.GetFileName(dirs[i]);
+                if (!CandleDatas.TryGetValue(market, out List<CandlesData> datas))
+                {
+                    datas = LoadData(market);
+                    CandleDatas.Add(market, datas);
+                }
+                onProgress?.Invoke((float)i / dirs.Length);
+            }
+        }
+
+        /// <summary>
         /// 데이터 로드
         /// </summary>
         /// <param name="market"></param>
         /// <returns></returns>
-        private static List<CandlesData> Load(string market)
+        private static List<CandlesData> LoadData(string market)
         {
             List<CandlesData> modelInputs = new List<CandlesData>();
             string path = Path.Combine(Utils.CSV_DATA_PATH, market, market);
             var strs = Utils.OpenCSVFile(path);
-            if (strs != null)
+            try
             {
-                for (int i = 0; i < strs.GetLength(0); i++)
+                if (strs != null)
                 {
-                    CandlesData modelInput = new CandlesData();
-                    modelInput.market = strs[i, (int)eModelInput.market];
-                    DateTime.TryParse(strs[i, (int)eModelInput.candle_date_time_utc], out modelInput.candle_date_time_utc);
-                    DateTime.TryParse(strs[i, (int)eModelInput.candle_date_time_kst], out modelInput.candle_date_time_kst);
-                    double.TryParse(strs[i, (int)eModelInput.opening_price], out modelInput.opening_price);
-                    double.TryParse(strs[i, (int)eModelInput.high_price], out modelInput.high_price);
-                    double.TryParse(strs[i, (int)eModelInput.low_price], out modelInput.low_price);
-                    float.TryParse(strs[i, (int)eModelInput.trade_price], out modelInput.trade_price);
-                    double.TryParse(strs[i, (int)eModelInput.timestamp], out modelInput.timestamp);
-                    double.TryParse(strs[i, (int)eModelInput.candle_acc_trade_price], out modelInput.candle_acc_trade_price);
-                    double.TryParse(strs[i, (int)eModelInput.candle_acc_trade_volume], out modelInput.candle_acc_trade_volume);
-                    modelInputs.Add(modelInput);
+                    for (int i = 0; i < strs.GetLength(0); i++)
+                    {
+                        CandlesData modelInput = new CandlesData();
+                        modelInput.market = strs[i, (int)eModelInput.market];
+                        DateTime.TryParse(strs[i, (int)eModelInput.candle_date_time_utc], out modelInput.candle_date_time_utc);
+                        DateTime.TryParse(strs[i, (int)eModelInput.candle_date_time_kst], out modelInput.candle_date_time_kst);
+                        double.TryParse(strs[i, (int)eModelInput.opening_price], out modelInput.opening_price);
+                        double.TryParse(strs[i, (int)eModelInput.high_price], out modelInput.high_price);
+                        double.TryParse(strs[i, (int)eModelInput.low_price], out modelInput.low_price);
+                        float.TryParse(strs[i, (int)eModelInput.trade_price], out modelInput.trade_price);
+                        double.TryParse(strs[i, (int)eModelInput.timestamp], out modelInput.timestamp);
+                        double.TryParse(strs[i, (int)eModelInput.candle_acc_trade_price], out modelInput.candle_acc_trade_price);
+                        double.TryParse(strs[i, (int)eModelInput.candle_acc_trade_volume], out modelInput.candle_acc_trade_volume);
+                        modelInputs.Add(modelInput);
+                    }
                 }
             }
+            catch { }
             return modelInputs;
         }
 
+        private static Mutex mutex_GetDatas = new Mutex();
         /// <summary>
         /// 캔들 리스트 가져오기
         /// </summary>
@@ -53,11 +78,13 @@ namespace CoinTrader.ML
         /// <returns></returns>
         private static List<CandlesData> GetDatas(string market)
         {
+            mutex_GetDatas.WaitOne();
             if (!CandleDatas.TryGetValue(market, out List<CandlesData> datas))
             {
-                datas = Load(market);
+                datas = LoadData(market);
                 CandleDatas.Add(market, datas);
             }
+            mutex_GetDatas.ReleaseMutex();
             return datas;
         }
 
@@ -76,6 +103,31 @@ namespace CoinTrader.ML
                     datas.Add(input);
                     Save(market);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 정보 추가
+        /// </summary>
+        /// <param name="market"></param>
+        /// <param name="inputs"></param>
+        public static void Add(string market, List<CandlesData> inputs)
+        {
+            var datas = GetDatas(market);
+            if (datas != null)
+            {
+                for (int i = 0; i < inputs.Count; i++)
+                {
+                    CandlesData input = inputs[i];
+                    if (input != null)
+                    {
+                        if (!datas.Exists(data => data.candle_date_time_utc == input.candle_date_time_utc))
+                        {
+                            datas.Add(input);
+                        }
+                    }
+                }
+                Save(market);
             }
         }
 
@@ -101,7 +153,7 @@ namespace CoinTrader.ML
         }
 
         /// <summary>
-        /// 전날 변동성 k 배수로 가져오기 가져오기
+        /// 전날 변동성 k 배수로 가져오기
         /// </summary>
         /// <param name="date"></param>
         /// <param name="k">배수 세팅 0f ~ 1f</param>
@@ -122,7 +174,7 @@ namespace CoinTrader.ML
         }
 
         /// <summary>
-        /// 이동평균선 가져오기
+        /// 이동평균값 가져오기
         /// </summary>
         public static double GetMovingAverage(string market, DateTime date, int days)
         {

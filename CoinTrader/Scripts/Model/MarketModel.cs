@@ -2,21 +2,22 @@
 using Network;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class MarketModel
 {
     public delegate void UpdateTicker(MarketInfo marketInfo);
-    private event UpdateTicker onUpdateTicker = null;
-    public event UpdateTicker OnUpdateTicker
+    private event UpdateTicker onUpdateMarketInfo = null;
+    public event UpdateTicker OnUpdateMarketInfo
     {
         add
         {
-            onUpdateTicker -= value;
-            onUpdateTicker += value;
+            onUpdateMarketInfo -= value;
+            onUpdateMarketInfo += value;
         }
         remove
         {
-            onUpdateTicker -= value;
+            onUpdateMarketInfo -= value;
         }
     }
 
@@ -73,6 +74,7 @@ public class MarketModel
                     // 이동평균
                     marketInfo.movingAverage_15 = MachineLearning.GetMovingAverage(marketInfo.name, today, 15);
                     marketInfo.movingAverage_30 = MachineLearning.GetMovingAverage(marketInfo.name, today, 30);
+                    onUpdateMarketInfo?.Invoke(marketInfo);
                 }
             }
         }
@@ -88,6 +90,24 @@ public class MarketModel
     {
         markets.TryGetValue(marketType, out List<MarketInfo> marketInfos);
         return marketInfos;
+    }
+
+    /// <summary>
+    /// 마켓 정보 반환
+    /// </summary>
+    /// <param name="market"></param>
+    /// <returns></returns>
+    public MarketInfo GetMarketInfo(string market)
+    {
+        var enumerator = markets.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            var list = enumerator.Current.Value;
+            var find = list.Find(info => info.name.Equals(market));
+            if (find != null)
+                return find;
+        }
+        return null;
     }
 
     /// <summary>
@@ -122,15 +142,26 @@ public class MarketModel
                         var marketInfo = marketInfos.Find(info => info.name == tickerRes.market);
                         if (marketInfo != null)
                         {
+                            bool isUpdate = false;
+
                             if (marketInfo.trade_price != tickerRes.trade_price)
                             {
+                                isUpdate = true;
+                                // 현재가 세팅
                                 marketInfo.trade_price = tickerRes.trade_price;
-                                onUpdateTicker?.Invoke(marketInfo);
                             }
-                            marketInfo.prev_closing_price = tickerRes.prev_closing_price;
 
-                            // 변동성 타겟 가격 세팅
-                            marketInfo.SetTargetPrice(marketInfo.prev_closing_price + MachineLearning.GetTargetPrice(marketInfo.name, Time.NowTime.Date, 0.5f));
+                            if (marketInfo.prev_closing_price != tickerRes.prev_closing_price)
+                            {
+                                isUpdate = true;
+                                // 전일 종가 세팅
+                                marketInfo.prev_closing_price = tickerRes.prev_closing_price;
+                                // 변동성 타겟 가격 세팅
+                                Task.Run(() => marketInfo.SetTargetPrice(marketInfo.prev_closing_price + MachineLearning.GetTargetPrice(marketInfo.name, Time.NowTime.Date, 0.5f)));
+                            }
+
+                            if (isUpdate)
+                                onUpdateMarketInfo?.Invoke(marketInfo);
                         }
                     }
                 }
