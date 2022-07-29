@@ -12,7 +12,7 @@ namespace CoinTrader.ML
 {
     public static class MachineLearning
     {
-        public delegate void OnProgress(float total, float current, string text);
+        public delegate void OnProgress(int total, int current, string text);
 
         /// <summary>
         /// 데이터 Dictionary
@@ -22,22 +22,25 @@ namespace CoinTrader.ML
         /// <summary>
         /// 로드
         /// </summary>
-        public static void Initialize(OnProgress onProgress = null)
+        public static async void Initialize(OnProgress onProgress = null)
         {
-            if (Directory.Exists(Utils.CSV_DATA_PATH))
+            await Task.Run(() =>
             {
-                var dirs = Directory.GetDirectories(Utils.CSV_DATA_PATH);
-                for (int i = 0; i < dirs.Length; i++)
+                if (Directory.Exists(Utils.CSV_DATA_PATH))
                 {
-                    var market = Path.GetFileName(dirs[i]);
-                    if (!CandleDatas.TryGetValue(market, out List<CandlesData> datas))
+                    var dirs = Directory.GetDirectories(Utils.CSV_DATA_PATH);
+                    for (int i = 0; i < dirs.Length; i++)
                     {
-                        datas = LoadData(market);
-                        CandleDatas.Add(market, datas);
+                        var market = Path.GetFileName(dirs[i]);
+                        if (!CandleDatas.TryGetValue(market, out List<CandlesData> datas))
+                        {
+                            datas = LoadData(market);
+                            CandleDatas.Add(market, datas);
+                        }
+                        onProgress?.Invoke(dirs.Length, i + 1, $"'{market}' 로드중..");
                     }
-                    onProgress?.Invoke((float)dirs.Length, (float)i, $"'{market}' 로드중..");
                 }
-            }
+            });
         }
 
         /// <summary>

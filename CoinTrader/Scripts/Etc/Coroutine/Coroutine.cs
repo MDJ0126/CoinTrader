@@ -50,6 +50,15 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
+        /// 코루틴 전체 중지
+        /// </summary>
+        /// <param name="control"></param>
+        public static void StopAllCoroutine(this Control control)
+        {
+            waitRemoves.Add(coroutines.Find(co => co.control.Equals(control)));
+        }
+
+        /// <summary>
         /// 핸들러 소멸 이벤트 (코루틴에서 삭제 처리)
         /// </summary>
         /// <param name="sender"></param>
