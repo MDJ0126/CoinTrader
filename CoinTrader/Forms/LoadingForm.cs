@@ -31,7 +31,7 @@ namespace CoinTrader.Forms
         {
             loadingProgressBar.Value = (int)(current / total * 100f);
             loadingProgressBar.Update();
-            loadingLabel.Text = $"{text}...({current}/{total})";
+            loadingLabel.Text = $"{text}({current}/{total})";
             loadingLabel.Update();
         }
     }
