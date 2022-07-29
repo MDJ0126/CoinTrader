@@ -97,6 +97,20 @@ namespace CoinTrader.ML
         }
 
         /// <summary>
+        /// 데이터 날리기
+        /// </summary>
+        /// <param name="data"></param>
+        private static void ReleaseData(string market)
+        {
+            if (CandleDatas.TryGetValue(market, out List<CandlesData> datas))
+            {
+                CandleDatas.Remove(market);
+                datas = null;
+                GC.Collect();
+            }
+        }
+
+        /// <summary>
         /// 정보 추가
         /// </summary>
         /// <param name="market"></param>
@@ -186,6 +200,7 @@ namespace CoinTrader.ML
         /// </summary>
         public static double GetMovingAverage(string market, DateTime date, int days)
         {
+            double average = 0f;
             var datas = GetDatas(market);
             if (datas != null)
             {
@@ -220,11 +235,10 @@ namespace CoinTrader.ML
 
                         ++i;
                     }
-                    double average = total / days;
-                    return average;
+                    average = total / days;
                 }
             }
-            return 0f;
+            return average;
         }
 
         /// <summary>
@@ -232,12 +246,13 @@ namespace CoinTrader.ML
         /// </summary>
         public static DateTime GetOldDateTime(string market)
         {
+            DateTime dateTime = DateTime.MaxValue;
             var datas = GetDatas(market);
             if (datas != null)
             {
                 if (datas.Count > 0)
                 {
-                    return datas[0].candle_date_time_kst;
+                    dateTime = datas[0].candle_date_time_kst;
                 }
             }
             return DateTime.MaxValue;
@@ -248,12 +263,13 @@ namespace CoinTrader.ML
         /// </summary>
         public static DateTime GetLastDateTime(string market)
         {
+            DateTime dateTime = DateTime.MinValue;
             var datas = GetDatas(market);
             if (datas != null)
             {
                 if (datas.Count > 0)
                 {
-                    return datas[datas.Count - 1].candle_date_time_kst;
+                    dateTime = datas[datas.Count - 1].candle_date_time_kst;
                 }
             }
             return DateTime.MinValue;
