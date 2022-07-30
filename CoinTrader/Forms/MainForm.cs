@@ -27,8 +27,6 @@ namespace CoinTrader.Forms
             InitializeComponent();
             this.StyleManager = metroStyleManager;
             //this.StyleManager.Theme = MetroFramework.MetroThemeStyle.Dark;
-            ProtocolManager.GetHandler<HandlerAccount>().Request();
-            ProtocolManager.GetHandler<HandlerApiKey>().Request();
         }
 
         private void Form1_Load(object sender, EventArgs e)

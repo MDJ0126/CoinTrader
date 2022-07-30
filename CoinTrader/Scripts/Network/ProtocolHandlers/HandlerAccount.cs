@@ -60,6 +60,7 @@ namespace Network
             if (response.IsSuccessful)
             {
                 res = JsonParser<AccountRes>(response.Content);
+                ModelCenter.Account.SetAccount(res);
             }
             else
             {

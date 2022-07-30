@@ -44,6 +44,11 @@ namespace Network
             if (response.IsSuccessful)
             {
                 res = JsonParser<ApiKeyRes>(response.Content);
+                for (int i = 0; i < res.Count; i++)
+                {
+                    if (res[i].access_key == Config.ACCESS_KEY)
+                        Config.ExpireAt = res[i].expire_at;
+                }
             }
             else
             {

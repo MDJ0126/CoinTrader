@@ -17,11 +17,37 @@ namespace CoinTrader.Forms
         {
             yield return new WaitForSeconds(0.5f);
             WaterfallProcess wfp = new WaterfallProcess();
+            wfp.Add(CheckAPIKeyState);
+            wfp.Add(SetAccount);
             wfp.Add(SetMarketList);
             wfp.Add(SetCandleDays);
             wfp.Start(result =>
             {
                 Completed();
+            });
+        }
+
+        /// <summary>
+        /// API Key 만료기한 확인하기
+        /// </summary>
+        /// <param name="onFinished"></param>
+        private void CheckAPIKeyState(Action<bool> onFinished)
+        {
+            ProtocolManager.GetHandler<HandlerApiKey>().Request((result, res) =>
+            {
+                onFinished.Invoke(true);
+            });
+        }
+
+        /// <summary>
+        /// 잔고 세팅
+        /// </summary>
+        /// <param name="onFinished"></param>
+        private void SetAccount(Action<bool> onFinished)
+        {
+            ProtocolManager.GetHandler<HandlerAccount>().Request((result, res) =>
+            {
+                onFinished.Invoke(true);
             });
         }
 
