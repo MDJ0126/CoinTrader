@@ -43,8 +43,8 @@ public static class DeeplearningProcess
                                 DateTime oldTime = MachineLearning.GetOldDateTime(marketInfo.name);
                                 if (oldTime == DateTime.MaxValue)
                                     oldTime = Time.NowTime;
+                                // utc 기준으로 요청
                                 string to = oldTime.ToString("yyyy-MM-dd HH:mm:ss");
-
                                 bool isFinished = false;
                                 ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, onFinished: (result, res) =>
                                 {
@@ -77,6 +77,7 @@ public static class DeeplearningProcess
 
                             if (addHours > 0f)
                             {
+                                // utc 기준으로 요청
                                 string to = lastTime.ToString("yyyy-MM-dd HH:mm:ss");
                                 bool isFinished = false;
                                 ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, count: addHours - 1, onFinished: (result, res) =>

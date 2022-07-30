@@ -101,7 +101,7 @@ public class MarketInfo
         candlesDaysLatest30.Clear();
         candlesDaysLatest30.AddRange(res);
 
-        prev_closing_price = candlesDaysLatest30[candlesDaysLatest30.Count - 1].prev_closing_price;
+        prev_closing_price = candlesDaysLatest30[candlesDaysLatest30.Count - 1].trade_price;
         movingAverage_15 = GetMovingAverage(15);
         movingAverage_30 = GetMovingAverage(30);
         buy_target_price = GetTargetPrice(0.5f);
@@ -138,7 +138,7 @@ public class MarketInfo
         if (candlesDaysLatest30 != null && candlesDaysLatest30.Count > 0)
         {
             var candleData = candlesDaysLatest30[candlesDaysLatest30.Count - 1];
-            return prev_closing_price + (candleData.high_price - candleData.low_price) *k;
+            return prev_closing_price + (candleData.high_price - candleData.low_price) * k;
         }
         return double.MaxValue;
     }
