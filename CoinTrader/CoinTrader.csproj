@@ -196,6 +196,11 @@
     <Compile Include="Scripts\Model\MarketModel.cs" />
     <Compile Include="Scripts\Model\ModelCenter.cs" />
     <Compile Include="Scripts\Network\ProtocolHandlers\HandlerCandlesMinutes.cs" />
+    <Compile Include="Scripts\Network\ProtocolHandlers\HandlerOrders.cs" />
+    <Compile Include="Scripts\Network\ProtocolHandlers\HandlerOrderCancel.cs" />
+    <Compile Include="Scripts\Network\ProtocolHandlers\HandlerOrderList.cs" />
+    <Compile Include="Scripts\Network\ProtocolHandlers\HandlerOrderCheck.cs" />
+    <Compile Include="Scripts\Network\ProtocolHandlers\HandlerOrdersChance.cs" />
     <Compile Include="Scripts\Network\ProtocolHandlers\HandlerMarket.cs" />
     <Compile Include="Scripts\Network\ProtocolHandlers\HandlerCandlesDays.cs" />
     <Compile Include="Scripts\Network\ProtocolHandlers\HandlerTicker.cs" />
