@@ -134,8 +134,11 @@ namespace System.Windows.Forms
                 // 반복기 종료 처리
                 for (int i = 0; i < waitRemoves.Count; i++)
                 {
-                    waitRemoves[i].control.HandleDestroyed -= HandleDestroyed;
-                    coroutines.Remove(waitRemoves[i]);
+                    if (waitRemoves[i] != null)
+                    {
+                        waitRemoves[i].control.HandleDestroyed -= HandleDestroyed;
+                        coroutines.Remove(waitRemoves[i]);
+                    }
                 }
                 waitRemoves.Clear();
 

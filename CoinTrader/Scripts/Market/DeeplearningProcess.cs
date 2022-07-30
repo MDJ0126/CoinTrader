@@ -50,7 +50,7 @@ public static class DeeplearningProcess
                                 {
                                     if (res != null && res.Count > 0)
                                     {
-                                        MachineLearning.Add(res[0].market, ConvertDatas(res));
+                                        MachineLearning.AddOld(res[0].market, ConvertDatas(res));
                                     }
                                     else
                                     {
@@ -66,24 +66,24 @@ public static class DeeplearningProcess
                             }
 
                             // 최신 데이터들 불러오기
-                            DateTime lastTime = MachineLearning.GetLastDateTime(marketInfo.name);
+                            DateTime lastTime = MachineLearning.GetLatestDateTime(marketInfo.name);
                             if (lastTime == DateTime.MinValue)
                                 lastTime = Time.NowTime;
                             TimeSpan ts = Time.NowTime - lastTime;
                             int addHours = (int)ts.TotalHours;
-                            if (ts.TotalHours > 200f) // 200개 초과하면 줄인다
-                                addHours -= (int)(ts.TotalHours - 200f);
+                            if (addHours > 200) // 200개 초과하면 줄인다
+                                addHours = 200;
                             lastTime = lastTime.AddHours(addHours);
 
                             if (addHours > 0f)
                             {
                                 string to = lastTime.ToString("yyyy-MM-dd HH:mm:ss");
                                 bool isFinished = false;
-                                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, count: addHours, onFinished: (result, res) =>
+                                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, count: addHours - 1, onFinished: (result, res) =>
                                 {
                                     if (res != null && res.Count > 0)
                                     {
-                                        MachineLearning.Add(res[0].market, ConvertDatas(res));
+                                        MachineLearning.AddLatest(res[0].market, ConvertDatas(res));
                                     }
                                     isFinished = true;
                                 });

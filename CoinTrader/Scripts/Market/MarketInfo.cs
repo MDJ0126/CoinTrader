@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Network;
+using System;
 using System.Collections.Generic;
 
 public class MarketInfo
@@ -39,6 +40,10 @@ public class MarketInfo
     /// 변동성 타겟 가격 (어제의 고가 - 어제의 저가) * k)
     /// </summary>
     public double buy_target_price = 0f;
+    /// <summary>
+    /// 최근 30일 캔들 데이터
+    /// </summary>
+    public List<CandlesDaysRes> candlesDaysLatest30 = new List<CandlesDaysRes>();
 
     /// <summary>
     /// 예상 종가 세팅
@@ -87,8 +92,64 @@ public class MarketInfo
         buy_target_price = targetPrice;
     }
 
+    /// <summary>
+    /// 캔들 데이터 세팅
+    /// </summary>
+    /// <param name="res"></param>
+    public void SetCandleDaysRes(List<CandlesDaysRes> res)
+    {
+        candlesDaysLatest30.Clear();
+        candlesDaysLatest30.AddRange(res);
+
+        prev_closing_price = candlesDaysLatest30[candlesDaysLatest30.Count - 1].prev_closing_price;
+        movingAverage_15 = GetMovingAverage(15);
+        movingAverage_30 = GetMovingAverage(30);
+        buy_target_price = GetTargetPrice(0.5f);
+    }
+
+    /// <summary>
+    /// 이동평균값 가져오기
+    /// </summary>
+    private double GetMovingAverage(int days)
+    {
+        double average = 0f;
+        if (candlesDaysLatest30 != null && candlesDaysLatest30.Count > 0)
+        {
+            var candleData = candlesDaysLatest30[candlesDaysLatest30.Count - 1];
+            double total = 0f;
+            for (int i = 0; i < days; i++)
+            {
+                total += candlesDaysLatest30[candlesDaysLatest30.Count - 1 - i].trade_price;
+            }
+            average = total / days;
+        }
+        return average;
+    }
+
+    /// <summary>
+    /// 전날 변동성 k 배수로 가져오기
+    /// </summary>
+    /// <param name="date"></param>
+    /// <param name="k">배수 세팅 0f ~ 1f</param>
+    /// <returns></returns>
+    private double GetTargetPrice(float k)
+    {
+        k = Utils.Clamp(k, 0f, 1f);
+        if (candlesDaysLatest30 != null && candlesDaysLatest30.Count > 0)
+        {
+            var candleData = candlesDaysLatest30[candlesDaysLatest30.Count - 1];
+            return prev_closing_price + (candleData.high_price - candleData.low_price) *k;
+        }
+        return double.MaxValue;
+    }
+
     public override string ToString()
     {
         return $"{name}, {korean_name}, 현재가: {trade_price:N0}";
+    }
+
+    internal void ResetDay()
+    {
+        throw new NotImplementedException();
     }
 }

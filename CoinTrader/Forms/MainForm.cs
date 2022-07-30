@@ -29,9 +29,6 @@ namespace CoinTrader.Forms
             //this.StyleManager.Theme = MetroFramework.MetroThemeStyle.Dark;
             ProtocolManager.GetHandler<HandlerAccount>().Request();
             ProtocolManager.GetHandler<HandlerApiKey>().Request();
-
-            // 매입량
-            // 이동평균선
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -51,11 +48,12 @@ namespace CoinTrader.Forms
 
             // 워터풀 프로세스 시작
             WaterfallProcess wfp = new WaterfallProcess();
-            wfp.Add(SetCoinList);
+            wfp.Add(SetMarketList);
             wfp.Start(result =>
             {
-                ModelCenter.Market.OnUpdateMarketInfo += OnUpdateMarketInfo;
+                DeeplearningProcess.Start();
                 DeeplearningProcess.onUpdateMarketInfo += OnUpdateMarketInfo;
+                ModelCenter.Market.OnUpdateMarketInfo += OnUpdateMarketInfo;
 
                 listView1.Items.Clear();
                 listView1.DoubleBuffered(true);
@@ -79,36 +77,33 @@ namespace CoinTrader.Forms
         /// <summary>
         /// 코인 리스트 세팅
         /// </summary>
-        private void SetCoinList(Action<bool> onFinished)
+        private void SetMarketList(Action<bool> onFinished)
         {
-            ProtocolManager.GetHandler<HandlerMarket>().Request((result, res) =>
+            metroListView1.BeginUpdate();
+            if (ModelCenter.Market.markets.TryGetValue(eMarketType.KRW, out var marketInfos))
             {
-                metroListView1.BeginUpdate();
-                if (ModelCenter.Market.markets.TryGetValue(eMarketType.KRW, out var marketInfos))
+                for (int i = 0; i < marketInfos.Count; i++)
                 {
-                    for (int i = 0; i < marketInfos.Count; i++)
-                    {
-                        ListViewItem item = new ListViewItem();
-                        item.Text = marketInfos[i].name;
-                        item.SubItems.Add(marketInfos[i].korean_name);
-                        item.SubItems.Add("");
-                        item.SubItems.Add("");
-                        item.SubItems.Add("");
-                        item.SubItems.Add("");
-                        item.SubItems.Add("");
-                        item.SubItems.Add("");
-                        item.SubItems.Add("");
-                        metroListView1.Items.Add(item);
-                    }
+                    ListViewItem item = new ListViewItem();
+                    item.Text = marketInfos[i].name;
+                    item.SubItems.Add(marketInfos[i].korean_name);
+                    item.SubItems.Add("");
+                    item.SubItems.Add("");
+                    item.SubItems.Add("");
+                    item.SubItems.Add("");
+                    item.SubItems.Add("");
+                    item.SubItems.Add("");
+                    item.SubItems.Add("");
+                    metroListView1.Items.Add(item);
                 }
-                metroListView1.EndUpdate();
+            }
+            metroListView1.EndUpdate();
 
-                if (tickerCoroutine != null)
-                    this.StopCoroutine(tickerCoroutine);
-                tickerCoroutine = this.StartCoroutine(RequestTicker());
+            if (tickerCoroutine != null)
+                this.StopCoroutine(tickerCoroutine);
+            tickerCoroutine = this.StartCoroutine(RequestTicker());
 
-                onFinished?.Invoke(true);
-            });
+            onFinished?.Invoke(true);
         }
 
         private Coroutine tickerCoroutine = null;

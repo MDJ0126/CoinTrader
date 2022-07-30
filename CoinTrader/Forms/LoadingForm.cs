@@ -1,4 +1,5 @@
 ﻿using CoinTrader.ML;
+using Network;
 using System;
 using System.Collections;
 using System.Windows.Forms;
@@ -7,55 +8,66 @@ namespace CoinTrader.Forms
 {
     public partial class LoadingForm : Form
     {
-        private float total = 0f;
-        private float current = 0f;
-        private string text = string.Empty;
-        private bool isCompleted = false;
-
         public LoadingForm()
         {
             InitializeComponent();
-            this.StartCoroutine(Updater());
-            this.StartCoroutine(Start());
+            this.StartCoroutine(StartProcess());
         }
-
-        private IEnumerator Updater()
-        {
-            while (true)
-            {
-                if (current > 0f && total > 0f)
-                {
-                    loadingProgressBar.Value = (int)(current / total * 100f);
-                    loadingProgressBar.Update();
-                    loadingLabel.Text = $"{text}({current}/{total})";
-                    loadingLabel.Update();
-                }
-                yield return null;
-
-                if (isCompleted)
-                    Completed();
-            }
-        }
-
-        private IEnumerator Start()
+        private IEnumerator StartProcess()
         {
             yield return new WaitForSeconds(0.5f);
             WaterfallProcess wfp = new WaterfallProcess();
-            wfp.Add(MachineLearningLoad);
+            wfp.Add(SetMarketList);
+            wfp.Add(SetCandleDays);
             wfp.Start(result =>
             {
-                isCompleted = true;
+                Completed();
             });
         }
 
-        private void MachineLearningLoad(Action<bool> onFinished)
+        /// <summary>
+        /// 기본 마켓 정보 요청
+        /// </summary>
+        /// <param name="onFinished"></param>
+        private void SetMarketList(Action<bool> onFinished)
         {
-            MachineLearning.Initialize((total, current, text) =>
+            UpdateProgressBar(1f, 1f, "마켓 리스트를 요청합니다.");
+            ProtocolManager.GetHandler<HandlerMarket>().Request((result, res) =>
             {
-                UpdateProgressBar(total, current, text);
-                if (total == current)
-                    onFinished?.Invoke(true);
+                onFinished.Invoke(true);
             });
+        }
+
+        /// <summary>
+        /// 기본 30일 캔들 데이터 세팅
+        /// </summary>
+        /// <param name="onFinished"></param>
+        private void SetCandleDays(Action<bool> onFinished)
+        {
+            this.StartCoroutine(RequestCandleDays(onFinished));
+        }
+
+        private IEnumerator RequestCandleDays(Action<bool> onFinished)
+        {
+            if (ModelCenter.Market.markets.TryGetValue(eMarketType.KRW, out var marketInfos))
+            {
+                for (int i = 0; i < marketInfos.Count; i++)
+                {
+                    var marketInfo = marketInfos[i];
+                    bool isFinished = false;
+                    ProtocolManager.GetHandler<HandlerCandlesDays>().Request(marketInfo.name, "", 30, onFinished: (result, res) =>
+                    {
+                        marketInfo.SetCandleDaysRes(res);
+                        isFinished = true;
+                    });
+                    yield return new WaitUntil(() => isFinished);
+
+                    UpdateProgressBar(marketInfos.Count, i + 1, $"'{marketInfo.name}'의 30일 캔들 데이터를 요청합니다.");
+
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
+            onFinished.Invoke(true);
         }
 
         private void Completed()
@@ -68,9 +80,10 @@ namespace CoinTrader.Forms
 
         private void UpdateProgressBar(float total, float current, string text)
         {
-            this.total = total;
-            this.current = current;
-            this.text = text;
+            loadingProgressBar.Value = (int)(current / total * 100f);
+            loadingProgressBar.Update();
+            loadingLabel.Text = $"{text} ({current}/{total})";
+            loadingLabel.Update();
         }
     }
 }

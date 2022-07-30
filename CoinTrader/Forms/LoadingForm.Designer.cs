@@ -63,7 +63,7 @@
             this.loadingLabel.Name = "loadingLabel";
             this.loadingLabel.Size = new System.Drawing.Size(256, 14);
             this.loadingLabel.TabIndex = 3;
-            this.loadingLabel.Text = "\'KRW-BTC\' 로드중..";
+            this.loadingLabel.Text = "프로그램에 필요한 데이터를 수집합니다.";
             this.loadingLabel.UseCompatibleTextRendering = true;
             // 
             // LoadingForm

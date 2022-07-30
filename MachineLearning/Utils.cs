@@ -104,6 +104,73 @@ internal static class Utils
     }
 
     /// <summary>
+    /// 이어쓰기
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="collection">컬렉션</param>
+    /// <param name="path">파일 위치</param>
+    /// <param name="pasteInFront">앞에 붙여넣을지 여부</param>
+    /// <returns>작업 완료 여부</returns>
+    public static bool AppendCSVFile<T>(ICollection<T> collection, string path, bool pasteInFront = false)
+    {
+        if (collection.Count > 0)
+        {
+            sb.Length = 0;
+            path += ".csv";
+            if (File.Exists(path))
+            {
+                string originalText = File.ReadAllText(path);
+                var enumerator = collection.GetEnumerator();
+                if (pasteInFront)
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+                        for (int i = 0; i < fieldInfos.Length; i++)
+                        {
+                            if (i > 0) sb.Append(',');
+                            sb.Append(fieldInfos[i].GetValue(enumerator.Current));
+                        }
+                        sb.Append('\n');
+                    };
+                    using (var writer = File.CreateText(path + ".temp"))
+                    {
+                        writer.Write(sb + originalText);
+                        writer.Close();
+                    }
+                }
+                else
+                {
+                    using (var writer = File.CreateText(path + ".temp"))
+                    {
+                        // 데이터 입력
+                        while (enumerator.MoveNext())
+                        {
+                            sb.Append('\n');
+                            FieldInfo[] fieldInfos = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+                            for (int i = 0; i < fieldInfos.Length; i++)
+                            {
+                                if (i > 0) sb.Append(',');
+                                sb.Append(fieldInfos[i].GetValue(enumerator.Current));
+                            }
+                        };
+                        writer.Write(originalText + sb);
+                        writer.Close();
+                    }
+                }
+                try
+                {
+                    File.Delete(path);
+                }
+                catch { }
+                File.Move(path + ".temp", path);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
     /// 텍스트 파일 열기
     /// </summary>
     /// <param name="path"></param>

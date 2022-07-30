@@ -50,7 +50,7 @@ namespace CoinTrader.ML
         /// <returns></returns>
         private static List<CandlesData> LoadData(string market)
         {
-            List<CandlesData> modelInputs = new List<CandlesData>();
+            List<CandlesData> candlesDatas = new List<CandlesData>();
             string path = Path.Combine(Utils.CSV_DATA_PATH, market, market);
             var strs = Utils.OpenCSVFile(path);
             try
@@ -59,23 +59,52 @@ namespace CoinTrader.ML
                 {
                     for (int i = 0; i < strs.GetLength(0); i++)
                     {
-                        CandlesData modelInput = new CandlesData();
-                        modelInput.market = strs[i, (int)eModelInput.market];
-                        DateTime.TryParse(strs[i, (int)eModelInput.candle_date_time_utc], out modelInput.candle_date_time_utc);
-                        DateTime.TryParse(strs[i, (int)eModelInput.candle_date_time_kst], out modelInput.candle_date_time_kst);
-                        double.TryParse(strs[i, (int)eModelInput.opening_price], out modelInput.opening_price);
-                        double.TryParse(strs[i, (int)eModelInput.high_price], out modelInput.high_price);
-                        double.TryParse(strs[i, (int)eModelInput.low_price], out modelInput.low_price);
-                        float.TryParse(strs[i, (int)eModelInput.trade_price], out modelInput.trade_price);
-                        double.TryParse(strs[i, (int)eModelInput.timestamp], out modelInput.timestamp);
-                        double.TryParse(strs[i, (int)eModelInput.candle_acc_trade_price], out modelInput.candle_acc_trade_price);
-                        double.TryParse(strs[i, (int)eModelInput.candle_acc_trade_volume], out modelInput.candle_acc_trade_volume);
-                        modelInputs.Add(modelInput);
+                        CandlesData candlesData = new CandlesData();
+                        candlesData.market = strs[i, (int)eModelInput.market];
+                        DateTime.TryParse(strs[i, (int)eModelInput.candle_date_time_utc], out candlesData.candle_date_time_utc);
+                        DateTime.TryParse(strs[i, (int)eModelInput.candle_date_time_kst], out candlesData.candle_date_time_kst);
+                        double.TryParse(strs[i, (int)eModelInput.opening_price], out candlesData.opening_price);
+                        double.TryParse(strs[i, (int)eModelInput.high_price], out candlesData.high_price);
+                        double.TryParse(strs[i, (int)eModelInput.low_price], out candlesData.low_price);
+                        float.TryParse(strs[i, (int)eModelInput.trade_price], out candlesData.trade_price);
+                        double.TryParse(strs[i, (int)eModelInput.timestamp], out candlesData.timestamp);
+                        double.TryParse(strs[i, (int)eModelInput.candle_acc_trade_price], out candlesData.candle_acc_trade_price);
+                        double.TryParse(strs[i, (int)eModelInput.candle_acc_trade_volume], out candlesData.candle_acc_trade_volume);
+                        candlesDatas.Add(candlesData);
                     }
                 }
             }
             catch { }
-            return modelInputs;
+            return candlesDatas;
+        }
+
+        /// <summary>
+        /// 스트링을 데이터로 만들기
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private static CandlesData MakeCandlesData(string data)
+        {
+            try
+            {
+                string[] strs = data.Split(',');
+                CandlesData candlesData = new CandlesData();
+                candlesData.market = strs[(int)eModelInput.market];
+                DateTime.TryParse(strs[(int)eModelInput.candle_date_time_utc], out candlesData.candle_date_time_utc);
+                DateTime.TryParse(strs[(int)eModelInput.candle_date_time_kst], out candlesData.candle_date_time_kst);
+                double.TryParse(strs[(int)eModelInput.opening_price], out candlesData.opening_price);
+                double.TryParse(strs[(int)eModelInput.high_price], out candlesData.high_price);
+                double.TryParse(strs[(int)eModelInput.low_price], out candlesData.low_price);
+                float.TryParse(strs[(int)eModelInput.trade_price], out candlesData.trade_price);
+                double.TryParse(strs[(int)eModelInput.timestamp], out candlesData.timestamp);
+                double.TryParse(strs[(int)eModelInput.candle_acc_trade_price], out candlesData.candle_acc_trade_price);
+                double.TryParse(strs[(int)eModelInput.candle_acc_trade_volume], out candlesData.candle_acc_trade_volume);
+                return candlesData;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         private static Mutex mutex_GetDatas = new Mutex();
@@ -123,7 +152,7 @@ namespace CoinTrader.ML
                 if (!datas.Exists(data => data.candle_date_time_utc == input.candle_date_time_utc))
                 {
                     datas.Add(input);
-                    Save(market);
+                    SaveData(market);
                 }
             }
         }
@@ -149,14 +178,14 @@ namespace CoinTrader.ML
                         }
                     }
                 }
-                Save(market);
+                SaveData(market);
             }
         }
 
         /// <summary>
         /// 저장
         /// </summary>
-        private static void Save(string market)
+        private static void SaveData(string market)
         {
             var datas = GetDatas(market);
             if (datas != null)
@@ -175,70 +204,27 @@ namespace CoinTrader.ML
         }
 
         /// <summary>
-        /// 전날 변동성 k 배수로 가져오기
+        /// 학습 데이터 추가 (과거)
         /// </summary>
-        /// <param name="date"></param>
-        /// <param name="k">배수 세팅 0f ~ 1f</param>
-        /// <returns></returns>
-        public static double GetTargetPrice(string market, DateTime date, float k)
+        /// <param name="market"></param>
+        /// <param name="inputs"></param>
+        public static void AddOld(string market, List<CandlesData> inputs)
         {
-            k = Utils.Clamp(k, 0f, 1f);
-            var datas = GetDatas(market);
-            if (datas != null)
-            {
-                // 일자화
-                date = date.Date;
-                var candleData = datas.Find(data => data.candle_date_time_kst == date.AddDays(-1f));
-                if (candleData != null)
-                    return (candleData.high_price - candleData.low_price) * k;
-            }
-            return double.MaxValue;
+            string path = Path.Combine(Utils.CSV_DATA_PATH, market, market);
+            bool create = Utils.CreateCSVFile(inputs, path, overwrite: false, writeHeader: false);
+            if (!create) Utils.AppendCSVFile(inputs, path, pasteInFront: true);
         }
 
         /// <summary>
-        /// 이동평균값 가져오기
+        /// 학습 데이터 추가 (최신)
         /// </summary>
-        public static double GetMovingAverage(string market, DateTime date, int days)
+        /// <param name="market"></param>
+        /// <param name="inputs"></param>
+        public static void AddLatest(string market, List<CandlesData> inputs)
         {
-            double average = 0f;
-            var datas = GetDatas(market);
-            if (datas != null)
-            {
-                // 일자화
-                date = date.Date;
-                var candleData = datas.Find(data => data.candle_date_time_kst == date.AddDays(-1f));
-                if (candleData != null)
-                {
-                    int index = datas.IndexOf(candleData);
-                    double total = 0f;
-                    int i = 0;
-                    int day = 0;
-                    while (true)
-                    {
-                        int currentIndex = index - i;
-                        if (currentIndex > 0)
-                        {
-                            if (datas[currentIndex].candle_date_time_kst.Hour == 0 && datas[currentIndex].candle_date_time_kst.Minute == 0)
-                            {
-                                total += datas[currentIndex].trade_price;
-                                ++day;
-                            }
-                        }
-                        else
-                        {
-                            total = 0f;
-                            break;
-                        }
-
-                        if (day >= days)
-                            break;
-
-                        ++i;
-                    }
-                    average = total / days;
-                }
-            }
-            return average;
+            string path = Path.Combine(Utils.CSV_DATA_PATH, market, market);
+            bool create = Utils.CreateCSVFile(inputs, path, overwrite: false, writeHeader: false);
+            if (!create) Utils.AppendCSVFile(inputs, path, pasteInFront: false);
         }
 
         /// <summary>
@@ -246,14 +232,14 @@ namespace CoinTrader.ML
         /// </summary>
         public static DateTime GetOldDateTime(string market)
         {
-            DateTime dateTime = DateTime.MaxValue;
-            var datas = GetDatas(market);
-            if (datas != null)
+            string path = Path.Combine(Utils.CSV_DATA_PATH, market, market + ".csv");
+            if (File.Exists(path))
             {
-                if (datas.Count > 0)
-                {
-                    dateTime = datas[0].candle_date_time_kst;
-                }
+                string[] strs = File.ReadAllLines(path);
+                CandlesData datas = MakeCandlesData(strs[0]);
+                DateTime dateTime = DateTime.MinValue;
+                if (datas != null)
+                    return datas.candle_date_time_utc;
             }
             return DateTime.MaxValue;
         }
@@ -261,16 +247,15 @@ namespace CoinTrader.ML
         /// <summary>
         /// 학습 가장 최근 날짜 가져오기
         /// </summary>
-        public static DateTime GetLastDateTime(string market)
+        public static DateTime GetLatestDateTime(string market)
         {
-            DateTime dateTime = DateTime.MinValue;
-            var datas = GetDatas(market);
-            if (datas != null)
+            string path = Path.Combine(Utils.CSV_DATA_PATH, market, market + ".csv");
+            if (File.Exists(path))
             {
-                if (datas.Count > 0)
-                {
-                    dateTime = datas[datas.Count - 1].candle_date_time_kst;
-                }
+                string[] strs = File.ReadAllLines(path);
+                CandlesData datas = MakeCandlesData(strs[strs.Length - 1]);
+                if (datas != null)
+                    return datas.candle_date_time_utc;
             }
             return DateTime.MinValue;
         }
@@ -286,38 +271,38 @@ namespace CoinTrader.ML
             var path = Path.Combine(Utils.CSV_DATA_PATH, market, market + ".csv");
             var modelPath = Path.Combine(Utils.CSV_DATA_PATH, market, $"{market}.zip");
 
-            var datas = GetDatas(market);
-            if (datas.Count > 0)
+            if (File.Exists(path))
             {
-                if (File.Exists(path))
+                string[] strs = File.ReadAllLines(path);
+                int row = strs.Length;
+                MLContext mlContext = new MLContext(/*seed: 0*/);
+
+                // 데이터뷰 생성
+                IDataView dataView = mlContext.Data.LoadFromTextFile<CandlesData>(path: path, hasHeader: false, separatorChar: ',');
+                var forecastingPipeline = mlContext.Forecasting.ForecastBySsa(
+                                        inputColumnName: "trade_price", // 추척할 데이터 컬럼
+                                        windowSize: 14,  // 예측 전 최종적으로 결정짓는 요소: 이전(최근) '14'개 정보
+                                        trainSize: row, // 총 학습할 데이터 길이
+                                        seriesLength: 24,   // 24개로 분할하여 학습한다.
+                                        horizon: 24 * 7,     // 예측 24개을 요청
+                                        confidenceLevel: 0.95f, // 신뢰 수준 95%
+
+                                        outputColumnName: "Forecasted",               // 평균 추정치
+                                        confidenceLowerBoundColumn: "LowerBound",     // 최상의 경우
+                                        confidenceUpperBoundColumn: "UpperBound");    // 최악의 경우
+                #region 파이프라인 MSD 메모
+
+                /* forecastingPipeline은 첫 번째 연도와 샘플에 대해 365개의 데이터 요소를 사용하거나 시계열 데이터 세트를 seriesLength 매개 변수에
+                지정된 대로 30일(월별) 간격으로 분할합니다. 이러한 각 샘플은 주별 또는 7일 기간을 통해 분석됩니다. 다음 기간에 대한 예측 값을 결정할 때
+                이전 7일의 값을 사용하여 예측을 수행합니다. 모델은 horizon 매개 변수로 정의된 대로 향후 7일의 기간을 예측하도록 설정됩니다.
+                예측은 추측이므로 항상 100% 정확하지는 않습니다. 따라서 상한 및 하한으로 정의된 최선 및 최악의 시나리오 값 범위를 파악하고 있는 것이 좋습니다.
+                이 경우 하한 및 상한에 대한 신뢰 수준은 95%로 설정됩니다. 신뢰 수준을 적절하게 높이거나 줄일 수 있습니다. 값이 높을수록 원하는 수준의 신뢰도를
+                얻기 위해 상한 및 하한 간 범위가 넓어집니다. */
+
+                #endregion
+
+                try
                 {
-                    string[] strs = File.ReadAllLines(path);
-                    int row = strs.Length;
-                    MLContext mlContext = new MLContext(/*seed: 0*/);
-
-                    // 데이터뷰 생성
-                    IDataView dataView = mlContext.Data.LoadFromTextFile<CandlesData>(path: path, hasHeader: false, separatorChar: ',');
-                    var forecastingPipeline = mlContext.Forecasting.ForecastBySsa(
-                                            inputColumnName: "trade_price", // 추척할 데이터 컬럼
-                                            windowSize: 21,  // 예측 전 최종적으로 결정짓는 요소: 이전(최근) '14'개 정보
-                                            trainSize: row, // 총 학습할 데이터 길이
-                                            seriesLength: 24,   // 24개로 분할하여 학습한다.
-                                            horizon: 24 * 7,     // 예측 24개을 요청
-                                            confidenceLevel: 0.95f, // 신뢰 수준 95%
-
-                                            outputColumnName: "Forecasted",               // 평균 추정치
-                                            confidenceLowerBoundColumn: "LowerBound",     // 최상의 경우
-                                            confidenceUpperBoundColumn: "UpperBound");    // 최악의 경우
-                    #region 파이프라인 MSD 메모
-
-                    /* forecastingPipeline은 첫 번째 연도와 샘플에 대해 365개의 데이터 요소를 사용하거나 시계열 데이터 세트를 seriesLength 매개 변수에
-                    지정된 대로 30일(월별) 간격으로 분할합니다. 이러한 각 샘플은 주별 또는 7일 기간을 통해 분석됩니다. 다음 기간에 대한 예측 값을 결정할 때
-                    이전 7일의 값을 사용하여 예측을 수행합니다. 모델은 horizon 매개 변수로 정의된 대로 향후 7일의 기간을 예측하도록 설정됩니다.
-                    예측은 추측이므로 항상 100% 정확하지는 않습니다. 따라서 상한 및 하한으로 정의된 최선 및 최악의 시나리오 값 범위를 파악하고 있는 것이 좋습니다.
-                    이 경우 하한 및 상한에 대한 신뢰 수준은 95%로 설정됩니다. 신뢰 수준을 적절하게 높이거나 줄일 수 있습니다. 값이 높을수록 원하는 수준의 신뢰도를
-                    얻기 위해 상한 및 하한 간 범위가 넓어집니다. */
-
-                    #endregion
 
                     // 모델 학습하기
                     SsaForecastingTransformer forecaster = forecastingPipeline.Fit(dataView);
@@ -333,6 +318,10 @@ namespace CoinTrader.ML
                     // 예측하기
                     ModelOutput forecast = forecastEngine.Predict();
                     return forecast;
+                }
+                catch 
+                {
+                    return null;
                 }
             }
             return null;
