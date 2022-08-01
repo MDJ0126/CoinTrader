@@ -15,6 +15,11 @@ namespace CoinTrader.ML
         public delegate void OnProgress(int total, int current, string text);
 
         /// <summary>
+        /// 학습에 필요한 데이터 길이 제한
+        /// </summary>
+        private const int MODEL_DATA_COUNT = 480;   // 20일 데이터
+
+        /// <summary>
         /// 데이터 Dictionary
         /// </summary>
         private static Dictionary<string, List<CandlesData>> CandleDatas = new Dictionary<string, List<CandlesData>>();
@@ -26,9 +31,9 @@ namespace CoinTrader.ML
         {
             await Task.Run(() =>
             {
-                if (Directory.Exists(Utils.CSV_DATA_PATH))
+                if (Directory.Exists(CVSUtils.CSV_DATA_PATH))
                 {
-                    var dirs = Directory.GetDirectories(Utils.CSV_DATA_PATH);
+                    var dirs = Directory.GetDirectories(CVSUtils.CSV_DATA_PATH);
                     for (int i = 0; i < dirs.Length; i++)
                     {
                         var market = Path.GetFileName(dirs[i]);
@@ -51,8 +56,8 @@ namespace CoinTrader.ML
         private static List<CandlesData> LoadData(string market)
         {
             List<CandlesData> candlesDatas = new List<CandlesData>();
-            string path = Path.Combine(Utils.CSV_DATA_PATH, market, market);
-            var strs = Utils.OpenCSVFile(path);
+            string path = Path.Combine(CVSUtils.CSV_DATA_PATH, market, market);
+            var strs = CVSUtils.OpenCSVFile(path);
             try
             {
                 if (strs != null)
@@ -198,8 +203,8 @@ namespace CoinTrader.ML
                     return A.CompareTo(B);
                 });
 
-                string path = Path.Combine(Utils.CSV_DATA_PATH, market, market);
-                bool result = Utils.CreateCSVFile(datas, path, writeHeader: false);
+                string path = Path.Combine(CVSUtils.CSV_DATA_PATH, market, market);
+                bool result = CVSUtils.CreateCSVFile(datas, path, writeHeader: false);
             }
         }
 
@@ -210,9 +215,10 @@ namespace CoinTrader.ML
         /// <param name="inputs"></param>
         public static void AddOld(string market, List<CandlesData> inputs)
         {
-            string path = Path.Combine(Utils.CSV_DATA_PATH, market, market);
-            bool create = Utils.CreateCSVFile(inputs, path, overwrite: false, writeHeader: false);
-            if (!create) Utils.AppendCSVFile(inputs, path, pasteInFront: true);
+            string path = Path.Combine(CVSUtils.CSV_DATA_PATH, market, market);
+            bool create = CVSUtils.CreateCSVFile(inputs, path, overwrite: false, writeHeader: false);
+            if (!create) CVSUtils.AppendCSVFile(inputs, path, pasteInFront: true);
+            CVSUtils.CleanUpRowCVS(path, MODEL_DATA_COUNT);
         }
 
         /// <summary>
@@ -222,9 +228,20 @@ namespace CoinTrader.ML
         /// <param name="inputs"></param>
         public static void AddLatest(string market, List<CandlesData> inputs)
         {
-            string path = Path.Combine(Utils.CSV_DATA_PATH, market, market);
-            bool create = Utils.CreateCSVFile(inputs, path, overwrite: false, writeHeader: false);
-            if (!create) Utils.AppendCSVFile(inputs, path, pasteInFront: false);
+            string path = Path.Combine(CVSUtils.CSV_DATA_PATH, market, market);
+            bool create = CVSUtils.CreateCSVFile(inputs, path, overwrite: false, writeHeader: false);
+            if (!create) CVSUtils.AppendCSVFile(inputs, path, pasteInFront: false);
+            CVSUtils.CleanUpRowCVS(path, MODEL_DATA_COUNT);
+        }
+
+        /// <summary>
+        /// 과거 데이터 추가가 가능한 상태인지 판단
+        /// </summary>
+        /// <param name="market"></param>
+        public static bool CanAddedOldData(string market)
+        {
+            string path = Path.Combine(CVSUtils.CSV_DATA_PATH, market, market);
+            return CVSUtils.GetRowCount(path) < MODEL_DATA_COUNT;
         }
 
         /// <summary>
@@ -232,7 +249,7 @@ namespace CoinTrader.ML
         /// </summary>
         public static DateTime GetOldDateTime(string market)
         {
-            string path = Path.Combine(Utils.CSV_DATA_PATH, market, market + ".csv");
+            string path = Path.Combine(CVSUtils.CSV_DATA_PATH, market, market + ".csv");
             if (File.Exists(path))
             {
                 string[] strs = File.ReadAllLines(path);
@@ -249,7 +266,7 @@ namespace CoinTrader.ML
         /// </summary>
         public static DateTime GetLatestDateTime(string market)
         {
-            string path = Path.Combine(Utils.CSV_DATA_PATH, market, market + ".csv");
+            string path = Path.Combine(CVSUtils.CSV_DATA_PATH, market, market + ".csv");
             if (File.Exists(path))
             {
                 string[] strs = File.ReadAllLines(path);
@@ -268,8 +285,8 @@ namespace CoinTrader.ML
         /// <returns>예상 가격</returns>
         public static ModelOutput GetPredictePrice(string market)
         {
-            var path = Path.Combine(Utils.CSV_DATA_PATH, market, market + ".csv");
-            var modelPath = Path.Combine(Utils.CSV_DATA_PATH, market, $"{market}.zip");
+            var path = Path.Combine(CVSUtils.CSV_DATA_PATH, market, market + ".csv");
+            var modelPath = Path.Combine(CVSUtils.CSV_DATA_PATH, market, $"{market}.zip");
 
             if (File.Exists(path))
             {
@@ -281,7 +298,7 @@ namespace CoinTrader.ML
                 IDataView dataView = mlContext.Data.LoadFromTextFile<CandlesData>(path: path, hasHeader: false, separatorChar: ',');
                 var forecastingPipeline = mlContext.Forecasting.ForecastBySsa(
                                         inputColumnName: "trade_price", // 추척할 데이터 컬럼
-                                        windowSize: 14,  // 예측 전 최종적으로 결정짓는 요소: 이전(최근) '14'개 정보
+                                        windowSize: 6,  // 예측 전 최종적으로 결정짓는 최근 데이터 개수
                                         trainSize: row, // 총 학습할 데이터 길이
                                         seriesLength: 24,   // 24개로 분할하여 학습한다.
                                         horizon: 24 * 7,     // 예측 24개을 요청
@@ -312,7 +329,7 @@ namespace CoinTrader.ML
 
                     // 학습된 모델 파일 저장(.zip)
                     var forecastEngine = forecaster.CreateTimeSeriesEngine<CandlesData, ModelOutput>(mlContext);
-                    Utils.CreatePathFolder(modelPath);
+                    CVSUtils.CreatePathFolder(modelPath);
                     forecastEngine.CheckPoint(mlContext, modelPath);
 
                     // 예측하기

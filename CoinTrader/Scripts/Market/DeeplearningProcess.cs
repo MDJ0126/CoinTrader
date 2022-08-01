@@ -2,7 +2,6 @@
 using Network;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 public static class DeeplearningProcess
@@ -38,49 +37,52 @@ public static class DeeplearningProcess
                         await Task.Run(async () =>
                         {
                             // 과거 데이터들 불러오기
-                            if (!completedOldDataMarketNames.Exists(name => name.Equals(marketInfo.name)))
+                            if (MachineLearning.CanAddedOldData(marketInfo.name))
                             {
-                                DateTime oldTime = MachineLearning.GetOldDateTime(marketInfo.name);
-                                if (oldTime == DateTime.MaxValue)
-                                    oldTime = Time.NowTime;
-                                // utc 기준으로 요청
-                                string to = oldTime.ToString("yyyy-MM-dd HH:mm:ss");
-                                bool isFinished = false;
-                                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, onFinished: (result, res) =>
+                                if (!completedOldDataMarketNames.Exists(name => name.Equals(marketInfo.name)))
                                 {
-                                    if (res != null && res.Count > 0)
+                                    DateTime oldTime = MachineLearning.GetOldDateTime(marketInfo.name);
+                                    if (oldTime == DateTime.MaxValue)
+                                        oldTime = Time.NowTime;
+                                    // utc 기준으로 요청
+                                    string to = oldTime.ToString("yyyy-MM-dd HH:mm:ss");
+                                    bool isFinished = false;
+                                    ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, onFinished: (result, res) =>
                                     {
-                                        MachineLearning.AddOld(res[0].market, ConvertDatas(res));
-                                    }
-                                    else
-                                    {
-                                        completedOldDataMarketNames.Add(marketInfo.name);
-                                    }
-                                    isFinished = true;
-                                });
+                                        if (res != null && res.Count > 0)
+                                        {
+                                            MachineLearning.AddOld(res[0].market, ConvertDatas(res));
+                                        }
+                                        else
+                                        {
+                                            completedOldDataMarketNames.Add(marketInfo.name);
+                                        }
+                                        isFinished = true;
+                                    });
 
-                                while (!isFinished)
-                                {
-                                    await Task.Delay(100);
+                                    while (!isFinished)
+                                    {
+                                        await Task.Delay(100);
+                                    }
                                 }
                             }
 
                             // 최신 데이터들 불러오기
-                            DateTime lastTime = MachineLearning.GetLatestDateTime(marketInfo.name);
-                            if (lastTime == DateTime.MinValue)
-                                lastTime = Time.NowTime;
-                            TimeSpan ts = Time.NowTime - lastTime;
+                            DateTime latestTime = MachineLearning.GetLatestDateTime(marketInfo.name);
+                            if (latestTime == DateTime.MinValue)
+                                latestTime = Time.NowTime;
+                            TimeSpan ts = Time.NowTime - latestTime;
                             int addHours = (int)ts.TotalHours;
-                            if (addHours > 200) // 200개 초과하면 줄인다
+                            if (addHours > 200) // 200개 초과하지 않게 한다.
                                 addHours = 200;
-                            lastTime = lastTime.AddHours(addHours);
+                            latestTime = latestTime.AddHours(addHours + 1);
 
                             if (addHours > 0f)
                             {
                                 // utc 기준으로 요청
-                                string to = lastTime.ToString("yyyy-MM-dd HH:mm:ss");
+                                string to = latestTime.ToString("yyyy-MM-dd HH:mm:ss");
                                 bool isFinished = false;
-                                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, count: addHours - 1, onFinished: (result, res) =>
+                                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, count: addHours, onFinished: (result, res) =>
                                 {
                                     if (res != null && res.Count > 0)
                                     {
@@ -105,7 +107,7 @@ public static class DeeplearningProcess
                 }
             }
 
-            await Task.Delay(100);
+            await Task.Delay(1000);
         }
     }
 

@@ -14,4 +14,8 @@ public static class Config
     /// API 엑세스 키 만료 날짜
     /// </summary>
     public static DateTime ExpireAt = DateTime.MinValue;
+    /// <summary>
+    /// 테스트 모드 (가계정을 만들어서 구매 테스트)
+    /// </summary>
+    public static bool isTestMode = true;
 }

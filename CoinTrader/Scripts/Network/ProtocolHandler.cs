@@ -48,7 +48,7 @@ namespace Network
             restRequest?.Invoke(this, req, (res) =>
             {
                 CheckDataUsage();
-                if (res.IsSuccessful)
+                if (res != null && res.IsSuccessful)
                 {
                     // 남은 요청 수 갱신
                     UpdateRemainingReq(res);

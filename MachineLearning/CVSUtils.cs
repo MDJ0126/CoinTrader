@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-internal static class Utils
+internal static class CVSUtils
 {
     public static string CSV_DATA_PATH = Path.Combine(Environment.CurrentDirectory, "Data");
 
@@ -168,6 +168,59 @@ internal static class Utils
             }
         }
         return false;
+    }
+
+    /// <summary>
+    /// 특정한 로우 길이만 남기고 이전 기록은 모두 지운다.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="remainRowCount"></param>
+    public static void CleanUpRowCVS(string path, int remainRowCount)
+    {
+        path += ".csv";
+        if (File.Exists(path))
+        {
+            string[] strs = File.ReadAllLines(path);
+            if (strs.Length > remainRowCount)
+            {
+                sb.Length = 0;
+                for (int i = strs.Length - remainRowCount; i < strs.Length; i++)
+                {
+                    sb.Append(strs[i]);
+                    if (i < strs.Length - 1)
+                        sb.Append('\n');
+                }
+
+                using (var writer = File.CreateText(path + ".temp"))
+                {
+                    writer.Write(sb);
+                    writer.Close();
+                }
+
+                try
+                {
+                    File.Delete(path);
+                }
+                catch { }
+                File.Move(path + ".temp", path);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 로우 길이 가져오기
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static int GetRowCount(string path)
+    {
+        path += ".csv";
+        if (File.Exists(path))
+        {
+            string[] strs = File.ReadAllLines(path);
+            return strs.Length;
+        }
+        return 0;
     }
 
     /// <summary>

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class AccountModel
 {
     public List<AccountRes> Accounts = new List<AccountRes>();
+    public List<AccountRes> Accounts_Test = new List<AccountRes>();
 
     /// <summary>
     /// 잔고 세팅
