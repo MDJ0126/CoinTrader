@@ -157,7 +157,7 @@ namespace CoinTrader.Forms
                 item.SubItems[(int)eTickerHeader.YesterDay].Text = $"{symbol} {marketInfo.trade_price - marketInfo.prev_closing_price:N0}원 ({percentage:F2}%)";
 
                 // 이동평균 15일
-                percentage = (marketInfo.movingAverage_15 - marketInfo.prev_closing_price) / marketInfo.prev_closing_price;
+                percentage = (marketInfo.movingAverage_15 - marketInfo.prev_closing_price) / marketInfo.prev_closing_price * 100f;
                 symbol = string.Empty;
                 color = Color.Black;
                 if (percentage > 0f)
@@ -174,7 +174,7 @@ namespace CoinTrader.Forms
                 item.SubItems[(int)eTickerHeader.MovingAverage15].Text = $"{symbol} {marketInfo.movingAverage_15:N0}원 ({percentage:F2}%)";
 
                 // 이동평균 30일
-                percentage = (marketInfo.movingAverage_30 - marketInfo.prev_closing_price) / marketInfo.prev_closing_price;
+                percentage = (marketInfo.movingAverage_30 - marketInfo.prev_closing_price) / marketInfo.prev_closing_price * 100f;
                 symbol = string.Empty;
                 color = Color.Black;
                 if (percentage > 0f)
