@@ -84,15 +84,6 @@ public class MarketInfo
     }
 
     /// <summary>
-    /// 변동성 타겟 가격 세팅
-    /// </summary>
-    /// <param name="targetPrice"></param>
-    public void SetTargetPrice(double targetPrice)
-    {
-        buy_target_price = targetPrice;
-    }
-
-    /// <summary>
     /// 캔들 데이터 세팅
     /// </summary>
     /// <param name="res"></param>
@@ -101,7 +92,7 @@ public class MarketInfo
         candlesDaysLatest30.Clear();
         candlesDaysLatest30.AddRange(res);
 
-        prev_closing_price = candlesDaysLatest30[candlesDaysLatest30.Count - 1].trade_price;
+        prev_closing_price = candlesDaysLatest30[candlesDaysLatest30.Count - 1].prev_closing_price;
         movingAverage_15 = GetMovingAverage(15);
         movingAverage_30 = GetMovingAverage(30);
         buy_target_price = GetTargetPrice(0.5f);

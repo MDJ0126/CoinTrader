@@ -211,7 +211,7 @@ namespace CoinTrader.Forms
                 }
 
                 // 매수 예상 가격
-                percentage = (marketInfo.buy_target_price - marketInfo.prev_closing_price) / marketInfo.prev_closing_price;
+                percentage = (marketInfo.buy_target_price - marketInfo.prev_closing_price) / marketInfo.prev_closing_price * 100f;
                 symbol = string.Empty;
                 color = Color.Black;
                 if (percentage > 0f)
