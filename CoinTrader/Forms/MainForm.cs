@@ -49,6 +49,11 @@ namespace CoinTrader.Forms
             wfp.Add(SetMarketList);
             wfp.Start(result =>
             {
+                AutoTradingProcess.Start();
+
+                AccountProcess.Start();
+                AccountProcess.updateAccount = OnUpdateAccount;
+
                 DeeplearningProcess.Start();
                 DeeplearningProcess.onUpdateMarketInfo += OnUpdateMarketInfo;
                 ModelCenter.Market.OnUpdateMarketInfo += OnUpdateMarketInfo;
@@ -57,6 +62,15 @@ namespace CoinTrader.Forms
                 listView1.DoubleBuffered(true);
                 metroListView1.DoubleBuffered(true);
             });
+        }
+
+        /// <summary>
+        /// 현재 자산 총평가
+        /// </summary>
+        /// <param name="price"></param>
+        private void OnUpdateAccount(double price)
+        {
+            currentPrice.Text = price.ToString("N0");
         }
 
         /// <summary>

@@ -91,13 +91,27 @@ public class MarketModel
     /// <returns></returns>
     public MarketInfo GetMarketInfo(string market)
     {
-        var enumerator = markets.GetEnumerator();
-        while (enumerator.MoveNext())
+        if (market.Length <= 3)
         {
-            var list = enumerator.Current.Value;
-            var find = list.Find(info => info.name.Equals(market));
-            if (find != null)
-                return find;
+            var enumerator = markets.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                var list = enumerator.Current.Value;
+                var find = list.Find(info => info.name.Contains(market));
+                if (find != null)
+                    return find;
+            }
+        }
+        else
+        { 
+            var enumerator = markets.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                var list = enumerator.Current.Value;
+                var find = list.Find(info => info.name.Equals(market));
+                if (find != null)
+                    return find;
+            }
         }
         return null;
     }

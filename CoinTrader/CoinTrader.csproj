@@ -190,6 +190,7 @@
     <Compile Include="Scripts\Etc\Coroutine\Coroutine.cs" />
     <Compile Include="Scripts\Etc\Coroutine\iKeepWait.cs" />
     <Compile Include="Scripts\Etc\Enumeration.cs" />
+    <Compile Include="Scripts\Process\AccountProcess.cs" />
     <Compile Include="Scripts\Process\AutoTradingProcess.cs" />
     <Compile Include="Scripts\Process\DeeplearningProcess.cs" />
     <Compile Include="Scripts\Market\PredictPrice.cs" />

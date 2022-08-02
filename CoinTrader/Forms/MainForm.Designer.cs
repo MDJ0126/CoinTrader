@@ -50,10 +50,14 @@ namespace CoinTrader.Forms
             this.Log = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.optionTabPage = new MetroFramework.Controls.MetroTabPage();
             this.timeLabel = new System.Windows.Forms.Label();
+            this.accountTab = new MetroFramework.Controls.MetroTabPage();
+            this.label1 = new System.Windows.Forms.Label();
+            this.currentPrice = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).BeginInit();
             this.metroTabControl1.SuspendLayout();
             this.mainTabPage.SuspendLayout();
             this.logTabPage.SuspendLayout();
+            this.accountTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // metroStyleManager
@@ -68,6 +72,7 @@ namespace CoinTrader.Forms
             this.metroTabControl1.Controls.Add(this.mainTabPage);
             this.metroTabControl1.Controls.Add(this.logTabPage);
             this.metroTabControl1.Controls.Add(this.optionTabPage);
+            this.metroTabControl1.Controls.Add(this.accountTab);
             this.metroTabControl1.Location = new System.Drawing.Point(1, 71);
             this.metroTabControl1.Name = "metroTabControl1";
             this.metroTabControl1.SelectedIndex = 0;
@@ -148,12 +153,12 @@ namespace CoinTrader.Forms
             // 
             // columnHeader7
             // 
-            this.columnHeader7.Text = "금일 예상 종가(딥러닝)";
+            this.columnHeader7.Text = "이번 시간 예상 종가(딥러닝)";
             this.columnHeader7.Width = 150;
             // 
             // columnHeader8
             // 
-            this.columnHeader8.Text = "매수 예상 가격";
+            this.columnHeader8.Text = "변동성 돌파(+0.5배)";
             this.columnHeader8.Width = 150;
             // 
             // columnHeader9
@@ -229,6 +234,42 @@ namespace CoinTrader.Forms
             this.timeLabel.TabIndex = 3;
             this.timeLabel.Text = "1999년12월31일";
             // 
+            // accountTab
+            // 
+            this.accountTab.Controls.Add(this.currentPrice);
+            this.accountTab.Controls.Add(this.label1);
+            this.accountTab.HorizontalScrollbarBarColor = true;
+            this.accountTab.HorizontalScrollbarHighlightOnWheel = false;
+            this.accountTab.HorizontalScrollbarSize = 10;
+            this.accountTab.Location = new System.Drawing.Point(4, 38);
+            this.accountTab.Name = "accountTab";
+            this.accountTab.Size = new System.Drawing.Size(1189, 486);
+            this.accountTab.TabIndex = 3;
+            this.accountTab.Text = "잔고";
+            this.accountTab.VerticalScrollbarBarColor = true;
+            this.accountTab.VerticalScrollbarHighlightOnWheel = false;
+            this.accountTab.VerticalScrollbarSize = 10;
+            // 
+            // label1
+            // 
+            this.label1.BackColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(19, 31);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(150, 25);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "현재 자산 총평가";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // currentPrice
+            // 
+            this.currentPrice.BackColor = System.Drawing.Color.White;
+            this.currentPrice.Location = new System.Drawing.Point(175, 31);
+            this.currentPrice.Name = "currentPrice";
+            this.currentPrice.Size = new System.Drawing.Size(150, 25);
+            this.currentPrice.TabIndex = 2;
+            this.currentPrice.Text = "999999999";
+            this.currentPrice.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -248,6 +289,7 @@ namespace CoinTrader.Forms
             this.metroTabControl1.ResumeLayout(false);
             this.mainTabPage.ResumeLayout(false);
             this.logTabPage.ResumeLayout(false);
+            this.accountTab.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -272,6 +314,9 @@ namespace CoinTrader.Forms
         private System.Windows.Forms.Label timeLabel;
         private System.Windows.Forms.ColumnHeader columnHeader8;
         private System.Windows.Forms.ColumnHeader columnHeader9;
+        private MetroFramework.Controls.MetroTabPage accountTab;
+        private System.Windows.Forms.Label currentPrice;
+        private System.Windows.Forms.Label label1;
     }
 }
 

@@ -20,6 +20,7 @@ namespace CoinTrader.Forms
             wfp.Add(CheckAPIKeyState);
             wfp.Add(SetAccount);
             wfp.Add(SetMarketList);
+            wfp.Add(RequestTicker);
             wfp.Add(SetCandleDays);
             wfp.Start(result =>
             {
@@ -59,6 +60,19 @@ namespace CoinTrader.Forms
         {
             UpdateProgressBar(1f, 1f, "마켓 리스트를 요청합니다.");
             ProtocolManager.GetHandler<HandlerMarket>().Request((result, res) =>
+            {
+                onFinished.Invoke(true);
+            });
+        }
+
+        /// <summary>
+        /// 현재가 한 번 갱신
+        /// </summary>
+        /// <param name="onFinished"></param>
+        private void RequestTicker(Action<bool> onFinished)
+        {
+            UpdateProgressBar(1f, 1f, "모든 현재가를 갱신합니다.");
+            ProtocolManager.GetHandler<HandlerTicker>().Request(eMarketType.KRW, (result, res) =>
             {
                 onFinished.Invoke(true);
             });

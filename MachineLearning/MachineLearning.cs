@@ -298,10 +298,10 @@ namespace CoinTrader.ML
                 IDataView dataView = mlContext.Data.LoadFromTextFile<CandlesData>(path: path, hasHeader: false, separatorChar: ',');
                 var forecastingPipeline = mlContext.Forecasting.ForecastBySsa(
                                         inputColumnName: "trade_price", // 추척할 데이터 컬럼
-                                        windowSize: 6,  // 예측 전 최종적으로 결정짓는 최근 데이터 개수
-                                        trainSize: row, // 총 학습할 데이터 길이
+                                        windowSize: 3,      // 예측 전 최종적으로 결정짓는 최근 데이터 개수
+                                        trainSize: row,     // 총 학습할 데이터 길이
                                         seriesLength: 24,   // 24개로 분할하여 학습한다.
-                                        horizon: 24 * 7,     // 예측 24개을 요청
+                                        horizon: 24,        // 예측 24개을 요청
                                         confidenceLevel: 0.95f, // 신뢰 수준 95%
 
                                         outputColumnName: "Forecasted",               // 평균 추정치
