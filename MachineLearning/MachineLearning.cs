@@ -283,7 +283,7 @@ namespace CoinTrader.ML
         /// <param name="market">마켓 이름</param>
         /// <param name="date">예상 날짜</param>
         /// <returns>예상 가격</returns>
-        public static ModelOutput GetPredictePrice(string market)
+        public static ModelOutput GetPredictPrice(string market)
         {
             var path = Path.Combine(CVSUtils.CSV_DATA_PATH, market, market + ".csv");
             var modelPath = Path.Combine(CVSUtils.CSV_DATA_PATH, market, $"{market}.zip");
@@ -298,12 +298,12 @@ namespace CoinTrader.ML
                 IDataView dataView = mlContext.Data.LoadFromTextFile<CandlesData>(path: path, hasHeader: false, separatorChar: ',');
                 var forecastingPipeline = mlContext.Forecasting.ForecastBySsa(
                                         inputColumnName: "trade_price", // 추척할 데이터 컬럼
-                                        windowSize: 3,      // 예측 전 최종적으로 결정짓는 최근 데이터 개수
                                         trainSize: row,     // 총 학습할 데이터 길이
-                                        seriesLength: 24,   // 24개로 분할하여 학습한다.
-                                        horizon: 24,        // 예측 24개을 요청
+                                        seriesLength: 24,   // 1. 24개로 분할하여 학습한다.
+                                        windowSize: 3,      // 2. 24개 데이터를 다시 3개 단위씩 나누어 더욱 섬세하게 학습한다.
+                                        horizon: 24,        // 3. 예측 24개을 요청
+                                        
                                         confidenceLevel: 0.95f, // 신뢰 수준 95%
-
                                         outputColumnName: "Forecasted",               // 평균 추정치
                                         confidenceLowerBoundColumn: "LowerBound",     // 최상의 경우
                                         confidenceUpperBoundColumn: "UpperBound");    // 최악의 경우

@@ -14,7 +14,7 @@ namespace Network
         public delegate void RestRequestDelegate(ProtocolHandler protocolHandler, RestRequest request, Action<RestResponse> onResponse);
         public RestRequestDelegate restRequest = null;
 
-        protected Uri URI { get; set; }
+        public Uri URI { get; set; }
         protected Method Method { get; set; }
 
         /// <summary>

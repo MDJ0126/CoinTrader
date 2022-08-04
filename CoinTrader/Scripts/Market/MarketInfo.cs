@@ -37,7 +37,7 @@ public class MarketInfo
     /// </summary>
     public bool IsGoldenCross => movingAverage_30 < movingAverage_15;
     /// <summary>
-    /// 변동성 타겟 가격 (어제의 고가 - 어제의 저가) * k)
+    /// 변동성 타겟 가격 = 전일 종가 + ((어제의 고가 - 어제의 저가) * k)
     /// </summary>
     public double buy_target_price = 0f;
     /// <summary>
@@ -75,7 +75,7 @@ public class MarketInfo
     }
 
     /// <summary>
-    /// 변동성 퍼센테이지 Normalize (-1f ~ 1f)
+    /// 전일 대비
     /// </summary>
     /// <returns></returns>
     public double GetVariabilityNormalize()

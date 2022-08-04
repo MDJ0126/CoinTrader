@@ -98,7 +98,7 @@ public static class DeeplearningProcess
                             }
 
                             // 예상 종가 도출
-                            marketInfo.SetPredictPrices(Time.NowTime, MachineLearning.GetPredictePrice(marketInfo.name));
+                            marketInfo.SetPredictPrices(Time.NowTime, MachineLearning.GetPredictPrice(marketInfo.name));
 
                         });
                         

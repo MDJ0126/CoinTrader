@@ -1,6 +1,7 @@
 ﻿using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Network
 {
@@ -77,7 +78,7 @@ namespace Network
 
         public HandlerOrders()
         {
-            this.URI = new Uri(ProtocolManager.BASE_URL + "orders?");
+            this.URI = new Uri(ProtocolManager.BASE_URL + "orders");
             this.Method = Method.Post;
         }
 
@@ -101,8 +102,48 @@ namespace Network
         /// <param name="onFinished"></param>
         public void Request(string market, string side, string volume, string price, string ord_type, string identifier, Action<bool, List<HandlerOrdersRes>> onFinished = null)        
         {
-            RestRequest request = new RestRequest(URI + $"&market={market}&side={side}&volume={volume}&price={price}&ord_type={ord_type}&identifier={identifier}", Method);
+            // 참고 : https://docs.upbit.com/docs/market-info-trade-price-detail
+            var marketInfo = ModelCenter.Market.GetMarketInfo(market);
+            double filter = Convert.ToDouble(price);
+            float unit = 0f;
+            if (marketInfo.trade_price >= 2000000) unit = 1000f;
+            else if (marketInfo.trade_price >= 1000000 && marketInfo.trade_price < 2000000) unit = 500f;
+            else if (marketInfo.trade_price >= 500000 && marketInfo.trade_price < 1000000) unit = 100f;
+            else if (marketInfo.trade_price >= 100000 && marketInfo.trade_price < 500000) unit = 50f;
+            else if (marketInfo.trade_price >= 10000 && marketInfo.trade_price < 100000) unit = 10f;
+            else if (marketInfo.trade_price >= 1000 && marketInfo.trade_price < 10000) unit = 5f;
+            else if (marketInfo.trade_price >= 100 && marketInfo.trade_price < 1000) unit = 1f;
+            else if (marketInfo.trade_price >= 10 && marketInfo.trade_price < 100) unit = 0.1f;
+            else if (marketInfo.trade_price >= 1 && marketInfo.trade_price < 10) unit = 0.01f;
+            else if (marketInfo.trade_price >= 0.1 && marketInfo.trade_price < 1) unit = 0.001f;
+            else if (marketInfo.trade_price >= 0 && marketInfo.trade_price < 0.1) unit = 0.0001f;
+            price = (filter - (filter % unit)).ToString();
+
+            RestRequest request = new RestRequest(URI, Method);
+
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(market))
+                parameters.Add("market", market);
+
+            if (!string.IsNullOrEmpty(side))
+                parameters.Add("side", side);
+
+            if (!string.IsNullOrEmpty(volume))
+                parameters.Add("volume", volume);
+
+            if (!string.IsNullOrEmpty(price))
+                parameters.Add("price", price);
+
+            if (!string.IsNullOrEmpty(ord_type))
+                parameters.Add("ord_type", ord_type);
+
+            if (!string.IsNullOrEmpty(identifier))
+                parameters.Add("identifier", identifier);
+
+            request.AddHeader("Authorization", ProtocolManager.GetAuthToken(parameters));
             request.AddHeader("Accept", "application/json");
+            request.AddHeader("Content-Type", "application/json");
+            request.AddParameter("application/json", ConvertJson(parameters), ParameterType.RequestBody);
             base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
         }
 
@@ -117,6 +158,22 @@ namespace Network
                 if (response.ErrorMessage != null)
                     Logger.Error(response.ErrorMessage);
             }
+        }
+
+        private string ConvertJson(Dictionary<string, string> parameters)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append('{');
+            var enumerator = parameters.GetEnumerator();
+            bool isFirst = true;
+            while (enumerator.MoveNext())
+            {
+                if (!isFirst) sb.Append(',');
+                sb.Append($"\"{enumerator.Current.Key}\"").Append(',').Append($"\"{enumerator.Current.Value}\"");
+                isFirst = false;
+            }
+            sb.Append('}');
+            return sb.ToString();
         }
     }
 }
