@@ -13,6 +13,8 @@ namespace Network
 
         private List<ProtocolHandler> handlers = new List<ProtocolHandler>();
 
+        RestClient client = new RestClient("https://api.upbit.com");
+
         protected override void Install()
         {
 
@@ -37,8 +39,7 @@ namespace Network
                 protocolHandler.UseReuqestCount();
 
                 // Request
-                RestClient restClient = new RestClient(protocolHandler.URI);
-                RestResponse response = await restClient.ExecuteAsync(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 // Reponse
                 onResponse?.Invoke(response);
@@ -81,13 +82,13 @@ namespace Network
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        public static string GetAuthToken(string parameter = "")
+        public static string GetAuthToken()
         {
             var payload = new JwtPayload
             {
                 { "access_key", Config.ACCESS_KEY },
                 { "nonce", Guid.NewGuid().ToString() },
-                { "query_hash", parameter },
+                { "query_hash", string.Empty },
                 { "query_hash_alg", "SHA512" }
             };
 
@@ -101,26 +102,24 @@ namespace Network
             return "Bearer " + jwtToken;
         }
 
-        public static string GetAuthToken(Dictionary<string, string> parameters)
+        /// <summary>
+        /// Authorization
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public static string GetAuthToken(string queryString)
         {
-            StringBuilder builder = new StringBuilder();
-            foreach (KeyValuePair<string, string> pair in parameters)
-            {
-                builder.Append(pair.Key).Append("=").Append(pair.Value).Append("&");
-            }
-            string queryString = builder.ToString().TrimEnd('&');
-
             SHA512 sha512 = SHA512.Create();
             byte[] queryHashByteArray = sha512.ComputeHash(Encoding.UTF8.GetBytes(queryString));
             string queryHash = BitConverter.ToString(queryHashByteArray).Replace("-", "").ToLower();
 
             var payload = new JwtPayload
-        {
-            { "access_key", Config.ACCESS_KEY },
-            { "nonce", Guid.NewGuid().ToString() },
-            { "query_hash", queryHash },
-            { "query_hash_alg", "SHA512" }
-        };
+            {
+                { "access_key", Config.ACCESS_KEY },
+                { "nonce", Guid.NewGuid().ToString() },
+                { "query_hash", queryHash },
+                { "query_hash_alg", "SHA512" }
+            };
 
             byte[] keyBytes = Encoding.Default.GetBytes(Config.SECRET_KEY);
             var securityKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(keyBytes);
@@ -130,6 +129,27 @@ namespace Network
 
             var jwtToken = new JwtSecurityTokenHandler().WriteToken(secToken);
             return "Bearer " + jwtToken;
+        }
+
+        /// <summary>
+        /// 쿼리 스트링 만들기
+        /// key=value&key2=value...
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static string GetQueryString(Dictionary<string, string> parameters)
+        {
+            StringBuilder builder = new StringBuilder();
+            foreach (KeyValuePair<string, string> pair in parameters)
+            {
+                builder.Append(pair.Key).Append("=").Append(pair.Value).Append("&");
+            }
+
+            if (builder.Length > 0)
+            {
+                builder.Length = builder.Length - 1; // 마지막 &를 제거하기 위함.
+            }
+            return builder.ToString();
         }
     }
 };

@@ -91,7 +91,7 @@ public class MarketModel
     /// <returns></returns>
     public MarketInfo GetMarketInfo(string market)
     {
-        if (market.Length <= 3)
+        if (market.Length <= 4)
         {
             var enumerator = markets.GetEnumerator();
             while (enumerator.MoveNext())

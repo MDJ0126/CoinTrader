@@ -1,4 +1,5 @@
-﻿using RestSharp;
+﻿using Newtonsoft.Json;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -78,7 +79,7 @@ namespace Network
 
         public HandlerOrders()
         {
-            this.URI = new Uri(ProtocolManager.BASE_URL + "orders");
+            this.URI = new Uri(ProtocolManager.BASE_URL + "orders?");
             this.Method = Method.Post;
         }
 
@@ -100,7 +101,7 @@ namespace Network
             //- market : 시장가 주문(매도)
         /// <param name="identifier">조회용 사용자 지정값 (선택)</param>
         /// <param name="onFinished"></param>
-        public void Request(string market, string side, string volume, string price, string ord_type, string identifier, Action<bool, List<HandlerOrdersRes>> onFinished = null)        
+        public void Request(string market, string side, string volume, string price, string ord_type, string identifier = "", Action<bool, List<HandlerOrdersRes>> onFinished = null)        
         {
             // 참고 : https://docs.upbit.com/docs/market-info-trade-price-detail
             var marketInfo = ModelCenter.Market.GetMarketInfo(market);
@@ -119,7 +120,6 @@ namespace Network
             else if (marketInfo.trade_price >= 0 && marketInfo.trade_price < 0.1) unit = 0.0001f;
             price = (filter - (filter % unit)).ToString();
 
-            RestRequest request = new RestRequest(URI, Method);
 
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(market))
@@ -140,10 +140,12 @@ namespace Network
             if (!string.IsNullOrEmpty(identifier))
                 parameters.Add("identifier", identifier);
 
-            request.AddHeader("Authorization", ProtocolManager.GetAuthToken(parameters));
+            var queryString = ProtocolManager.GetQueryString(parameters);
+            RestRequest request = new RestRequest(URI + queryString, Method);
+            request.AddHeader("Authorization", ProtocolManager.GetAuthToken(queryString));
             request.AddHeader("Accept", "application/json");
             request.AddHeader("Content-Type", "application/json");
-            request.AddParameter("application/json", ConvertJson(parameters), ParameterType.RequestBody);
+            request.AddJsonBody(JsonConvert.SerializeObject(parameters));
             base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
         }
 
@@ -158,22 +160,6 @@ namespace Network
                 if (response.ErrorMessage != null)
                     Logger.Error(response.ErrorMessage);
             }
-        }
-
-        private string ConvertJson(Dictionary<string, string> parameters)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append('{');
-            var enumerator = parameters.GetEnumerator();
-            bool isFirst = true;
-            while (enumerator.MoveNext())
-            {
-                if (!isFirst) sb.Append(',');
-                sb.Append($"\"{enumerator.Current.Key}\"").Append(',').Append($"\"{enumerator.Current.Value}\"");
-                isFirst = false;
-            }
-            sb.Append('}');
-            return sb.ToString();
         }
     }
 }

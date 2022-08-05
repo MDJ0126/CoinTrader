@@ -1,6 +1,14 @@
 ﻿using CoinTrader.Forms;
+using Network;
+using Newtonsoft.Json;
+using RestSharp;
 using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CoinTrader
@@ -36,6 +44,24 @@ namespace CoinTrader
                 MessageBox.Show("이미 실행 중입니다.", "CoinTrader", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Application.Exit();
             }
+        }
+
+
+
+        private static string ConvertJson(Dictionary<string, string> parameters)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append('{');
+            var enumerator = parameters.GetEnumerator();
+            bool isFirst = true;
+            while (enumerator.MoveNext())
+            {
+                if (!isFirst) sb.Append(',');
+                sb.Append($"\"{enumerator.Current.Key}\"").Append(',').Append($"\"{enumerator.Current.Value}\"");
+                isFirst = false;
+            }
+            sb.Append('}');
+            return sb.ToString();
         }
     }
 }
