@@ -30,7 +30,6 @@ namespace CoinTrader.Forms
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.metroStyleManager = new MetroFramework.Components.MetroStyleManager(this.components);
             this.metroTabControl1 = new MetroFramework.Controls.MetroTabControl();
@@ -45,18 +44,14 @@ namespace CoinTrader.Forms
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.logTabPage = new MetroFramework.Controls.MetroTabPage();
-            this.listView1 = new MetroFramework.Controls.MetroListView();
-            this.Log = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.optionTabPage = new MetroFramework.Controls.MetroTabPage();
-            this.timeLabel = new System.Windows.Forms.Label();
             this.accountTab = new MetroFramework.Controls.MetroTabPage();
-            this.label1 = new System.Windows.Forms.Label();
             this.currentPrice = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.timeLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).BeginInit();
             this.metroTabControl1.SuspendLayout();
             this.mainTabPage.SuspendLayout();
-            this.logTabPage.SuspendLayout();
             this.accountTab.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -70,12 +65,11 @@ namespace CoinTrader.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.metroTabControl1.Controls.Add(this.mainTabPage);
-            this.metroTabControl1.Controls.Add(this.logTabPage);
             this.metroTabControl1.Controls.Add(this.optionTabPage);
             this.metroTabControl1.Controls.Add(this.accountTab);
             this.metroTabControl1.Location = new System.Drawing.Point(1, 71);
             this.metroTabControl1.Name = "metroTabControl1";
-            this.metroTabControl1.SelectedIndex = 0;
+            this.metroTabControl1.SelectedIndex = 1;
             this.metroTabControl1.Size = new System.Drawing.Size(1197, 528);
             this.metroTabControl1.TabIndex = 2;
             this.metroTabControl1.UseSelectable = true;
@@ -166,50 +160,6 @@ namespace CoinTrader.Forms
             this.columnHeader9.Text = "골든크로스";
             this.columnHeader9.Width = 100;
             // 
-            // logTabPage
-            // 
-            this.logTabPage.Controls.Add(this.listView1);
-            this.logTabPage.HorizontalScrollbarBarColor = true;
-            this.logTabPage.HorizontalScrollbarHighlightOnWheel = false;
-            this.logTabPage.HorizontalScrollbarSize = 10;
-            this.logTabPage.Location = new System.Drawing.Point(4, 38);
-            this.logTabPage.Name = "logTabPage";
-            this.logTabPage.Size = new System.Drawing.Size(1189, 486);
-            this.logTabPage.TabIndex = 1;
-            this.logTabPage.Text = "로그";
-            this.logTabPage.VerticalScrollbarBarColor = true;
-            this.logTabPage.VerticalScrollbarHighlightOnWheel = false;
-            this.logTabPage.VerticalScrollbarSize = 10;
-            // 
-            // listView1
-            // 
-            this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.Log});
-            this.listView1.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.listView1.FullRowSelect = true;
-            this.listView1.GridLines = true;
-            this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.listView1.HideSelection = false;
-            this.listView1.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
-            this.listView1.Location = new System.Drawing.Point(0, 3);
-            this.listView1.Margin = new System.Windows.Forms.Padding(1);
-            this.listView1.Name = "listView1";
-            this.listView1.OwnerDraw = true;
-            this.listView1.Size = new System.Drawing.Size(1188, 483);
-            this.listView1.TabIndex = 0;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.UseSelectable = true;
-            this.listView1.View = System.Windows.Forms.View.Details;
-            // 
-            // Log
-            // 
-            this.Log.Text = "";
-            this.Log.Width = 768;
-            // 
             // optionTabPage
             // 
             this.optionTabPage.HorizontalScrollbarBarColor = true;
@@ -223,16 +173,6 @@ namespace CoinTrader.Forms
             this.optionTabPage.VerticalScrollbarBarColor = true;
             this.optionTabPage.VerticalScrollbarHighlightOnWheel = false;
             this.optionTabPage.VerticalScrollbarSize = 10;
-            // 
-            // timeLabel
-            // 
-            this.timeLabel.AutoSize = true;
-            this.timeLabel.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.timeLabel.Location = new System.Drawing.Point(23, 53);
-            this.timeLabel.Name = "timeLabel";
-            this.timeLabel.Size = new System.Drawing.Size(99, 15);
-            this.timeLabel.TabIndex = 3;
-            this.timeLabel.Text = "1999년12월31일";
             // 
             // accountTab
             // 
@@ -250,6 +190,16 @@ namespace CoinTrader.Forms
             this.accountTab.VerticalScrollbarHighlightOnWheel = false;
             this.accountTab.VerticalScrollbarSize = 10;
             // 
+            // currentPrice
+            // 
+            this.currentPrice.BackColor = System.Drawing.Color.White;
+            this.currentPrice.Location = new System.Drawing.Point(175, 31);
+            this.currentPrice.Name = "currentPrice";
+            this.currentPrice.Size = new System.Drawing.Size(150, 25);
+            this.currentPrice.TabIndex = 2;
+            this.currentPrice.Text = "999999999";
+            this.currentPrice.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // label1
             // 
             this.label1.BackColor = System.Drawing.Color.White;
@@ -260,15 +210,15 @@ namespace CoinTrader.Forms
             this.label1.Text = "현재 자산 총평가";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // currentPrice
+            // timeLabel
             // 
-            this.currentPrice.BackColor = System.Drawing.Color.White;
-            this.currentPrice.Location = new System.Drawing.Point(175, 31);
-            this.currentPrice.Name = "currentPrice";
-            this.currentPrice.Size = new System.Drawing.Size(150, 25);
-            this.currentPrice.TabIndex = 2;
-            this.currentPrice.Text = "999999999";
-            this.currentPrice.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.timeLabel.AutoSize = true;
+            this.timeLabel.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.timeLabel.Location = new System.Drawing.Point(23, 53);
+            this.timeLabel.Name = "timeLabel";
+            this.timeLabel.Size = new System.Drawing.Size(99, 15);
+            this.timeLabel.TabIndex = 3;
+            this.timeLabel.Text = "1999년12월31일";
             // 
             // MainForm
             // 
@@ -288,7 +238,6 @@ namespace CoinTrader.Forms
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).EndInit();
             this.metroTabControl1.ResumeLayout(false);
             this.mainTabPage.ResumeLayout(false);
-            this.logTabPage.ResumeLayout(false);
             this.accountTab.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -299,9 +248,6 @@ namespace CoinTrader.Forms
         private MetroFramework.Components.MetroStyleManager metroStyleManager;
         private MetroFramework.Controls.MetroTabControl metroTabControl1;
         private MetroFramework.Controls.MetroTabPage mainTabPage;
-        private MetroFramework.Controls.MetroListView listView1;
-        internal System.Windows.Forms.ColumnHeader Log;
-        private MetroFramework.Controls.MetroTabPage logTabPage;
         private MetroFramework.Controls.MetroTabPage optionTabPage;
         private System.Windows.Forms.ListView metroListView1;
         private System.Windows.Forms.ColumnHeader columnHeader1;

@@ -33,7 +33,6 @@ namespace CoinTrader.Forms
         {
             //MessageBox.Show("투자에 주의 바랍니다.");
             Initialize();
-            Logger.OnLogger += OnLogger;
         }
 
         /// <summary>
@@ -58,8 +57,6 @@ namespace CoinTrader.Forms
                 DeeplearningProcess.onUpdateMarketInfo += OnUpdateMarketInfo;
                 ModelCenter.Market.OnUpdateMarketInfo += OnUpdateMarketInfo;
 
-                listView1.Items.Clear();
-                listView1.DoubleBuffered(true);
                 metroListView1.DoubleBuffered(true);
             });
         }
@@ -259,16 +256,6 @@ namespace CoinTrader.Forms
                 item.SubItems[(int)eTickerHeader.GoldenCross].Text = text;
             }
             metroListView1.EndUpdate();
-        }
-
-        /// <summary>
-        /// 로거
-        /// </summary>
-        /// <param name="text"></param>
-        private void OnLogger(string text)
-        {
-            listView1.Items.Add(text);
-            listView1.EnsureVisible(listView1.Items.Count - 1);
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
