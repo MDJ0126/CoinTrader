@@ -105,21 +105,23 @@ namespace Network
         {
             // 참고 : https://docs.upbit.com/docs/market-info-trade-price-detail
             var marketInfo = ModelCenter.Market.GetMarketInfo(market);
-            double filter = Convert.ToDouble(price);
-            float unit = 0f;
-            if (marketInfo.trade_price >= 2000000) unit = 1000f;
-            else if (marketInfo.trade_price >= 1000000 && marketInfo.trade_price < 2000000) unit = 500f;
-            else if (marketInfo.trade_price >= 500000 && marketInfo.trade_price < 1000000) unit = 100f;
-            else if (marketInfo.trade_price >= 100000 && marketInfo.trade_price < 500000) unit = 50f;
-            else if (marketInfo.trade_price >= 10000 && marketInfo.trade_price < 100000) unit = 10f;
-            else if (marketInfo.trade_price >= 1000 && marketInfo.trade_price < 10000) unit = 5f;
-            else if (marketInfo.trade_price >= 100 && marketInfo.trade_price < 1000) unit = 1f;
-            else if (marketInfo.trade_price >= 10 && marketInfo.trade_price < 100) unit = 0.1f;
-            else if (marketInfo.trade_price >= 1 && marketInfo.trade_price < 10) unit = 0.01f;
-            else if (marketInfo.trade_price >= 0.1 && marketInfo.trade_price < 1) unit = 0.001f;
-            else if (marketInfo.trade_price >= 0 && marketInfo.trade_price < 0.1) unit = 0.0001f;
-            price = (filter - (filter % unit)).ToString();
-
+            if (!string.IsNullOrEmpty(price))
+            {
+                double filter = Convert.ToDouble(price);
+                float unit = 0f;
+                if (marketInfo.trade_price >= 2000000) unit = 1000f;
+                else if (marketInfo.trade_price >= 1000000 && marketInfo.trade_price < 2000000) unit = 500f;
+                else if (marketInfo.trade_price >= 500000 && marketInfo.trade_price < 1000000) unit = 100f;
+                else if (marketInfo.trade_price >= 100000 && marketInfo.trade_price < 500000) unit = 50f;
+                else if (marketInfo.trade_price >= 10000 && marketInfo.trade_price < 100000) unit = 10f;
+                else if (marketInfo.trade_price >= 1000 && marketInfo.trade_price < 10000) unit = 5f;
+                else if (marketInfo.trade_price >= 100 && marketInfo.trade_price < 1000) unit = 1f;
+                else if (marketInfo.trade_price >= 10 && marketInfo.trade_price < 100) unit = 0.1f;
+                else if (marketInfo.trade_price >= 1 && marketInfo.trade_price < 10) unit = 0.01f;
+                else if (marketInfo.trade_price >= 0.1 && marketInfo.trade_price < 1) unit = 0.001f;
+                else if (marketInfo.trade_price >= 0 && marketInfo.trade_price < 0.1) unit = 0.0001f;
+                price = (filter - (filter % unit)).ToString();
+            }
 
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(market))

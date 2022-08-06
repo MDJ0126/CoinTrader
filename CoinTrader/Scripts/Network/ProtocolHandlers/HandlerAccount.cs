@@ -18,15 +18,15 @@ namespace Network
         /// <summary>
         /// 주문가능 금액/수량
         /// </summary>
-        public float balance;
+        public double balance;
         /// <summary>
         /// 주문 중 묶여있는 금액/수량
         /// </summary>
-        public float locked;
+        public double locked;
         /// <summary>
         /// 매수평균가
         /// </summary>
-        public float avg_buy_price;
+        public double avg_buy_price;
         /// <summary>
         /// 매수평균가 수정 여부
         /// </summary>

@@ -24,12 +24,6 @@ public static class AutoTradingProcess
         DateTime buyingTime = Time.NowTime;
         while (true)
         {
-            // 하락장 감지
-            // 
-            // 무한 증식 시장가 매도
-            //
-            // 이전 틱과 지금 틱과 거래율 비교
-
             // 총 평가 (순수 코인만)
             double only_coin_balance = 0d;
             // 총 보유 자산 (코인 + 원화)
@@ -93,7 +87,7 @@ public static class AutoTradingProcess
                     // 조건 충족 매수 시작
                     if (isTargetPriceSuccess && isGoldenCross)
                     {
-                        //if ((marketInfo.buy_target_price - marketInfo.trade_price) / marketInfo.trade_price > 0.01f)
+                        if ((marketInfo.buy_target_price - marketInfo.trade_price) / marketInfo.trade_price > 0.01f)
                         {
                             //Logger.Log($"매수 시도 {marketInfo}");    // 메신저 넣자
                             bool isFinished = false;
@@ -126,11 +120,11 @@ public static class AutoTradingProcess
                                 var percentage = (marketInfo.trade_price - myAccounts[i].avg_buy_price) / myAccounts[i].avg_buy_price;
                                 if (percentage > 0.01f                          // +1%가 되거나
                                     || percentage < -0.1f                       // -10%가 되거나
-                                    || buyingTime.AddHours(6f) < Time.NowTime) // 6시간이 지났을 경우 매도
+                                    || buyingTime.AddHours(6f) < Time.NowTime)  // 6시간이 지났을 경우 매도
                                 {
-                                    //Logger.Log($"매도 시도 {marketInfo}");    // 메신저 넣자
+                                    //Logger.Log($"매도 시도 {marketInfo}");     // 메신저 넣자
                                     bool isFinished = false;
-                                    Sell($"KRW-{myAccounts[i].currency}", myAccounts[i].locked, () =>
+                                    Sell($"KRW-{myAccounts[i].currency}", myAccounts[i].balance, () =>
                                     {
                                         isFinished = true;
                                     });
@@ -161,15 +155,13 @@ public static class AutoTradingProcess
         {
             if (result)
             {
-                ProtocolManager.GetHandler<HandlerOrderCheck>().Request(res[0].uuid, "", (result2, res2) =>
+                ProtocolManager.GetHandler<HandlerAccount>().Request((result2, res2) =>
                 {
                     onFinished?.Invoke();
                 });
             }
             else
-            {
                 onFinished?.Invoke();
-            }
         });
     }
 
@@ -183,17 +175,15 @@ public static class AutoTradingProcess
     {
         ProtocolManager.GetHandler<HandlerOrders>().Request(market, "ask", volume.ToString(), "", "market", "", (result, res) =>
         {
-            ProtocolManager.GetHandler<HandlerOrderCheck>().Request(res[0].uuid, "", (result2, res2) =>
+            if (res != null)
             {
-                if (res2[0].state == "done")
+                ProtocolManager.GetHandler<HandlerAccount>().Request((result2, res2) =>
                 {
                     onFinished?.Invoke();
-                }
-                else
-                {
-                    Sell(market, volume, onFinished);
-                }
-            });
+                });
+            }
+            else
+                onFinished?.Invoke();
         });
     }
 
