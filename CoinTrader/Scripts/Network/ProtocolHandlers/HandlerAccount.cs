@@ -3,6 +3,7 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Network
 {
@@ -47,12 +48,13 @@ namespace Network
             this.Method = Method.Get;
         }
 
-        public void Request(Action<bool, List<AccountRes>> onFinished = null)
+        public async Task<List<AccountRes>> Request()
         {
             RestRequest request = new RestRequest(URI, Method);
             request.AddHeader("Authorization", ProtocolManager.GetAuthToken());
             request.AddHeader("Accept", "application/json");
-            base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
+            await base.RequestProcess(request);
+            return res;
         }
 
         protected override void Response(RestRequest request, RestResponse response)

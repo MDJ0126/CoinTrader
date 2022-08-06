@@ -3,6 +3,7 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Network
 {
@@ -108,13 +109,14 @@ namespace Network
         /// <param name="count">캔들 개수(최대 200개까지 요청 가능)</param>
         /// <param name="convertingPriceUnit">종가 환산 화폐 단위 (생략 가능, KRW로 명시할 시 원화 환산 가격을 반환.)</param>
         /// <param name="onFinished"></param>
-        public void Request(string market, string to = "", int count = 200, string convertingPriceUnit = "KRW", Action<bool, List<CandlesDaysRes>> onFinished = null)
+        public async Task<List<CandlesDaysRes>> Request(string market, string to = "", int count = 200, string convertingPriceUnit = "KRW")
         {
             if (string.IsNullOrEmpty(to))
                 to = Time.NowTime.Date.AddDays(1f).ToString("yyyy-MM-dd HH:mm:ss");
             RestRequest request = new RestRequest(URI + $"market={market}&to={to}&count={count}&convertingPriceUnit={convertingPriceUnit}", Method);
             request.AddHeader("Accept", "application/json");
-            base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
+            await base.RequestProcess(request);
+            return res;
         }
 
         protected override void Response(RestRequest request, RestResponse response)

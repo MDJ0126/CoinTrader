@@ -4,6 +4,7 @@ using MetroFramework.Forms;
 using System.Collections;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Threading.Tasks;
 
 namespace CoinTrader.Forms
 {
@@ -107,31 +108,22 @@ namespace CoinTrader.Forms
                 }
             }
             metroListView1.EndUpdate();
-
-            if (tickerCoroutine != null)
-                this.StopCoroutine(tickerCoroutine);
-            tickerCoroutine = this.StartCoroutine(RequestTicker());
+            
+            RequestTicker();
 
             onFinished?.Invoke(true);
         }
 
-        private Coroutine tickerCoroutine = null;
         /// <summary>
         /// 주기적으로 현재가 갱신 요청
         /// </summary>
         /// <returns></returns>
-        private IEnumerator RequestTicker()
+        private async void RequestTicker()
         {
             while (true)
             {
-                const float INTERVAL = 0.2f;
-                bool isFinished = false;
-                ProtocolManager.GetHandler<HandlerTicker>().Request(eMarketType.KRW, (result, res) =>
-                {
-                    isFinished = true;
-                });
-                yield return new WaitUntil(() => isFinished);
-                yield return new WaitForSeconds(INTERVAL);
+                var res = await ProtocolManager.GetHandler<HandlerTicker>().Request(eMarketType.KRW);
+                await Task.Delay(200);
             }
         }
 

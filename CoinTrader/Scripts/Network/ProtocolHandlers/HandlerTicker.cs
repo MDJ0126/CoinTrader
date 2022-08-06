@@ -3,6 +3,7 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Network
 {
@@ -163,12 +164,13 @@ namespace Network
         /// </summary>
         /// <param name="market">반점으로 구분되는 마켓 코드 (ex. KRW-BTC, BTC-ETH)</param>
         /// <param name="onFinished"></param>
-        public void Request(eMarketType marketType, Action<bool, List<TickerRes>> onFinished = null)
+        public async Task<List<TickerRes>> Request(eMarketType marketType)
         {
             string marketStr = ModelCenter.Market.GetAllMarketStr(marketType);
             RestRequest request = new RestRequest(URI + $"markets={marketStr}", Method);
             request.AddHeader("Accept", "application/json");
-            base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
+            await base.RequestProcess(request);
+            return res;
         }
 
         protected override void Response(RestRequest request, RestResponse response)

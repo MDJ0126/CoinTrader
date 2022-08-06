@@ -4,53 +4,20 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Network
 {
-    public class ProtocolManager : Singleton<ProtocolManager>
+    public class ProtocolManager
     {
         public static readonly string BASE_URL = "https://api.upbit.com/v1/";
 
-        private List<ProtocolHandler> handlers = new List<ProtocolHandler>();
+        private static List<ProtocolHandler> handlers = new List<ProtocolHandler>();
 
-        RestClient client = new RestClient("https://api.upbit.com");
-
-        protected override void Install()
+        public void Release()
         {
-
-        }
-
-        protected override void Release()
-        {
-            this.handlers.Clear();
-            this.handlers = null;
-        }
-
-        /// <summary>
-        /// 요청 등록
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="onResponse"></param>
-        private async void Request(ProtocolHandler protocolHandler, RestRequest request, Action<RestResponse> onResponse)
-        {
-            if (protocolHandler.CanRequest())
-            {
-                // 요청 횟수 차감
-                protocolHandler.UseReuqestCount();
-
-                // Request
-                RestResponse response = await client.ExecuteAsync(request);
-
-                // Reponse
-                onResponse?.Invoke(response);
-            }
-            else
-            {
-                Logger.Warning($"요청이 너무 빠릅니다. ({protocolHandler})");
-
-                // Reponse
-                onResponse?.Invoke(null);
-            }
+            handlers.Clear();
+            handlers = null;
         }
 
         /// <summary>
@@ -62,7 +29,7 @@ namespace Network
         {
             T protocolHandler;
 
-            var enumerator = Instance.handlers.GetEnumerator();
+            var enumerator = handlers.GetEnumerator();
             while (enumerator.MoveNext())
             {
                 protocolHandler = enumerator.Current as T;
@@ -72,8 +39,7 @@ namespace Network
 
             // if handler is null
             protocolHandler = new T();
-            protocolHandler.restRequest = Instance.Request;
-            Instance.handlers.Add(protocolHandler);
+            handlers.Add(protocolHandler);
             return protocolHandler;
         }
 

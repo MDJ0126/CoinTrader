@@ -1,6 +1,7 @@
 ﻿using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Network
 {
@@ -81,11 +82,12 @@ namespace Network
             this.Method = Method.Delete;
         }
 
-        public void Request(string uuid, string identifier, Action<bool, List<HandlerOrderCancelRes>> onFinished = null)
+        public async Task<List<HandlerOrderCancelRes>> Request(string uuid, string identifier)
         {
             RestRequest request = new RestRequest(URI + $"&uuid={uuid}&identifier={identifier}", Method);
             request.AddHeader("Accept", "application/json");
-            base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
+            await base.RequestProcess(request);
+            return res;
         }
 
         protected override void Response(RestRequest request, RestResponse response)

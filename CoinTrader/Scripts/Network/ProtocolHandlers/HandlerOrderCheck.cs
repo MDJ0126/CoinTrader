@@ -1,6 +1,7 @@
 ﻿using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Network
 {
@@ -119,11 +120,12 @@ namespace Network
         /// <param name="uuid">주문 UUID</param>
         /// <param name="identifier">조회용 사용자 지정 값</param>
         /// <param name="onFinished"></param>
-        public void Request(string uuid = "", string identifier = "", Action<bool, List<HandlerOrderCheckRes>> onFinished = null)
+        public async Task<List<HandlerOrderCheckRes>> Request(string uuid = "", string identifier = "")
         {
             RestRequest request = new RestRequest(URI + $"uuid={uuid}&identifier={identifier}", Method);
             request.AddHeader("Accept", "application/json");
-            base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
+            await base.RequestProcess(request);
+            return res;
         }
 
         protected override void Response(RestRequest request, RestResponse response)

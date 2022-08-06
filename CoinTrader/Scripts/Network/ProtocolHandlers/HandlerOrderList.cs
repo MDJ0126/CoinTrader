@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Network
 {
@@ -102,7 +103,7 @@ namespace Network
         //- asc : 오름차순
         //- desc : 내림차순(default)
         /// <param name="onFinished"></param>
-        public void Request(string market, string[] uuids, string[] identifiers, string state, string[] states, int page = 1, int limit = 100, string order_by = "desc", Action<bool, List<HandlerOrderListRes>> onFinished = null)
+        public async Task<List<HandlerOrderListRes>> Request(string market, string[] uuids, string[] identifiers, string state, string[] states, int page = 1, int limit = 100, string order_by = "desc")
         {
             sb.Length = 0;
             sb.Append(URI);
@@ -136,7 +137,8 @@ namespace Network
             sb.Append($"order_by={order_by}");
             RestRequest request = new RestRequest(sb.ToString(), Method);
             request.AddHeader("Accept", "application/json");
-            base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
+            await base.RequestProcess(request);
+            return res;
         }
 
         protected override void Response(RestRequest request, RestResponse response)

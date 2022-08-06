@@ -4,15 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Network
 {
     public abstract class ProtocolHandler
     {
-        protected static Dictionary<string, RemainingReq> RemainingReqs { get; } = new Dictionary<string, RemainingReq>();
+        private static RestClient client = new RestClient("https://api.upbit.com");
 
-        public delegate void RestRequestDelegate(ProtocolHandler protocolHandler, RestRequest request, Action<RestResponse> onResponse);
-        public RestRequestDelegate restRequest = null;
+        protected static Dictionary<string, RemainingReq> RemainingReqs { get; } = new Dictionary<string, RemainingReq>();
 
         public Uri URI { get; set; }
         protected Method Method { get; set; }
@@ -28,11 +28,6 @@ namespace Network
         public int requestCount = 0;
 
         /// <summary>
-        /// 통신 요청 정보 캐싱
-        /// </summary>
-        private Action<bool> onFinished = null;
-
-        /// <summary>
         /// Request 요청 그룹
         /// </summary>
         private string group = string.Empty;    // => Unknown
@@ -41,27 +36,41 @@ namespace Network
         /// Rest 요청 프로세스
         /// </summary>
         /// <param name="onFinished"></param>
-        protected void RequestProcess(RestRequest req, Action<bool> onFinished)
+        protected async Task<RestResponse> RequestProcess(RestRequest req)
         {
-            ++requestCount;
-            this.onFinished = onFinished;
-            restRequest?.Invoke(this, req, (res) =>
+            RestResponse res = null;
+            
+            // 요청이 가능한지
+            if (CanRequest())
             {
+                // 요청 카운트 소모 처리
+                UseReuqestCount();
+                res = await client.ExecuteAsync(req);
+
+                // 데이터 사용량 체크 (미지원)
                 CheckDataUsage();
-                if (res != null && res.IsSuccessful)
+
+                if (res != null)
                 {
                     // 남은 요청 수 갱신
                     UpdateRemainingReq(res);
 
-                    // 표준 수신 처리
-                    Response(req, res);
-
-                    // 수신 처리 완료 콜백
-                    onFinished?.Invoke(true);
+                    if (res.IsSuccessful)
+                    {
+                        // 표준 수신 처리
+                        Response(req, res);
+                    }
+                    else
+                    {
+                        Logger.Warning($"요청에 대한 응답 실패 => ({res.Content})");
+                    }
                 }
-                else
-                    onFinished?.Invoke(false);
-            });
+            }
+            else
+            {
+                Logger.Warning($"요청이 너무 빠릅니다 => ({this})");
+            }
+            return res;
         }
 
         /// <summary>
@@ -70,7 +79,10 @@ namespace Network
         public void UseReuqestCount()
         {
             if (RemainingReqs.TryGetValue(group, out var remainingReq))
+            {
+                ++requestCount;
                 remainingReq.UseRequestCount();
+            }
         }
 
         /// <summary>

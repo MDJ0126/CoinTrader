@@ -2,6 +2,7 @@
 using Network;
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CoinTrader.Forms
@@ -32,37 +33,31 @@ namespace CoinTrader.Forms
         /// API Key 만료기한 확인하기
         /// </summary>
         /// <param name="onFinished"></param>
-        private void CheckAPIKeyState(Action<bool> onFinished)
+        private async void CheckAPIKeyState(Action<bool> onFinished)
         {
-            ProtocolManager.GetHandler<HandlerApiKey>().Request((result, res) =>
-            {
-                onFinished.Invoke(true);
-            });
+            var res = await ProtocolManager.GetHandler<HandlerApiKey>().Request();
+            onFinished.Invoke(true);
         }
 
         /// <summary>
         /// 잔고 세팅
         /// </summary>
         /// <param name="onFinished"></param>
-        private void SetAccount(Action<bool> onFinished)
+        private async void SetAccount(Action<bool> onFinished)
         {
-            ProtocolManager.GetHandler<HandlerAccount>().Request((result, res) =>
-            {
-                onFinished.Invoke(true);
-            });
+            var res = await ProtocolManager.GetHandler<HandlerAccount>().Request();
+            onFinished.Invoke(true);
         }
 
         /// <summary>
         /// 기본 마켓 정보 요청
         /// </summary>
         /// <param name="onFinished"></param>
-        private void SetMarketList(Action<bool> onFinished)
+        private async void SetMarketList(Action<bool> onFinished)
         {
             UpdateProgressBar(1f, 1f, "마켓 리스트를 요청합니다.");
-            ProtocolManager.GetHandler<HandlerMarket>().Request((result, res) =>
-            {
-                onFinished.Invoke(true);
-            });
+            var res = await ProtocolManager.GetHandler<HandlerMarket>().Request();
+            onFinished.Invoke(true);
         }
 
         /// <summary>
@@ -72,39 +67,25 @@ namespace CoinTrader.Forms
         private void RequestTicker(Action<bool> onFinished)
         {
             UpdateProgressBar(1f, 1f, "모든 현재가를 갱신합니다.");
-            ProtocolManager.GetHandler<HandlerTicker>().Request(eMarketType.KRW, (result, res) =>
-            {
-                onFinished.Invoke(true);
-            });
+            var res = ProtocolManager.GetHandler<HandlerTicker>().Request(eMarketType.KRW);
+            onFinished.Invoke(true);
         }
 
         /// <summary>
         /// 기본 30일 캔들 데이터 세팅
         /// </summary>
         /// <param name="onFinished"></param>
-        private void SetCandleDays(Action<bool> onFinished)
-        {
-            this.StartCoroutine(RequestCandleDays(onFinished));
-        }
-
-        private IEnumerator RequestCandleDays(Action<bool> onFinished)
+        private async void SetCandleDays(Action<bool> onFinished)
         {
             if (ModelCenter.Market.markets.TryGetValue(eMarketType.KRW, out var marketInfos))
             {
                 for (int i = 0; i < marketInfos.Count; i++)
                 {
                     var marketInfo = marketInfos[i];
-                    bool isFinished = false;
-                    ProtocolManager.GetHandler<HandlerCandlesDays>().Request(marketInfo.name, "", 30, onFinished: (result, res) =>
-                    {
-                        marketInfo.SetCandleDaysRes(res);
-                        isFinished = true;
-                    });
-                    yield return new WaitUntil(() => isFinished);
-
                     UpdateProgressBar(marketInfos.Count, i + 1, $"'{marketInfo.name}'의 30일 캔들 데이터를 요청합니다.");
-
-                    yield return new WaitForSeconds(0.1f);
+                    var res = await ProtocolManager.GetHandler<HandlerCandlesDays>().Request(marketInfo.name, "", 30);
+                    marketInfo.SetCandleDaysRes(res);
+                    await Task.Delay(100);
                 }
             }
             onFinished.Invoke(true);

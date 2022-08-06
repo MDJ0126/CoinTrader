@@ -87,20 +87,13 @@ public static class AutoTradingProcess
                     // 조건 충족 매수 시작
                     if (isTargetPriceSuccess && isGoldenCross)
                     {
-                        if ((marketInfo.buy_target_price - marketInfo.trade_price) / marketInfo.trade_price > 0.01f)
+                        var close_price_rate = (marketInfo.buy_target_price - marketInfo.trade_price) / marketInfo.trade_price;
+                        if (close_price_rate > 0.01f)
                         {
                             //Logger.Log($"매수 시도 {marketInfo}");    // 메신저 넣자
-                            bool isFinished = false;
-                            Buy(marketInfo.name, use_balance, () =>
-                            {
-                                buyingTime = Time.NowTime;
-                                isFinished = true;
-                            });
-
-                            while (!isFinished)
-                            {
-                                await Task.Delay(10);
-                            }
+                            await Buy(marketInfo.name, use_balance);
+                            buyingTime = Time.NowTime;
+                            break;
                         }
                     }
                 }
@@ -117,21 +110,13 @@ public static class AutoTradingProcess
                         {
                             if (marketInfo.trade_price != 0d)
                             {
-                                var percentage = (marketInfo.trade_price - myAccounts[i].avg_buy_price) / myAccounts[i].avg_buy_price;
-                                if (percentage > 0.01f                          // +1%가 되거나
-                                    || percentage < -0.1f                       // -10%가 되거나
-                                    || buyingTime.AddHours(6f) < Time.NowTime)  // 6시간이 지났을 경우 매도
+                                var avg_buy_price_rate = (marketInfo.trade_price - myAccounts[i].avg_buy_price) / myAccounts[i].avg_buy_price;
+                                if (avg_buy_price_rate > 0.01f                        // +1%가 되거나
+                                    || avg_buy_price_rate < -0.1f                     // -10%가 되거나
+                                    || buyingTime.AddHours(6f) < Time.NowTime)      // 6시간이 지났을 경우 매도
                                 {
                                     //Logger.Log($"매도 시도 {marketInfo}");     // 메신저 넣자
-                                    bool isFinished = false;
-                                    Sell($"KRW-{myAccounts[i].currency}", myAccounts[i].balance, () =>
-                                    {
-                                        isFinished = true;
-                                    });
-                                    while (!isFinished)
-                                    {
-                                        await Task.Delay(10);
-                                    }
+                                    await Sell($"KRW-{myAccounts[i].currency}", myAccounts[i].balance);
                                 }
                             }
                         }
@@ -149,20 +134,13 @@ public static class AutoTradingProcess
     /// <param name="market"></param>
     /// <param name="price"></param>
     /// <param name="onFinished"></param>
-    private static void Buy(string market, double price, Action onFinished)
+    private static async Task Buy(string market, double price)
     {
-        ProtocolManager.GetHandler<HandlerOrders>().Request(market, "bid", "", price.ToString(), "price", "", (result, res) =>
+        var res = await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "bid", "", price.ToString(), "price", "");
+        if (res != null)
         {
-            if (result)
-            {
-                ProtocolManager.GetHandler<HandlerAccount>().Request((result2, res2) =>
-                {
-                    onFinished?.Invoke();
-                });
-            }
-            else
-                onFinished?.Invoke();
-        });
+            var res2 = await ProtocolManager.GetHandler<HandlerAccount>().Request();
+        }
     }
 
     /// <summary>
@@ -171,20 +149,13 @@ public static class AutoTradingProcess
     /// <param name="market"></param>
     /// <param name="volume"></param>
     /// <param name="onFinished"></param>
-    private static void Sell(string market, double volume, Action onFinished)
+    private static async Task Sell(string market, double volume)
     {
-        ProtocolManager.GetHandler<HandlerOrders>().Request(market, "ask", volume.ToString(), "", "market", "", (result, res) =>
+        var res = await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "ask", volume.ToString(), "", "market", "");
+        if (res != null)
         {
-            if (res != null)
-            {
-                ProtocolManager.GetHandler<HandlerAccount>().Request((result2, res2) =>
-                {
-                    onFinished?.Invoke();
-                });
-            }
-            else
-                onFinished?.Invoke();
-        });
+            var res2 = ProtocolManager.GetHandler<HandlerAccount>().Request();
+        }
     }
 
     // 메모

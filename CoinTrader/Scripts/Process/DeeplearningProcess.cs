@@ -46,24 +46,16 @@ public static class DeeplearningProcess
                                         oldTime = Time.NowTime;
                                     // utc 기준으로 요청
                                     string to = oldTime.ToString("yyyy-MM-dd HH:mm:ss");
-                                    bool isFinished = false;
-                                    ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, onFinished: (result, res) =>
+                                    var res = await ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to);
+                                    if (res != null && res.Count > 0)
                                     {
-                                        if (res != null && res.Count > 0)
-                                        {
-                                            MachineLearning.AddOld(res[0].market, ConvertDatas(res));
-                                        }
-                                        else
-                                        {
-                                            completedOldDataMarketNames.Add(marketInfo.name);
-                                        }
-                                        isFinished = true;
-                                    });
-
-                                    while (!isFinished)
-                                    {
-                                        await Task.Delay(100);
+                                        MachineLearning.AddOld(res[0].market, ConvertDatas(res));
                                     }
+                                    else
+                                    {
+                                        completedOldDataMarketNames.Add(marketInfo.name);
+                                    }
+                                    await Task.Delay(100);
                                 }
                             }
 
@@ -81,20 +73,12 @@ public static class DeeplearningProcess
                             {
                                 // utc 기준으로 요청
                                 string to = latestTime.ToString("yyyy-MM-dd HH:mm:ss");
-                                bool isFinished = false;
-                                ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, count: addHours, onFinished: (result, res) =>
+                                var res = await ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to, count: addHours);
+                                if (res != null && res.Count > 0)
                                 {
-                                    if (res != null && res.Count > 0)
-                                    {
-                                        MachineLearning.AddLatest(res[0].market, ConvertDatas(res));
-                                    }
-                                    isFinished = true;
-                                });
-
-                                while (!isFinished)
-                                {
-                                    await Task.Delay(100);
+                                    MachineLearning.AddLatest(res[0].market, ConvertDatas(res));
                                 }
+                                await Task.Delay(100);
                             }
 
                             // 예상 종가 도출
@@ -106,7 +90,6 @@ public static class DeeplearningProcess
                     }
                 }
             }
-
             await Task.Delay(1000);
         }
     }

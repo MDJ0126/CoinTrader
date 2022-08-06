@@ -3,6 +3,7 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Network
 {
@@ -101,7 +102,7 @@ namespace Network
             //- market : 시장가 주문(매도)
         /// <param name="identifier">조회용 사용자 지정값 (선택)</param>
         /// <param name="onFinished"></param>
-        public void Request(string market, string side, string volume, string price, string ord_type, string identifier = "", Action<bool, List<HandlerOrdersRes>> onFinished = null)        
+        public async Task<List<HandlerOrdersRes>> Request(string market, string side, string volume, string price, string ord_type, string identifier = "")        
         {
             // 참고 : https://docs.upbit.com/docs/market-info-trade-price-detail
             var marketInfo = ModelCenter.Market.GetMarketInfo(market);
@@ -148,7 +149,8 @@ namespace Network
             request.AddHeader("Accept", "application/json");
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(JsonConvert.SerializeObject(parameters));
-            base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
+            await base.RequestProcess(request);
+            return res;
         }
 
         protected override void Response(RestRequest request, RestResponse response)

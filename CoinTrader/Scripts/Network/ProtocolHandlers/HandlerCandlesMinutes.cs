@@ -4,6 +4,7 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Network
 {
@@ -97,7 +98,7 @@ namespace Network
         /// <param name="to">마지막 캔들 시각 (exclusive). 포맷 : yyyy-MM-dd'T'HH:mm:ss'Z' or yyyy-MM-dd HH:mm:ss. 비워서 요청시 가장 최근 캔들</param>
         /// <param name="count">캔들 개수(최대 200개까지 요청 가능)</param>
         /// <param name="onFinished"></param>
-        public void Request(int unit, string market, string to = "", int count = 200, Action<bool, List<CandlesMinutesRes>> onFinished = null)
+        public async Task<List<CandlesMinutesRes>> Request(int unit, string market, string to = "", int count = 200)
         {
             if (string.IsNullOrEmpty(to))
             {
@@ -107,7 +108,8 @@ namespace Network
             }
             RestRequest request = new RestRequest(URI + $"{unit}?market={market}&to={to}&count={count}", Method);
             request.AddHeader("Accept", "application/json");
-            base.RequestProcess(request, (result) => onFinished?.Invoke(result, res));
+            await base.RequestProcess(request);
+            return res;
         }
 
         protected override void Response(RestRequest request, RestResponse response)
