@@ -53,7 +53,7 @@ public class MarketInfo
     {
         if (modelOutput != null)
         {
-            dateTime = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, 0, 0);
+            dateTime = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, 0);
             predictPrices.Clear();
             int length = modelOutput.Forecasted.Length;
             for (int i = 0; i < length; i++)
@@ -65,11 +65,7 @@ public class MarketInfo
                     lowerBound = modelOutput.LowerBound[i],
                     upperBound = modelOutput.UpperBound[i],
                 };
-
-                if (predictPrice.dateTime.Hour == 0)
-                {
-                    predictPrices.Add(predictPrice);
-                }
+                predictPrices.Add(predictPrice);
             }
         }
     }
