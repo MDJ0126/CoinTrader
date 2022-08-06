@@ -336,9 +336,9 @@ namespace CoinTrader.ML
                     ModelOutput forecast = forecastEngine.Predict();
                     return forecast;
                 }
-                catch 
+                catch (Exception e)
                 {
-                    return null;
+
                 }
             }
             return null;
