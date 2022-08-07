@@ -88,7 +88,7 @@ public static class AutoTradingProcess
                     if (isTargetPriceSuccess && isGoldenCross)
                     {
                         var close_price_rate = (marketInfo.buy_target_price - marketInfo.trade_price) / marketInfo.trade_price;
-                        if (close_price_rate > 0.01f)
+                        if (close_price_rate > 0.02f)
                         {
                             //Logger.Log($"매수 시도 {marketInfo}");    // 메신저 넣자
                             await Buy(marketInfo.name, use_balance);
@@ -111,7 +111,7 @@ public static class AutoTradingProcess
                             if (marketInfo.trade_price != 0d)
                             {
                                 var avg_buy_price_rate = (marketInfo.trade_price - myAccounts[i].avg_buy_price) / myAccounts[i].avg_buy_price;
-                                if (avg_buy_price_rate > 0.01f                        // +1%가 되거나
+                                if (avg_buy_price_rate > 0.02f                        // +2%가 되거나
                                     || avg_buy_price_rate < -0.1f                     // -10%가 되거나
                                     || buyingTime.AddHours(6f) < Time.NowTime)      // 6시간이 지났을 경우 매도
                                 {
