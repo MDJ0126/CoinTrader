@@ -17,6 +17,8 @@ public static class AutoTradingProcess
 
     private static async void Process()
     {
+        await Task.Delay(5000);
+
         const float USE_BALANCE_RATE = 0.5f;
 
         var myAccounts = ModelCenter.Account.Accounts;
