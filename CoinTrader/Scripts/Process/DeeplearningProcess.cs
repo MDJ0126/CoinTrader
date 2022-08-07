@@ -90,7 +90,7 @@ public static class DeeplearningProcess
                     }
                 }
             }
-            await Task.Delay(1000);
+            await Task.Delay(10000);
         }
     }
 

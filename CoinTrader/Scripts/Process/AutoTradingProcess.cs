@@ -17,8 +17,6 @@ public static class AutoTradingProcess
 
     private static async void Process()
     {
-        await Task.Delay(5000);
-
         const float USE_BALANCE_RATE = 0.5f;
 
         var myAccounts = ModelCenter.Account.Accounts;
@@ -70,7 +68,7 @@ public static class AutoTradingProcess
                     bool isGoldenCross = false;
 
                     var marketInfo = marketInfos[i];
-                    if (marketInfo != null)
+                    if (marketInfo != null && marketInfo.predictPrices != null && marketInfo.predictPrices.Count > 0)
                     {
                         if (marketInfo.buy_target_price > marketInfo.trade_price)
                         {
