@@ -117,20 +117,22 @@ namespace Network
         /// </summary>
         private void UpdateRemainingReq(RestResponse res)
         {
-            var enumerator = res.Headers.GetEnumerator();
-            while (enumerator.MoveNext())
+            if (res.Headers != null)
             {
-                var header = enumerator.Current;
-                if (header.Name.Equals(RemainingReq.HEADER_NAME))
+                var enumerator = res.Headers.GetEnumerator();
+                while (enumerator.MoveNext())
                 {
-                    string group = Utils.GetHeaderValue((string)header.Value, "group");
-                    if (!RemainingReqs.TryGetValue(group, out var value))
+                    var header = enumerator.Current;
+                    if (header != null && header.Name.Equals(RemainingReq.HEADER_NAME))
                     {
-                        this.group = group;
-                        value = new RemainingReq();
-                        RemainingReqs.Add(group, value);
+                        group = Utils.GetHeaderValue((string)header.Value, "group");
+                        if (!RemainingReqs.TryGetValue(group, out var value))
+                        {
+                            value = new RemainingReq();
+                            RemainingReqs.Add(group, value);
+                        }
+                        value.Update((string)header.Value);
                     }
-                    value.Update((string)header.Value);
                 }
             }
         }
