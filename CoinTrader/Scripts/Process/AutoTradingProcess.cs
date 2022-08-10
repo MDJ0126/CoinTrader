@@ -150,11 +150,8 @@ public static class AutoTradingProcess
     /// <param name="onFinished"></param>
     private static async Task Buy(string market, double price)
     {
-        var res = await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "bid", "", price.ToString(), "price", "");
-        if (res != null)
-        {
-            var res2 = await ProtocolManager.GetHandler<HandlerAccount>().Request();
-        }
+        await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "bid", "", price.ToString(), "price", "");
+        await ProtocolManager.GetHandler<HandlerAccount>().Request();
     }
 
     /// <summary>
@@ -165,11 +162,8 @@ public static class AutoTradingProcess
     /// <param name="onFinished"></param>
     private static async Task Sell(string market, double volume)
     {
-        var res = await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "ask", volume.ToString(), "", "market", "");
-        if (res != null)
-        {
-            var res2 = ProtocolManager.GetHandler<HandlerAccount>().Request();
-        }
+        await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "ask", volume.ToString(), "", "market", "");
+        await ProtocolManager.GetHandler<HandlerAccount>().Request();
     }
 
     // 메모
