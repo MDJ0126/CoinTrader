@@ -99,8 +99,9 @@ public static class AutoTradingProcess
                     // 조건 충족 매수 시작
                     if (isTargetPriceSuccess && isGoldenCross)
                     {
+                        bool isMinimumSuccess = marketInfo.buy_target_price >= 100f;
                         var close_price_rate = (marketInfo.buy_target_price - marketInfo.trade_price) / marketInfo.trade_price;
-                        if (close_price_rate > 0.02f)
+                        if (isMinimumSuccess && close_price_rate > 0.02f)
                         {
                             Logger.Log($"매수 시도 {marketInfo}");
                             await Buy(marketInfo.name, use_balance);
@@ -150,7 +151,7 @@ public static class AutoTradingProcess
     /// <param name="onFinished"></param>
     private static async Task Buy(string market, double price)
     {
-        await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "bid", "", price.ToString(), "price", "");
+        await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "bid", "", price.ToString("R"), "price", "");
         await ProtocolManager.GetHandler<HandlerAccount>().Request();
     }
 
@@ -162,7 +163,7 @@ public static class AutoTradingProcess
     /// <param name="onFinished"></param>
     private static async Task Sell(string market, double volume)
     {
-        await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "ask", volume.ToString(), "", "market", "");
+        await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "ask", volume.ToString("R"), "", "market", "");
         await ProtocolManager.GetHandler<HandlerAccount>().Request();
     }
 
