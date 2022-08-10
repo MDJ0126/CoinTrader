@@ -63,10 +63,12 @@ namespace CoinTrader.Forms
             // 딥러닝 프로세스
             DeeplearningProcess.Start();
             DeeplearningProcess.onUpdateMarketInfo += OnUpdateMarketInfo;
-            ModelCenter.Market.OnUpdateMarketInfo += OnUpdateMarketInfo;
 
             // 자동 거래 프로세스
             AutoTradingProcess.Start();
+
+            // 마켓 정보 갱신 이벤트
+            ModelCenter.Market.OnUpdateMarketInfo += OnUpdateMarketInfo;
 
             // 자정 업데이터
             PassthedayUpdater();
@@ -104,7 +106,7 @@ namespace CoinTrader.Forms
         }
 
         /// <summary>
-        /// 타이머 코루틴
+        /// 타이머
         /// </summary>
         /// <returns></returns>
         private async void Timer()
@@ -117,7 +119,7 @@ namespace CoinTrader.Forms
         }
 
         /// <summary>
-        /// 코인 리스트 세팅
+        /// 마켓 리스트뷰 세팅
         /// </summary>
         private void SetMarketList()
         {
