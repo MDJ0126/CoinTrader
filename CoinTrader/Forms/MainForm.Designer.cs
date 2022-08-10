@@ -49,10 +49,13 @@ namespace CoinTrader.Forms
             this.currentPrice = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.timeLabel = new System.Windows.Forms.Label();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).BeginInit();
             this.metroTabControl1.SuspendLayout();
             this.mainTabPage.SuspendLayout();
             this.accountTab.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // metroStyleManager
@@ -69,8 +72,8 @@ namespace CoinTrader.Forms
             this.metroTabControl1.Controls.Add(this.accountTab);
             this.metroTabControl1.Location = new System.Drawing.Point(1, 71);
             this.metroTabControl1.Name = "metroTabControl1";
-            this.metroTabControl1.SelectedIndex = 1;
-            this.metroTabControl1.Size = new System.Drawing.Size(1197, 528);
+            this.metroTabControl1.SelectedIndex = 0;
+            this.metroTabControl1.Size = new System.Drawing.Size(1197, 509);
             this.metroTabControl1.TabIndex = 2;
             this.metroTabControl1.UseSelectable = true;
             // 
@@ -82,7 +85,7 @@ namespace CoinTrader.Forms
             this.mainTabPage.HorizontalScrollbarSize = 10;
             this.mainTabPage.Location = new System.Drawing.Point(4, 38);
             this.mainTabPage.Name = "mainTabPage";
-            this.mainTabPage.Size = new System.Drawing.Size(1189, 486);
+            this.mainTabPage.Size = new System.Drawing.Size(1189, 467);
             this.mainTabPage.TabIndex = 0;
             this.mainTabPage.Text = "거래소";
             this.mainTabPage.VerticalScrollbarBarColor = true;
@@ -167,7 +170,7 @@ namespace CoinTrader.Forms
             this.optionTabPage.HorizontalScrollbarSize = 10;
             this.optionTabPage.Location = new System.Drawing.Point(4, 38);
             this.optionTabPage.Name = "optionTabPage";
-            this.optionTabPage.Size = new System.Drawing.Size(1189, 486);
+            this.optionTabPage.Size = new System.Drawing.Size(1189, 467);
             this.optionTabPage.TabIndex = 2;
             this.optionTabPage.Text = "옵션";
             this.optionTabPage.VerticalScrollbarBarColor = true;
@@ -183,7 +186,7 @@ namespace CoinTrader.Forms
             this.accountTab.HorizontalScrollbarSize = 10;
             this.accountTab.Location = new System.Drawing.Point(4, 38);
             this.accountTab.Name = "accountTab";
-            this.accountTab.Size = new System.Drawing.Size(1189, 486);
+            this.accountTab.Size = new System.Drawing.Size(1189, 467);
             this.accountTab.TabIndex = 3;
             this.accountTab.Text = "잔고";
             this.accountTab.VerticalScrollbarBarColor = true;
@@ -220,11 +223,34 @@ namespace CoinTrader.Forms
             this.timeLabel.TabIndex = 3;
             this.timeLabel.Text = "1999년12월31일";
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.statusStrip1.AutoSize = false;
+            this.statusStrip1.Dock = System.Windows.Forms.DockStyle.None;
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1});
+            this.statusStrip1.Location = new System.Drawing.Point(1, 580);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(1200, 22);
+            this.statusStrip1.TabIndex = 6;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.BackColor = System.Drawing.SystemColors.Control;
+            this.toolStripStatusLabel1.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(139, 17);
+            this.toolStripStatusLabel1.Text = "로그 내용이 들어가는 곳";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1200, 600);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.metroTabControl1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -239,6 +265,8 @@ namespace CoinTrader.Forms
             this.metroTabControl1.ResumeLayout(false);
             this.mainTabPage.ResumeLayout(false);
             this.accountTab.ResumeLayout(false);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -263,6 +291,8 @@ namespace CoinTrader.Forms
         private MetroFramework.Controls.MetroTabPage accountTab;
         private System.Windows.Forms.Label currentPrice;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
     }
 }
 

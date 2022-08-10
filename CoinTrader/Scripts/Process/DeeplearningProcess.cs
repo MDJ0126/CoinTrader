@@ -9,6 +9,7 @@ public static class DeeplearningProcess
     public static Action<MarketInfo> onUpdateMarketInfo = null;
 
     private static bool isStarted = false;
+    private static bool isRequestStop = false;
 
     private static List<string> completedOldDataMarketNames = new List<string>();
 
@@ -21,14 +22,19 @@ public static class DeeplearningProcess
         }
     }
 
+    public static void Stop()
+    {
+        isStarted = false;
+        isRequestStop = true;
+    }
+
     private static async void Process()
     {
-        while (true)
+        while (!isRequestStop)
         {
             var marketInfos = ModelCenter.Market.GetMarketInfos(eMarketType.KRW);
             if (marketInfos != null)
             {
-                DateTime start = Time.NowTime;
                 for (int i = 0; i < marketInfos.Count; i++)
                 {
                     var marketInfo = marketInfos[i];
@@ -43,7 +49,7 @@ public static class DeeplearningProcess
                                 {
                                     DateTime oldTime = MachineLearning.GetOldDateTime(marketInfo.name);
                                     if (oldTime == DateTime.MaxValue)
-                                        oldTime = Time.NowTime;
+                                        oldTime = Time.UtcNowTime;
                                     // utc 기준으로 요청
                                     string to = oldTime.ToString("yyyy-MM-dd HH:mm:ss");
                                     var res = await ProtocolManager.GetHandler<HandlerCandlesMinutes>().Request(60, marketInfos[i].name, to: to);
@@ -62,8 +68,8 @@ public static class DeeplearningProcess
                             // 최신 데이터들 불러오기
                             DateTime latestTime = MachineLearning.GetLatestDateTime(marketInfo.name);
                             if (latestTime == DateTime.MinValue)
-                                latestTime = Time.NowTime;
-                            TimeSpan ts = Time.NowTime - latestTime;
+                                latestTime = Time.UtcNowTime;
+                            TimeSpan ts = Time.UtcNowTime - latestTime;
                             int addHours = (int)ts.TotalHours;
                             if (addHours > 200) // 200개 초과하지 않게 한다.
                                 addHours = 200;

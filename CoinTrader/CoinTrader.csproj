@@ -214,6 +214,7 @@
     <Compile Include="Scripts\Network\ProtocolManager.cs" />
     <Compile Include="Scripts\Market\MarketInfo.cs" />
     <Compile Include="Scripts\Etc\Time.cs" />
+    <Compile Include="Scripts\Process\PassTheDayUpdater.cs" />
     <Compile Include="Scripts\Utility\WaterfallProcess.cs" />
     <Compile Include="Scripts\Utility\Logger.cs" />
     <Compile Include="Scripts\Utility\MultiThread.cs" />

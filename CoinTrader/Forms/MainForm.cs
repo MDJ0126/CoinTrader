@@ -26,8 +26,9 @@ namespace CoinTrader.Forms
         public MainForm()
         {
             InitializeComponent();
-            this.StyleManager = metroStyleManager;
+            //this.StyleManager = metroStyleManager;
             //this.StyleManager.Theme = MetroFramework.MetroThemeStyle.Dark;
+            metroListView1.DoubleBuffered(true);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -36,30 +37,61 @@ namespace CoinTrader.Forms
             Initialize();
         }
 
+        private void OnAddLog(string text)
+        {
+            toolStripStatusLabel1.Text = text;
+        }
+
         /// <summary>
         /// 초기화
         /// </summary>
         private void Initialize()
         {
+            // 로거 등록
+            Logger.OnLogger += OnAddLog;
+
             // 타이머 작동
-            this.StartCoroutine(Timer());
+            Timer();
 
-            // 워터풀 프로세스 시작
-            WaterfallProcess wfp = new WaterfallProcess();
-            wfp.Add(SetMarketList);
-            wfp.Start(result =>
+            // 마켓 리스트 리스트뷰 세팅
+            SetMarketList();
+
+            // 개인 잔고 업데이터
+            AccountUpdater.Start();
+            AccountUpdater.updateAccount = OnUpdateAccount;
+
+            // 딥러닝 프로세스
+            DeeplearningProcess.Start();
+            DeeplearningProcess.onUpdateMarketInfo += OnUpdateMarketInfo;
+            ModelCenter.Market.OnUpdateMarketInfo += OnUpdateMarketInfo;
+
+            // 자동 거래 프로세스
+            AutoTradingProcess.Start();
+
+            // 자정 업데이터
+            PassthedayUpdater();
+        }
+
+        private async void PassthedayUpdater()
+        {
+            while (true)
             {
+                // 하루에 한 번씩 업데이트 하는 프로세스
+                DateTime nowTime = Time.NowTime;
+                DateTime nextDate = nowTime.Date.AddDays(1f);
+                TimeSpan remain = nextDate - nowTime;
+                await Task.Delay(remain);
+
+                AutoTradingProcess.Stop();
+                DeeplearningProcess.Stop();
+                AccountUpdater.Stop();
+
+                await DataManager.Updater();
+
                 AutoTradingProcess.Start();
-
-                AccountProcess.Start();
-                AccountProcess.updateAccount = OnUpdateAccount;
-
                 DeeplearningProcess.Start();
-                DeeplearningProcess.onUpdateMarketInfo += OnUpdateMarketInfo;
-                ModelCenter.Market.OnUpdateMarketInfo += OnUpdateMarketInfo;
-
-                metroListView1.DoubleBuffered(true);
-            });
+                AccountUpdater.Start();
+            }
         }
 
         /// <summary>
@@ -75,19 +107,19 @@ namespace CoinTrader.Forms
         /// 타이머 코루틴
         /// </summary>
         /// <returns></returns>
-        private IEnumerator Timer()
+        private async void Timer()
         {
             while (true)
             {
                 timeLabel.Text = Time.NowTime.ToString("yyyy년 M월 d일 tt hh:mm:ss");
-                yield return new WaitForSeconds(1f);
+                await Task.Delay(100);
             }
         }
 
         /// <summary>
         /// 코인 리스트 세팅
         /// </summary>
-        private void SetMarketList(Action<bool> onFinished)
+        private void SetMarketList()
         {
             metroListView1.BeginUpdate();
             if (ModelCenter.Market.markets.TryGetValue(eMarketType.KRW, out var marketInfos))
@@ -110,8 +142,6 @@ namespace CoinTrader.Forms
             metroListView1.EndUpdate();
             
             RequestTicker();
-
-            onFinished?.Invoke(true);
         }
 
         /// <summary>

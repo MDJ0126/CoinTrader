@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 public static class Logger
@@ -65,25 +66,27 @@ public static class Logger
 
     public static void Start()
     {
-        Timer timer = new Timer();
-        timer.Interval = 100;
-        timer.Tick += (sender, eventArgs) => Update();
-        timer.Start();
+        Update();
     }
 
-    public static void Update()
+    public static async void Update()
     {
-        while (Logs.Count > 0)
+        while (true)
         {
-            string text = Logs.Dequeue();
-            if (!string.IsNullOrEmpty(text))
+            while (Logs.Count > 0)
             {
-                // Console 출력
-                Console.WriteLine(text);
+                string text = Logs.Dequeue();
+                if (!string.IsNullOrEmpty(text))
+                {
+                    // Console 출력
+                    Console.WriteLine(text);
 
-                // 로그 추가 이벤트 발생
-                onLog?.Invoke(text);
+                    // 로그 추가 이벤트 발생
+                    onLog?.Invoke(text);
+                }
             }
+
+            await Task.Delay(10);
         }
     }
 

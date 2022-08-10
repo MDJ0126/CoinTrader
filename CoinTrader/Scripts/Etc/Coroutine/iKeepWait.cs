@@ -7,10 +7,10 @@ public interface iKeepWait
 
 public class WaitForSeconds : iKeepWait
 {
-    private float _seconds;
+    private double _seconds;
     private DateTime after;
 
-    public WaitForSeconds(float seconds)
+    public WaitForSeconds(double seconds)
     {
         _seconds = seconds;
         after = DateTime.Now.AddSeconds(_seconds);

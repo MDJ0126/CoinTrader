@@ -30,45 +30,54 @@ public class MarketModel
     /// <param name="res"></param>
     public void SetBaseInfo(List<MarketRes> res)
     {
-        markets.Clear();
-        marketAllStrs.Clear();
         if (res != null)
         {
+            marketAllStrs.Clear();
             for (int i = 0; i < res.Count; i++)
             {
                 var marketRes = res[i];
+                string market = marketRes.market.Split('-')[0];
+                eMarketType marketType = Utils.FindEnumValue<eMarketType>(market);
+
+                if (!markets.TryGetValue(marketType, out var list))
+                {
+                    list = new List<MarketInfo>();
+                    markets.Add(marketType, list);
+                }
+
+                var marketInfo = new MarketInfo
+                {
+                    name = marketRes.market,
+                    korean_name = marketRes.korean_name,
+                    trade_price = 0,
+                };
 
                 if (marketRes.GetWarning() == MarketRes.eWarning.NONE)
                 {
-                    string market = marketRes.market.Split('-')[0];
-                    eMarketType marketType = Utils.FindEnumValue<eMarketType>(market);
-                    if (!markets.TryGetValue(marketType, out var list))
-                    {
-                        list = new List<MarketInfo>();
-                        markets.Add(marketType, list);
-                    }
-
-                    var marketInfo = new MarketInfo
-                    {
-                        name = marketRes.market,
-                        korean_name = marketRes.korean_name,
-                        trade_price = 0,
-                    };
-                    list.Add(marketInfo);
-
-                    // 스트링 리스트 따로 작성
-                    if (!marketAllStrs.TryGetValue(marketType, out var str))
-                    {
-                        marketAllStrs.Add(marketType, string.Empty);
-                    }
-
-                    if (marketAllStrs[marketType].Length > 0)
-                    {
-                        marketAllStrs[marketType] += $",{marketRes.market}";
-                    }
-                    else
-                        marketAllStrs[marketType] += marketRes.market;
+                    // 이상 없으면 추가
+                    if (!list.Exists(item => item.name == marketInfo.name))
+                        list.Add(marketInfo);
                 }
+                else
+                {
+                    // 이상이 있다면 제거
+                    var find = list.Find(item => item.name == marketInfo.name);
+                    if (find != null)
+                        list.Remove(find);
+                }
+
+                // 스트링 리스트 따로 작성
+                if (!marketAllStrs.TryGetValue(marketType, out var str))
+                {
+                    marketAllStrs.Add(marketType, string.Empty);
+                }
+
+                if (marketAllStrs[marketType].Length > 0)
+                {
+                    marketAllStrs[marketType] += $",{marketRes.market}";
+                }
+                else
+                    marketAllStrs[marketType] += marketRes.market;
             }
         }
     }

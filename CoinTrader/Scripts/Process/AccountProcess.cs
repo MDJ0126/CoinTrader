@@ -1,11 +1,12 @@
 ﻿using System.Threading.Tasks;
 
-public static class AccountProcess
+public static class AccountUpdater
 {
     public delegate void UpdateAccount(double price);
     public static UpdateAccount updateAccount;
 
     private static bool isStarted = false;
+    private static bool isRequestStop = false;
 
     public static void Start()
     {
@@ -16,10 +17,16 @@ public static class AccountProcess
         }
     }
 
+    public static void Stop()
+    {
+        isStarted = false;
+        isRequestStop = true;
+    }
+
     private static async void Process()
     {
         var myAccounts = ModelCenter.Account.Accounts;
-        while (true)
+        while (!isRequestStop)
         {
             // 나의 현재 자산 총 평가
             double avg_price_KRW = 0d;

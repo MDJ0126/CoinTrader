@@ -102,7 +102,7 @@ namespace Network
         {
             if (string.IsNullOrEmpty(to))
             {
-                var nowTime = Time.NowTime;
+                var nowTime = Time.UtcNowTime;
                 var dateTime = new DateTime(nowTime.Year, nowTime.Month, nowTime.Day, nowTime.Hour, 0, 0);
                 to = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
             }

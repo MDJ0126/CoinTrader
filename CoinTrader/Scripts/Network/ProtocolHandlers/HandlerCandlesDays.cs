@@ -112,7 +112,7 @@ namespace Network
         public async Task<List<CandlesDaysRes>> Request(string market, string to = "", int count = 200, string convertingPriceUnit = "KRW")
         {
             if (string.IsNullOrEmpty(to))
-                to = Time.NowTime.Date.AddDays(1f).ToString("yyyy-MM-dd HH:mm:ss");
+                to = Time.UtcNowTime.Date.AddDays(1f).ToString("yyyy-MM-dd HH:mm:ss");
             RestRequest request = new RestRequest(URI + $"market={market}&to={to}&count={count}&convertingPriceUnit={convertingPriceUnit}", Method);
             request.AddHeader("Accept", "application/json");
             await base.RequestProcess(request);

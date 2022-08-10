@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 public static class AutoTradingProcess
 {
     private static bool isStarted = false;
+    private static bool isRequestStop = false;
+    private static DateTime buyingTime = Time.NowTime;
 
     public static void Start()
     {
@@ -15,14 +17,19 @@ public static class AutoTradingProcess
         }
     }
 
+    public static void Stop()
+    {
+        isStarted = false;
+        isRequestStop = true;
+    }
+
     private static async void Process()
     {
         const float USE_BALANCE_RATE = 0.5f;
 
         var myAccounts = ModelCenter.Account.Accounts;
         var marketInfos = ModelCenter.Market.GetMarketInfos(eMarketType.KRW);
-        DateTime buyingTime = Time.NowTime;
-        while (true)
+        while (!isRequestStop)
         {
             // 총 평가 (순수 코인만)
             double only_coin_balance = 0d;
@@ -95,8 +102,9 @@ public static class AutoTradingProcess
                         var close_price_rate = (marketInfo.buy_target_price - marketInfo.trade_price) / marketInfo.trade_price;
                         if (close_price_rate > 0.02f)
                         {
-                            //Logger.Log($"매수 시도 {marketInfo}");    // 메신저 넣자
+                            Logger.Log($"매수 시도 {marketInfo}");
                             await Buy(marketInfo.name, use_balance);
+                            Logger.Log($"매수 완료 {marketInfo}");
                             buyingTime = Time.NowTime;
                             break;
                         }
@@ -120,8 +128,9 @@ public static class AutoTradingProcess
                                     || avg_buy_price_rate < -0.04f                  // -4%가 되거나
                                     || buyingTime.AddHours(6f) < Time.NowTime)      // 6시간이 지났을 경우 매도
                                 {
-                                    //Logger.Log($"매도 시도 {marketInfo}");     // 메신저 넣자
+                                    Logger.Log($"매도 시도 {marketInfo}");
                                     await Sell($"KRW-{myAccounts[i].currency}", myAccounts[i].balance);
+                                    Logger.Log($"매도 완료 {marketInfo}");
                                 }
                             }
                         }
