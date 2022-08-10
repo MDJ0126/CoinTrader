@@ -37,6 +37,8 @@ namespace CoinTrader
 
                 // 종료
                 MultiThread.Release();
+                Logger.Stop();
+
                 mutex.ReleaseMutex();
             }
             else

@@ -25,6 +25,8 @@ public static class Logger
 
     private static StringBuilder sb = new StringBuilder();
 
+    private static bool isStop = false;
+
     static Logger()
     {
 
@@ -69,9 +71,14 @@ public static class Logger
         Update();
     }
 
+    public static void Stop()
+    {
+        isStop = true;
+    }
+
     public static async void Update()
     {
-        while (true)
+        while (!isStop)
         {
             while (Logs.Count > 0)
             {
