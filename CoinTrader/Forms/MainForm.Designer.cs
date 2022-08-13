@@ -155,7 +155,7 @@ namespace CoinTrader.Forms
             // 
             // columnHeader8
             // 
-            this.columnHeader8.Text = "변동성 돌파(+0.5배)";
+            this.columnHeader8.Text = "변동성 돌파";
             this.columnHeader8.Width = 150;
             // 
             // columnHeader9
