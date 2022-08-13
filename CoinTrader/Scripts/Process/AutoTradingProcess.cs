@@ -79,13 +79,14 @@ public static class AutoTradingProcess
                     {
                         if (marketInfo.buy_target_price > marketInfo.trade_price)
                         {
+                            isTargetPriceSuccess = true;
                             for (int k = 0; k < marketInfo.predictPrices.Count; k++)
                             {
-                                if (k < 6)  // 6시간 정도만 예측
+                                if (k < 3)  // 앞으로 3시간 정도만 예측
                                 {
-                                    if (marketInfo.buy_target_price < marketInfo.predictPrices[k].forecasted)
+                                    if (marketInfo.trade_price > marketInfo.predictPrices[k].forecasted)
                                     {
-                                        isTargetPriceSuccess = true;
+                                        isTargetPriceSuccess = false;
                                         break;
                                     }
                                 }
@@ -99,9 +100,8 @@ public static class AutoTradingProcess
                     // 조건 충족 매수 시작
                     if (isTargetPriceSuccess && isGoldenCross)
                     {
-                        bool isMinimumPriceSuccess = marketInfo.buy_target_price >= 100f;
-                        var close_price_rate = (marketInfo.buy_target_price - marketInfo.trade_price) / marketInfo.trade_price;
-                        if (isMinimumPriceSuccess && close_price_rate > 0.02f)
+                        bool isMinimumPriceSuccess = marketInfo.trade_price >= 100f;
+                        if (isMinimumPriceSuccess)
                         {
                             Logger.Log($"매수 시도 {marketInfo}");
                             await Buy(marketInfo.name, use_balance);
@@ -125,9 +125,9 @@ public static class AutoTradingProcess
                             if (marketInfo.trade_price != 0d)
                             {
                                 var avg_buy_price_rate = (marketInfo.trade_price - myAccounts[i].avg_buy_price) / myAccounts[i].avg_buy_price;
-                                if (avg_buy_price_rate > 0.02f                      // +2%가 되거나
-                                    || avg_buy_price_rate < -0.04f                  // -4%가 되거나
-                                    || buyingTime.AddHours(6f) < Time.NowTime)      // 6시간이 지났을 경우 매도
+                                if (avg_buy_price_rate > 0.015f                      // +1.5%가 되거나
+                                    || avg_buy_price_rate < -0.02f                  // -2%가 되거나
+                                    || buyingTime.AddHours(3f) < Time.NowTime)      // 6시간이 지났을 경우 매도
                                 {
                                     Logger.Log($"매도 시도 {marketInfo}");
                                     await Sell($"KRW-{myAccounts[i].currency}", myAccounts[i].balance);
