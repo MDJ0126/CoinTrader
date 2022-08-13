@@ -100,7 +100,8 @@ public static class AutoTradingProcess
                     if (isTargetPriceSuccess && isGoldenCross)
                     {
                         bool isMinimumPriceSuccess = marketInfo.buy_target_price >= 100f;
-                        if (isMinimumPriceSuccess)
+                        var close_price_rate = (marketInfo.buy_target_price - marketInfo.trade_price) / marketInfo.trade_price;
+                        if (isMinimumPriceSuccess && close_price_rate > 0.02f)
                         {
                             Logger.Log($"매수 시도 {marketInfo}");
                             await Buy(marketInfo.name, use_balance);
