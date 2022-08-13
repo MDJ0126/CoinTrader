@@ -125,7 +125,7 @@ public static class AutoTradingProcess
                             if (marketInfo.trade_price != 0d)
                             {
                                 var avg_buy_price_rate = (marketInfo.trade_price - myAccounts[i].avg_buy_price) / myAccounts[i].avg_buy_price;
-                                if (avg_buy_price_rate > 0.015f                      // +1.5%가 되거나
+                                if (avg_buy_price_rate > 0.005f                      // +0.5%가 되거나
                                     || avg_buy_price_rate < -0.02f                  // -2%가 되거나
                                     || buyingTime.AddHours(3f) < Time.NowTime)      // 6시간이 지났을 경우 매도
                                 {
