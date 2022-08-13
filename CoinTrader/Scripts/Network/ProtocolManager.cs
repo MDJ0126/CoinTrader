@@ -40,7 +40,28 @@ namespace Network
             // if handler is null
             protocolHandler = new T();
             handlers.Add(protocolHandler);
+            protocolHandler.onRequest = OnRequest;
+            protocolHandler.onResponse = OnResponse;
             return protocolHandler;
+        }
+
+        private static void OnRequest(RestRequest req)
+        {
+
+        }
+
+        private static void OnResponse(RestResponse res)
+        {
+            // 패킷을 받을 때, 헤더에 있는 시간을 찍어와서 서버 시간으로 동기화 처리
+            var enumerator = res.Headers.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                var header = enumerator.Current;
+                if (header != null && header.Name.Equals("Date"))
+                {
+                    Time.UpdateDateTime(header.Value.ToString());
+                }
+            }
         }
 
         /// <summary>

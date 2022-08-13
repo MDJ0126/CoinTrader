@@ -80,7 +80,7 @@ namespace CoinTrader.Forms
             {
                 // 하루에 한 번씩 업데이트 하는 프로세스
                 DateTime nowTime = Time.NowTime;
-                DateTime nextDate = nowTime.Date.AddDays(1f);
+                DateTime nextDate = nowTime.Date.AddDays(1f).AddMinutes(1f); // 00시 01분에 데이터 갱신
                 TimeSpan remain = nextDate - nowTime;
                 await Task.Delay(remain);
 

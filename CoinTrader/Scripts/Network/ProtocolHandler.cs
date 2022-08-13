@@ -10,6 +10,9 @@ namespace Network
 {
     public abstract class ProtocolHandler
     {
+        public Action<RestRequest> onRequest = null;
+        public Action<RestResponse> onResponse = null;
+
         private static RestClient client = new RestClient("https://api.upbit.com");
 
         protected static Dictionary<string, RemainingReq> RemainingReqs { get; } = new Dictionary<string, RemainingReq>();
@@ -45,7 +48,11 @@ namespace Network
             {
                 // 요청 카운트 소모 처리
                 UseReuqestCount();
+
+                // 요청
+                onRequest?.Invoke(req);
                 res = await client.ExecuteAsync(req);
+                onResponse?.Invoke(res);
 
                 // 데이터 사용량 체크 (미지원)
                 CheckDataUsage();

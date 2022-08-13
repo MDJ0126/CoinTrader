@@ -1,47 +1,58 @@
 ﻿using System;
+using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 
 public static class Time
 {
     /// <summary>
+    /// 클라이언트와 동기화된 시간 차이 (Tick)
+    /// </summary>
+    private static long diffTick = 0L;
+
+    /// <summary>
     /// 기준 시간
     /// </summary>
-    private static DateTime startedTime = DateTime.Now;
+    private static DateTime syncTime = DateTime.Now;
 
     /// <summary>
-    /// 프로그램이 시작한 이후 경과 시간(seconds)
+    /// 현재 시간
     /// </summary>
-    private static float realtimeSinceStartup = 0f;
+    public static DateTime NowTime => DateTime.Now.AddTicks(diffTick);
 
     /// <summary>
-    /// 경과 시간 업데이트 간격
+    /// UTC 시간 (KST + 9시간)
     /// </summary>
-    private const float realtimeSinceStartup_UpdateInterval = 0.1f;
-    public static DateTime NowTime
-    {
-        get
-        {
-            // 현재 로직 기준으로 프로그램이 멈추면 시간 오차가 발생할 수 있음.
-            // (기기 시간을 변경되어도 영향 안 받도록 작업한 부분)
-            return startedTime.AddSeconds(realtimeSinceStartup);
-        }
-    }
-
     public static DateTime UtcNowTime => NowTime.AddHours(9f);
 
     public static void Start()
     {
-        realtimeSinceStartup = 0f;
-        MultiThread.Start(() =>
+        Synchronization("https://upbit.com/");
+    }
+
+    /// <summary>
+    /// 동기화 시간 업데이트
+    /// </summary>
+    /// <param name="dateStr"></param>
+    public static void UpdateDateTime(string dateStr)
+    {
+        if (DateTime.TryParse(dateStr, out DateTime dateTime))
         {
-            const int UPDATE_INTERVAL = (int)(realtimeSinceStartup_UpdateInterval * 1000);
-            const float UPDATE_VALUE = UPDATE_INTERVAL / 1000f;
-            while (true)
-            {
-                Thread.Sleep(UPDATE_INTERVAL);
-                realtimeSinceStartup += UPDATE_VALUE;
-                //Logger.Log(realtimeSinceStartup);
-            }
-        });
+            syncTime = dateTime;
+            diffTick = (syncTime - DateTime.Now).Ticks;
+        }
+    }
+
+    /// <summary>
+    /// 서버 동기화 업데이트
+    /// </summary>
+    /// <param name="serverURL"></param>
+    public static async void Synchronization(string serverURL)
+    {
+        WebRequest request = WebRequest.Create(serverURL);
+        WebResponse response = await request.GetResponseAsync();
+
+        if (Array.Exists(response.Headers.AllKeys, headerKey => headerKey.Equals("Date")))
+            UpdateDateTime(response.Headers["Date"]);
     }
 }

@@ -150,7 +150,6 @@ public static class Utils
 	{
 		int startIndex = headerValue.IndexOf(variableName, 0, System.StringComparison.OrdinalIgnoreCase);
 		int endIndex = startIndex + variableName.Length;
-		string variable = headerValue.Substring(startIndex, variableName.Length);
 		string value = string.Empty;
 		for (int i = endIndex + 1; i < headerValue.Length; i++)
 		{
