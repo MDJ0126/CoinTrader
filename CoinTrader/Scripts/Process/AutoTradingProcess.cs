@@ -99,9 +99,9 @@ public static class AutoTradingProcess
                     // 조건 충족 매수 시작
                     if (isTargetPriceSuccess && isGoldenCross)
                     {
-                        bool isMinimumSuccess = marketInfo.buy_target_price >= 100f;
+                        bool isMinimumPriceSuccess = marketInfo.buy_target_price >= 100f;
                         var close_price_rate = (marketInfo.buy_target_price - marketInfo.trade_price) / marketInfo.trade_price;
-                        if (isMinimumSuccess && close_price_rate > 0.02f)
+                        if (isMinimumPriceSuccess && close_price_rate > 0.02f)
                         {
                             Logger.Log($"매수 시도 {marketInfo}");
                             await Buy(marketInfo.name, use_balance);
@@ -151,7 +151,30 @@ public static class AutoTradingProcess
     /// <param name="onFinished"></param>
     private static async Task Buy(string market, double price)
     {
-        await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "bid", "", price.ToString("R"), "price", "");
+        var res = await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "bid", "", price.ToString("R"), "price", "");
+        if (res != null && res.Count > 0)
+        {
+            bool isSuccess = false;
+            while (!isSuccess)
+            {
+                isSuccess = true;
+                for (int i = 0; i < res.Count; i++)
+                {
+                    var orderCheckRes = await ProtocolManager.GetHandler<HandlerOrderCheck>().Request(res[i].uuid);
+                    if (orderCheckRes != null)
+                    {
+                        for (int j = 0; j < orderCheckRes.Count; j++)
+                        {
+                            if (orderCheckRes[j].GetOrderState() != eOrderState.done)
+                            {
+                                isSuccess = false;
+                            }
+                        }
+                    }
+                }
+                await Task.Delay(2000);
+            }
+        }
         await ProtocolManager.GetHandler<HandlerAccount>().Request();
     }
 
@@ -163,7 +186,30 @@ public static class AutoTradingProcess
     /// <param name="onFinished"></param>
     private static async Task Sell(string market, double volume)
     {
-        await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "ask", volume.ToString("R"), "", "market", "");
+        var res = await ProtocolManager.GetHandler<HandlerOrders>().Request(market, "ask", volume.ToString("R"), "", "market", "");
+        if (res != null && res.Count > 0)
+        {
+            bool isSuccess = false;
+            while (!isSuccess)
+            {
+                isSuccess = true;
+                for (int i = 0; i < res.Count; i++)
+                {
+                    var orderCheckRes = await ProtocolManager.GetHandler<HandlerOrderCheck>().Request(res[i].uuid);
+                    if (orderCheckRes != null)
+                    {
+                        for (int j = 0; j < orderCheckRes.Count; j++)
+                        {
+                            if (orderCheckRes[j].GetOrderState() != eOrderState.done)
+                            {
+                                isSuccess = false;
+                            }
+                        }
+                    }
+                }
+                await Task.Delay(2000);
+            }
+        }
         await ProtocolManager.GetHandler<HandlerAccount>().Request();
     }
 

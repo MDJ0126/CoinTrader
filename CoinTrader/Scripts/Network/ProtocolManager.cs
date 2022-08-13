@@ -53,13 +53,16 @@ namespace Network
         private static void OnResponse(RestResponse res)
         {
             // 패킷을 받을 때, 헤더에 있는 시간을 찍어와서 서버 시간으로 동기화 처리
-            var enumerator = res.Headers.GetEnumerator();
-            while (enumerator.MoveNext())
+            if (res.Headers != null)
             {
-                var header = enumerator.Current;
-                if (header != null && header.Name.Equals("Date"))
+                var enumerator = res.Headers.GetEnumerator();
+                while (enumerator.MoveNext())
                 {
-                    Time.UpdateDateTime(header.Value.ToString());
+                    var header = enumerator.Current;
+                    if (header != null && header.Name.Equals("Date"))
+                    {
+                        Time.UpdateDateTime(header.Value.ToString());
+                    }
                 }
             }
         }
@@ -125,6 +128,27 @@ namespace Network
         /// <param name="parameters"></param>
         /// <returns></returns>
         public static string GetQueryString(Dictionary<string, string> parameters)
+        {
+            StringBuilder builder = new StringBuilder();
+            foreach (KeyValuePair<string, string> pair in parameters)
+            {
+                builder.Append(pair.Key).Append("=").Append(pair.Value).Append("&");
+            }
+
+            if (builder.Length > 0)
+            {
+                builder.Length = builder.Length - 1; // 마지막 &를 제거하기 위함.
+            }
+            return builder.ToString();
+        }
+
+        /// <summary>
+        /// 쿼리 스트링 만들기
+        /// key=value&key2=value...
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static string GetQueryString(List<KeyValuePair<string, string>> parameters)
         {
             StringBuilder builder = new StringBuilder();
             foreach (KeyValuePair<string, string> pair in parameters)

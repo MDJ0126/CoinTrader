@@ -103,39 +103,42 @@ namespace Network
         //- asc : 오름차순
         //- desc : 내림차순(default)
         /// <param name="onFinished"></param>
-        public async Task<List<HandlerOrderListRes>> Request(string market, string[] uuids, string[] identifiers, string state, string[] states, int page = 1, int limit = 100, string order_by = "desc")
+        public async Task<List<HandlerOrderListRes>> Request(string market, string[] uuids = null, string[] identifiers = null, string state = "done", string[] states = null, int page = 1, int limit = 100, string order_by = "desc")
         {
-            sb.Length = 0;
-            sb.Append(URI);
+            List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>();
             if (!string.IsNullOrEmpty(market))
-                sb.Append($"&market={market}");
-            if (uuids.Length > 0)
+                parameters.Add(new KeyValuePair<string, string>("market", market));
+
+            if (uuids != null && uuids.Length > 0)
             {
                 for (int i = 0; i < uuids.Length; i++)
                 {
-                    sb.Append($"&uuids={uuids[i]}");
+                    parameters.Add(new KeyValuePair<string, string>("uuids", uuids[i]));
                 }
             }
-            if (identifiers.Length > 0)
+            if (identifiers != null && identifiers.Length > 0)
             {
                 for (int i = 0; i < identifiers.Length; i++)
                 {
-                    sb.Append($"&identifiers={identifiers[i]}");
+                    parameters.Add(new KeyValuePair<string, string>("identifiers", identifiers[i]));
                 }
             }
             if (!string.IsNullOrEmpty(state))
                 sb.Append($"&state={state}");
-            if (states.Length > 0)
+            if (states != null && states.Length > 0)
             {
                 for (int i = 0; i < states.Length; i++)
                 {
-                    sb.Append($"&states={states[i]}");
+                    parameters.Add(new KeyValuePair<string, string>("states", states[i]));
                 }
             }
-            sb.Append($"page={page}");
-            sb.Append($"limit={limit}");
-            sb.Append($"order_by={order_by}");
-            RestRequest request = new RestRequest(sb.ToString(), Method);
+            parameters.Add(new KeyValuePair<string, string>("page", page.ToString()));
+            parameters.Add(new KeyValuePair<string, string>("limit", limit.ToString()));
+            parameters.Add(new KeyValuePair<string, string>("order_by", order_by));
+
+            var queryString = ProtocolManager.GetQueryString(parameters);
+            RestRequest request = new RestRequest(URI + queryString, Method);
+            request.AddHeader("Authorization", ProtocolManager.GetAuthToken(queryString));
             request.AddHeader("Accept", "application/json");
             await base.RequestProcess(request);
             return res;

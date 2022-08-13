@@ -102,6 +102,11 @@ namespace Network
         /// 체결 시각
         /// </summary>
         public string trades_created_at;
+
+        public eOrderState GetOrderState()
+        {
+            return Utils.FindEnumValue<eOrderState>(state);
+        }
     }
 
     public class HandlerOrderCheck : ProtocolHandler
@@ -122,7 +127,15 @@ namespace Network
         /// <param name="onFinished"></param>
         public async Task<List<HandlerOrderCheckRes>> Request(string uuid = "", string identifier = "")
         {
-            RestRequest request = new RestRequest(URI + $"uuid={uuid}&identifier={identifier}", Method);
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(uuid))
+                parameters.Add("uuid", uuid);
+            if (!string.IsNullOrEmpty(identifier))
+                parameters.Add("identifier", identifier);
+            
+            var queryString = ProtocolManager.GetQueryString(parameters);
+            RestRequest request = new RestRequest(URI + queryString, Method);
+            request.AddHeader("Authorization", ProtocolManager.GetAuthToken(queryString));
             request.AddHeader("Accept", "application/json");
             await base.RequestProcess(request);
             return res;

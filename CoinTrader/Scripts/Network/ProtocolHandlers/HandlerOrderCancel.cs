@@ -82,9 +82,17 @@ namespace Network
             this.Method = Method.Delete;
         }
 
-        public async Task<List<HandlerOrderCancelRes>> Request(string uuid, string identifier)
+        public async Task<List<HandlerOrderCancelRes>> Request(string uuid = "", string identifier = "")
         {
-            RestRequest request = new RestRequest(URI + $"&uuid={uuid}&identifier={identifier}", Method);
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(uuid))
+                parameters.Add("uuid", uuid);
+            if (!string.IsNullOrEmpty(identifier))
+                parameters.Add("identifier", identifier);
+            
+            var queryString = ProtocolManager.GetQueryString(parameters);
+            RestRequest request = new RestRequest(URI + queryString, Method);
+            request.AddHeader("Authorization", ProtocolManager.GetAuthToken(queryString));
             request.AddHeader("Accept", "application/json");
             await base.RequestProcess(request);
             return res;

@@ -142,9 +142,15 @@ namespace Network
             this.Method = Method.Get;
         }
 
-        public async Task<List<HandlerOrdersChanceRes>> Request()
+        public async Task<List<HandlerOrdersChanceRes>> Request(string market)
         {
-            RestRequest request = new RestRequest(URI, Method);
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(market))
+                parameters.Add("market", market);
+
+            var queryString = ProtocolManager.GetQueryString(parameters);
+            RestRequest request = new RestRequest(URI + queryString, Method);
+            request.AddHeader("Authorization", ProtocolManager.GetAuthToken(queryString));
             request.AddHeader("Accept", "application/json");
             await base.RequestProcess(request);
             return res;
