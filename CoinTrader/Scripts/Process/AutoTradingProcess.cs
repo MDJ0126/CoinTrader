@@ -37,6 +37,8 @@ public static class AutoTradingProcess
             double total_balance = 0d;
             // 매매에 사용할 투자 금액
             double use_balance = 0d;
+            // 거래 수수료
+            double fee = 0d;
 
             for (int i = 0; i < myAccounts.Count; i++)
             {
@@ -62,8 +64,10 @@ public static class AutoTradingProcess
             use_balance = total_balance * USE_BALANCE_RATE;
 
             use_balance = Math.Truncate(use_balance);
-
+            fee = use_balance * 0.0005f;
             bool isAvailableKRW = (total_balance - only_coin_balance) * USE_BALANCE_RATE >= use_balance && use_balance > 6000;
+
+            const float targetRevenue = 0.03f;  // 거래당 목표 수익률
 
             // 2. 예측 결과 6시간 중, 변동성 돌파가 있고, 골든 크로스인 경우 매수 시작
             if (myAccounts.Count < 2 && isAvailableKRW)   // 원화 + 코인이면 잔고 길이가 '2'이다.
@@ -73,17 +77,21 @@ public static class AutoTradingProcess
                 {
                     bool isTargetPriceSuccess = false;
                     bool isGoldenCross = false;
+                    bool isRevenueSuccess = false;
 
                     var marketInfo = marketInfos[i];
                     if (marketInfo != null && marketInfo.predictPrices != null && marketInfo.predictPrices.Count > 0)
                     {
                         if (marketInfo.buy_target_price > marketInfo.trade_price)
                         {
+                            double forecastedAverage = 0d;
+                            double forecastedTotal = 0d;
                             isTargetPriceSuccess = true;
                             for (int k = 0; k < marketInfo.predictPrices.Count; k++)
                             {
                                 if (k < 3)  // 앞으로 3시간 정도만 예측
                                 {
+                                    forecastedTotal += marketInfo.predictPrices[k].forecasted;
                                     if (marketInfo.trade_price > marketInfo.predictPrices[k].forecasted)
                                     {
                                         isTargetPriceSuccess = false;
@@ -91,23 +99,30 @@ public static class AutoTradingProcess
                                     }
                                 }
                                 else
+                                {
+                                    forecastedAverage = forecastedTotal / k;
+                                    if (forecastedAverage > targetRevenue)
+                                    {
+                                        isRevenueSuccess = true;
+                                    }
                                     break;
+                                }
                             }
+                            isGoldenCross = marketInfo.IsGoldenCross;
                         }
-                        isGoldenCross = marketInfo.IsGoldenCross;
-                    }
 
-                    // 조건 충족 매수 시작
-                    if (isTargetPriceSuccess && isGoldenCross)
-                    {
-                        bool isMinimumPriceSuccess = marketInfo.trade_price >= 100f;
-                        if (isMinimumPriceSuccess)
+                        // 조건 충족 매수 시작
+                        if (isTargetPriceSuccess && isGoldenCross && isRevenueSuccess)
                         {
-                            Logger.Log($"매수 시도 {marketInfo}");
-                            await Buy(marketInfo.name, use_balance);
-                            Logger.Log($"매수 완료 {marketInfo}");
-                            buyingTime = Time.NowTime;
-                            break;
+                            bool isMinimumPriceSuccess = marketInfo.trade_price >= 100f;
+                            if (isMinimumPriceSuccess)
+                            {
+                                Logger.Log($"매수 시도 {marketInfo}");
+                                await Buy(marketInfo.name, use_balance);
+                                Logger.Log($"매수 완료 {marketInfo}");
+                                buyingTime = Time.NowTime;
+                                break;
+                            }
                         }
                     }
                 }
@@ -125,9 +140,9 @@ public static class AutoTradingProcess
                             if (marketInfo.trade_price != 0d)
                             {
                                 var avg_buy_price_rate = (marketInfo.trade_price - myAccounts[i].avg_buy_price) / myAccounts[i].avg_buy_price;
-                                if (avg_buy_price_rate > 0.005f                      // +0.5%가 되거나
-                                    || avg_buy_price_rate < -0.02f                  // -2%가 되거나
-                                    || buyingTime.AddHours(3f) < Time.NowTime)      // 6시간이 지났을 경우 매도
+                                if (avg_buy_price_rate > targetRevenue              // 목표 수익률 도달이거나
+                                    || avg_buy_price_rate < -targetRevenue          // 잃거나
+                                    || buyingTime.AddHours(3f) < Time.NowTime)      // 3시간이 지났을 경우 매도
                                 {
                                     Logger.Log($"매도 시도 {marketInfo}");
                                     await Sell($"KRW-{myAccounts[i].currency}", myAccounts[i].balance);
