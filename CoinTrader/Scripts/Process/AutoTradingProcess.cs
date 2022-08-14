@@ -89,7 +89,7 @@ public static class AutoTradingProcess
                             isTargetPriceSuccess = true;
                             for (int k = 0; k < marketInfo.predictPrices.Count; k++)
                             {
-                                if (k < 3)  // 앞으로 3시간 정도만 예측
+                                if (k < 1)  // 앞으로 1시간 정도만 예측
                                 {
                                     forecastedTotal += marketInfo.predictPrices[k].forecasted;
                                     if (marketInfo.trade_price > marketInfo.predictPrices[k].forecasted)
@@ -142,7 +142,7 @@ public static class AutoTradingProcess
                                 var avg_buy_price_rate = (marketInfo.trade_price - myAccounts[i].avg_buy_price) / myAccounts[i].avg_buy_price;
                                 if (avg_buy_price_rate > targetRevenue              // 목표 수익률 도달이거나
                                     || avg_buy_price_rate < -targetRevenue          // 잃거나
-                                    || buyingTime.AddHours(3f) < Time.NowTime)      // 3시간이 지났을 경우 매도
+                                    || buyingTime.AddHours(1f) < Time.NowTime)      // 3시간이 지났을 경우 매도
                                 {
                                     Logger.Log($"매도 시도 {marketInfo}");
                                     await Sell($"KRW-{myAccounts[i].currency}", myAccounts[i].balance);
