@@ -91,7 +91,7 @@ public class MarketInfo
         prev_closing_price = candlesDaysLatest30[candlesDaysLatest30.Count - 1].prev_closing_price;
         movingAverage_15 = GetMovingAverage(15);
         movingAverage_30 = GetMovingAverage(30);
-        buy_target_price = GetTargetPrice(0.3f);
+        buy_target_price = GetTargetPrice(0.5f);
     }
 
     /// <summary>
