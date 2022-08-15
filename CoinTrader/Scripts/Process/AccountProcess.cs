@@ -13,6 +13,7 @@ public static class AccountUpdater
         if (!isStarted)
         {
             isStarted = true;
+            isRequestStop = false;
             Process();
         }
     }

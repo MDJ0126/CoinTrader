@@ -18,6 +18,7 @@ public static class DeeplearningProcess
         if (!isStarted)
         {
             isStarted = true;
+            isRequestStop = false;
             Process();
         }
     }

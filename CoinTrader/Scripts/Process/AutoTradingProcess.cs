@@ -13,6 +13,7 @@ public static class AutoTradingProcess
         if (!isStarted)
         {
             isStarted = true;
+            isRequestStop = false;
             Process();
         }
     }
