@@ -134,9 +134,4 @@ public class MarketInfo
     {
         return $"{name}, {korean_name}, 현재가: {trade_price:N0}";
     }
-
-    internal void ResetDay()
-    {
-        throw new NotImplementedException();
-    }
 }

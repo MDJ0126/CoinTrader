@@ -68,7 +68,7 @@ public static class AutoTradingProcess
             fee = use_balance * 0.0005f;
             bool isAvailableKRW = (total_balance - only_coin_balance) * USE_BALANCE_RATE >= use_balance && use_balance > 6000;
 
-            const float targetRevenue = 0.03f;  // 거래당 목표 수익률
+            const float targetRevenue = 0.02f;  // 거래당 목표 수익률
 
             // 2. 예측 결과 6시간 중, 변동성 돌파가 있고, 골든 크로스인 경우 매수 시작
             if (myAccounts.Count < 2 && isAvailableKRW)   // 원화 + 코인이면 잔고 길이가 '2'이다.
