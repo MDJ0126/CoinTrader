@@ -100,7 +100,7 @@ public class MarketModel
     /// <returns></returns>
     public MarketInfo GetMarketInfo(string market)
     {
-        if (market.Length <= 4)
+        if (!market.Contains("-"))
         {
             var enumerator = markets.GetEnumerator();
             while (enumerator.MoveNext())
