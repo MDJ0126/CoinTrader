@@ -7,6 +7,8 @@ public static class AutoTradingProcess
     private static bool isStarted = false;
     private static bool isRequestStop = false;
     private static DateTime buyingTime = Time.NowTime;
+    private static string[] mainCoin = { "BTC", "ETH", "BCH", "ETC", "BTG" };
+    private static string[] altCoin = { "AAVE", "BSV", "SOL", "AVAX", "STRK" };
 
     public static void Start()
     {
@@ -30,6 +32,7 @@ public static class AutoTradingProcess
 
         var myAccounts = ModelCenter.Account.Accounts;
         var marketInfos = ModelCenter.Market.GetMarketInfos(eMarketType.KRW);
+
         while (!isRequestStop)
         {
             // 총 평가 (순수 코인만)
@@ -81,48 +84,55 @@ public static class AutoTradingProcess
                     bool isRevenueSuccess = false;
 
                     var marketInfo = marketInfos[i];
-                    if (marketInfo != null && marketInfo.predictPrices != null && marketInfo.predictPrices.Count > 0)
+                    if (marketInfo != null)
                     {
-                        if (marketInfo.buy_target_price > marketInfo.trade_price)
+                        bool isContainCoin = Array.Exists(mainCoin, name => marketInfo.name.Contains(name)) || Array.Exists(altCoin, name => marketInfo.name.Contains(name));
+                        if (isContainCoin)
                         {
-                            double forecastedAverage = 0d;
-                            double forecastedTotal = 0d;
-                            isTargetPriceSuccess = true;
-                            for (int k = 0; k < marketInfo.predictPrices.Count; k++)
+                            if (marketInfo.predictPrices != null && marketInfo.predictPrices.Count > 0)
                             {
-                                if (k < 3)  // 앞으로 3시간 정도만 예측
+                                if (marketInfo.buy_target_price > marketInfo.trade_price)
                                 {
-                                    forecastedTotal += marketInfo.predictPrices[k].forecasted;
-                                    if (marketInfo.trade_price > marketInfo.predictPrices[k].forecasted)
+                                    double forecastedAverage = 0d;
+                                    double forecastedTotal = 0d;
+                                    isTargetPriceSuccess = true;
+                                    for (int k = 0; k < marketInfo.predictPrices.Count; k++)
                                     {
-                                        isTargetPriceSuccess = false;
+                                        if (k < 3)  // 앞으로 3시간 정도만 예측
+                                        {
+                                            forecastedTotal += marketInfo.predictPrices[k].forecasted;
+                                            if (marketInfo.trade_price > marketInfo.predictPrices[k].forecasted)
+                                            {
+                                                isTargetPriceSuccess = false;
+                                                break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            forecastedAverage = forecastedTotal / k;
+                                            if (forecastedAverage > targetRevenue)
+                                            {
+                                                isRevenueSuccess = true;
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    isGoldenCross = marketInfo.IsGoldenCross;
+                                }
+
+                                // 조건 충족 매수 시작
+                                if (isTargetPriceSuccess && isGoldenCross && isRevenueSuccess)
+                                {
+                                    bool isMinimumPriceSuccess = marketInfo.trade_price >= 100f;
+                                    if (isMinimumPriceSuccess)
+                                    {
+                                        Logger.Log($"매수 시도 {marketInfo}");
+                                        await Buy(marketInfo.name, use_balance);
+                                        Logger.Log($"매수 완료 {marketInfo}");
+                                        buyingTime = Time.NowTime;
                                         break;
                                     }
                                 }
-                                else
-                                {
-                                    forecastedAverage = forecastedTotal / k;
-                                    if (forecastedAverage > targetRevenue)
-                                    {
-                                        isRevenueSuccess = true;
-                                    }
-                                    break;
-                                }
-                            }
-                            isGoldenCross = marketInfo.IsGoldenCross;
-                        }
-
-                        // 조건 충족 매수 시작
-                        if (isTargetPriceSuccess && isGoldenCross && isRevenueSuccess)
-                        {
-                            bool isMinimumPriceSuccess = marketInfo.trade_price >= 100f;
-                            if (isMinimumPriceSuccess)
-                            {
-                                Logger.Log($"매수 시도 {marketInfo}");
-                                await Buy(marketInfo.name, use_balance);
-                                Logger.Log($"매수 완료 {marketInfo}");
-                                buyingTime = Time.NowTime;
-                                break;
                             }
                         }
                     }
@@ -155,7 +165,7 @@ public static class AutoTradingProcess
                 }
             }
 
-            await Task.Delay(10);
+            await Task.Delay(1000);
         }
     }
 
