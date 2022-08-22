@@ -7,8 +7,8 @@ public static class AutoTradingProcess
     private static bool isStarted = false;
     private static bool isRequestStop = false;
     private static DateTime buyingTime = Time.NowTime;
-    private static string[] mainCoin = { "BTC", "ETH", "BCH", "ETC", "BTG" };
-    private static string[] altCoin = { "AAVE", "BSV", "SOL", "AVAX", "STRK" };
+    private static string[] mainCoin = { "BTC", "ETH", "ETC" };
+    private static string[] altCoin = { /*"AAVE", "BSV", "BCH", "SOL", "AVAX", "BTG", "STRK"*/ };
 
     public static void Start()
     {
