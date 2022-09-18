@@ -33,7 +33,7 @@ namespace CoinTrader
                 Logger.Start();
 
                 // 폼 실행
-                Application.Run(new LoadingForm());
+                Application.Run(new LoginForm());
 
                 // 종료
                 MultiThread.Release();
