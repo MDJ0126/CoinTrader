@@ -1,5 +1,8 @@
 ﻿using System.Threading.Tasks;
 
+/// <summary>
+/// 잔고 업데이터
+/// </summary>
 public static class AccountUpdater
 {
     public delegate void UpdateAccount(double price);

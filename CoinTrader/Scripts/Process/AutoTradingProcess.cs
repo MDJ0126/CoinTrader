@@ -2,6 +2,9 @@
 using System;
 using System.Threading.Tasks;
 
+/// <summary>
+/// 자동 거래 프로세스
+/// </summary>
 public static class AutoTradingProcess
 {
     private static bool isStarted = false;

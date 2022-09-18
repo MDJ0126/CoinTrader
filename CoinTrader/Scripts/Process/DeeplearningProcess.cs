@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+/// <summary>
+/// 딥러닝 프로세스 (머신 러닝)
+/// </summary>
 public static class DeeplearningProcess
 {
     public static Action<MarketInfo> onUpdateMarketInfo = null;
