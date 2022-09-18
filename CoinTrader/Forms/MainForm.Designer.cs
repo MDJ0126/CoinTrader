@@ -51,6 +51,7 @@ namespace CoinTrader.Forms
             this.timeLabel = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.startAutoTradeButton = new MetroFramework.Controls.MetroButton();
             ((System.ComponentModel.ISupportInitialize)(this.metroStyleManager)).BeginInit();
             this.metroTabControl1.SuspendLayout();
             this.mainTabPage.SuspendLayout();
@@ -245,11 +246,22 @@ namespace CoinTrader.Forms
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(139, 17);
             this.toolStripStatusLabel1.Text = "로그 내용이 들어가는 곳";
             // 
+            // startAutoTradeButton
+            // 
+            this.startAutoTradeButton.Location = new System.Drawing.Point(1000, 26);
+            this.startAutoTradeButton.Name = "startAutoTradeButton";
+            this.startAutoTradeButton.Size = new System.Drawing.Size(177, 59);
+            this.startAutoTradeButton.TabIndex = 8;
+            this.startAutoTradeButton.Text = "자동 거래 시작";
+            this.startAutoTradeButton.UseSelectable = true;
+            this.startAutoTradeButton.Click += new System.EventHandler(this.startAutoTradeButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1200, 600);
+            this.Controls.Add(this.startAutoTradeButton);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.metroTabControl1);
@@ -293,6 +305,7 @@ namespace CoinTrader.Forms
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private MetroFramework.Controls.MetroButton startAutoTradeButton;
     }
 }
 

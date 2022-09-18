@@ -15,7 +15,7 @@ public static class Config
     /// </summary>
     public static DateTime ExpireAt = DateTime.MinValue;
     /// <summary>
-    /// 테스트 모드 (가계정을 만들어서 구매 테스트)
+    /// 자동 거래 시작 여부
     /// </summary>
-    public static bool isTestMode = true;
+    public static bool isStartedAutoTrade = false;
 }

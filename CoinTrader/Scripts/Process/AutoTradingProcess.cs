@@ -12,11 +12,14 @@ public static class AutoTradingProcess
 
     public static void Start()
     {
-        if (!isStarted)
+        if (Config.isStartedAutoTrade)
         {
-            isStarted = true;
-            isRequestStop = false;
-            Process();
+            if (!isStarted)
+            {
+                isStarted = true;
+                isRequestStop = false;
+                Process();
+            }
         }
     }
 

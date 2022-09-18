@@ -286,5 +286,18 @@ namespace CoinTrader.Forms
         {
             Application.Exit();
         }
+
+        private void startAutoTradeButton_Click(object sender, EventArgs e)
+        {
+            Config.isStartedAutoTrade = !Config.isStartedAutoTrade;
+            AccountUpdater.Stop();
+            AccountUpdater.Start();
+            UpdateStartAutoTradeButtonUI();
+        }
+
+        private void UpdateStartAutoTradeButtonUI()
+        {
+            startAutoTradeButton.Enabled = !Config.isStartedAutoTrade;
+        }
     }
 }
